@@ -1,0 +1,3 @@
+Run the code/script: 
+- Open project folder in Command Prompt
+- run this command: python funds.eastmoney.py

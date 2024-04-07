@@ -1,0 +1,4 @@
+Scrapy==2.5.0
+selenium==3.141.0
+pandas
+requests
