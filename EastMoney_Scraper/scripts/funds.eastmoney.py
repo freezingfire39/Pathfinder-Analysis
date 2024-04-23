@@ -19,8 +19,8 @@ def take_input(csv_name):
    # Loop until valid input is provided by the user.
    while True:
       # Prompt the user to enter 'y' or 'n' to indicate their choice.
-      word = input(f"> Scrape {csv_name}.csv? (y/n): ")
-      
+      # word = input(f"> Scrape {csv_name}.csv? (y/n): ")
+      word = "y"
       # Check if the input is either 'y' or 'n'.
       if word.lower() == "y" or word.lower() == "n":
          # Break the loop if the input is valid.
