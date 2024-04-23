@@ -26,7 +26,7 @@ default_args = {
     'owner': 'app',
     'depends_on_past': False,
     # 'start_date': airflow.utils.dates.days_ago(1),
-    'start_date': datetime(year=2024, month=2, day=22, hour=0, minute=0, tzinfo=local_tz),
+    'start_date': datetime(year=2024, month=4, day=23, hour=0, minute=0, tzinfo=local_tz),
     'email': ['None'],
     'email_on_failure': False,
     'email_on_retry': False,
