@@ -26,7 +26,7 @@ default_args = {
     'owner': 'app',
     'depends_on_past': False,
     # 'start_date': airflow.utils.dates.days_ago(1),
-    'start_date': datetime(year=2024, month=2, day=1, hour=0, minute=0, tzinfo=local_tz),
+    'start_date': datetime(year=2024, month=2, day=22, hour=0, minute=0, tzinfo=local_tz),
     'email': ['None'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -128,3 +128,14 @@ python_op_1 = PythonOperator(
     dag=dag
 )
 
+python_op_2 = PythonOperator(
+    task_id='funds.eastmoney',
+    python_callable=python_script,
+    provide_context=True,
+    trigger_rule='all_success',
+    op_kwargs={'script_name':home + '/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts'
+                                    '/funds.eastmoney.py', 'params': ' '},
+    dag=dag
+)
+
+python_op_2.set_upstream(python_op_1)
