@@ -111,13 +111,13 @@ def initialize_configuration(**ctx):
     logging.info(now)
     logging.info(now.timestamp())
 
-# python_op_0 = PythonOperator(
-#     task_id='initialize_configuration',
-#     python_callable=initialize_configuration,
-#     provide_context=True,
-#     trigger_rule='all_success',
-#     op_kwargs={},
-#     dag=dag)
+python_op_0 = PythonOperator(
+    task_id='initialize_configuration',
+    python_callable=initialize_configuration,
+    provide_context=True,
+    trigger_rule='all_success',
+    op_kwargs={},
+    dag=dag)
 
 python_op_1 = PythonOperator(
     task_id='task_completed',
@@ -138,4 +138,4 @@ python_op_2 = PythonOperator(
     dag=dag
 )
 
-python_op_2.set_upstream(python_op_1)
+python_op_2.set_upstream(python_op_0)
