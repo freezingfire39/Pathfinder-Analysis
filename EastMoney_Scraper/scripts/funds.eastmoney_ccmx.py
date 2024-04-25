@@ -14,7 +14,8 @@ from selenium.webdriver.chrome.options import Options # Options class to configu
 from selenium.webdriver.common.by import By # By class to locate elements by different strategies
 from selenium.webdriver.support.ui import WebDriverWait # WebDriverWait class to wait for a certain condition to occur before proceeding
 from selenium.webdriver.support import expected_conditions as EC # EC provides a set of predefined conditions to wait until satisfied
-
+from pathlib import Path
+home = str(Path.home())
 # # Record the starting time of the program
 # start_time = time.time()
 
@@ -194,7 +195,7 @@ def botInitialization():
    prefs = {"profile.managed_default_content_settings.images": 2}
    chromeOptions.add_experimental_option("prefs", prefs)
    
-   chromePath = "chromedriver.exe" # Path to the Chrome driver executable
+   chromePath = home + "/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/chromedriver.exe" # Path to the Chrome driver executable
    driver = webdriver.Chrome(executable_path=chromePath, options=chromeOptions) # Initialize the Chrome driver
    driver.maximize_window() # Maximize the window
    return driver # Return the driver object
