@@ -6,7 +6,8 @@
 
 3) Download chromedriver according to your OS and Chrome Version(Check in Settings > About) from 
    this link: https://chromedriver.chromium.org/downloads
-
+https://storage.googleapis.com/chrome-for-testing-public/124.0.6367.91/linux64/chrome-linux64.zip
+https://storage.googleapis.com/chrome-for-testing-public/124.0.6367.91/linux64/chromedriver-linux64.zip
 4) Unzip chromedriver file. Copy and Paste chromedriver file in the same folder as the script/code/bot.
 
 Let me know in case of any issues or queries.
