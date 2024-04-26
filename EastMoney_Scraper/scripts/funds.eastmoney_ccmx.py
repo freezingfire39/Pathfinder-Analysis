@@ -195,7 +195,7 @@ def botInitialization():
    prefs = {"profile.managed_default_content_settings.images": 2}
    chromeOptions.add_experimental_option("prefs", prefs)
    
-   chromePath = home + "/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/chromedriver.exe" # Path to the Chrome driver executable
+   chromePath = home + "/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/chromedriver" # Path to the Chrome driver executable
    driver = webdriver.Chrome(executable_path=chromePath, options=chromeOptions) # Initialize the Chrome driver
    driver.maximize_window() # Maximize the window
    return driver # Return the driver object
