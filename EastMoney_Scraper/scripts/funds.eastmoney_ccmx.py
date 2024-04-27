@@ -186,6 +186,12 @@ def botInitialization():
    # Initialize the Bot
    chromeOptions = Options()
    chromeOptions.binary_location = home + "/Desktop/chrome-linux64/chrome"
+   chromeOptions.add_argument("--no-sandbox")  # Bypass OS security model
+   chromeOptions.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
+   chromeOptions.add_argument("--headless")  # Run in headless mode, if necessary
+   chromeOptions.add_argument("--enable-logging")
+   chromeOptions.add_argument("--v=1")  # Verbose level for logging
+
    chromeOptions.add_argument("start-maximized")
    chromeOptions.add_experimental_option("excludeSwitches", ["enable-automation"])
    chromeOptions.add_experimental_option("excludeSwitches", ["enable-logging"])
