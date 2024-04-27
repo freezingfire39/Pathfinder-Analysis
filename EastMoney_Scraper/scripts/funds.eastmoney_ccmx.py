@@ -185,6 +185,7 @@ print("\n\n\n> Records with desired data table extracted successfully.")
 def botInitialization():
    # Initialize the Bot
    chromeOptions = Options()
+   chromeOptions.binary_location = home + "/Desktop/chrome-linux64/chrome"
    chromeOptions.add_argument("start-maximized")
    chromeOptions.add_experimental_option("excludeSwitches", ["enable-automation"])
    chromeOptions.add_experimental_option("excludeSwitches", ["enable-logging"])
