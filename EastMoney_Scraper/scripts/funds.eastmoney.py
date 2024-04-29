@@ -612,9 +612,9 @@ class scrapySpider(scrapy.Spider):
    # Define a method to save data to CSV files based on the record and data provided 
    def save_data(self, record, data, csv_name, first_time=False):
       # Save data into folder named after the record
-      # outputPath = home + "/Desktop/output_china"
-      folder_name = os.path.join(os.path.dirname(__file__), record)
-      # folder_name = os.path.join(outputPath, record)
+      outputPath = home + "/Desktop/output_china"
+      # folder_name = os.path.join(os.path.dirname(__file__), record)
+      folder_name = os.path.join(outputPath, record)
 
       # Save data to Fund_1.csv
       if csv_name == "Fund_1":
@@ -752,7 +752,8 @@ def process_folder(folder):
 # Define the main function
 def main():
    # Get a list of all folders in the current directory
-   folders = [folder for folder in os.listdir() if os.path.isdir(folder)]
+   outputPath = home + "/Desktop/output_china"
+   folders = [folder for folder in os.listdir(outputPath) if os.path.isdir(os.path.join(outputPath, folder))]
    
    # Process folders concurrently using ThreadPoolExecutor
    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
