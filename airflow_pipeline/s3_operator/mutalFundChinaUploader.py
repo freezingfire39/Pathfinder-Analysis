@@ -12,18 +12,24 @@ bucket_name = 'mutal-fund-china-01'        # S3 bucket to upload to
 def upload_files(directory, bucket_name):
     s3 = boto3.client('s3')
     try:
-        for filename in os.listdir(directory):
-            if os.path.isfile(os.path.join(directory, filename)):
-                local_path = os.path.join(directory, filename)
-                s3.upload_file(local_path, bucket_name, filename)
-                print(f"Uploaded {filename} to {bucket_name}")
+        # Walk through the directory
+        for subdir, dirs, files in os.walk(directory): # travel dir tree
+            for filename in files:
+                # Construct the full local path
+                local_path = os.path.join(subdir, filename)
+                # Construct the full path for S3
+                relative_path = os.path.relpath(local_path, directory)
+                s3.upload_file(local_path, bucket_name, relative_path)
+                print(f"Uploaded {relative_path} to {bucket_name}")
     except NoCredentialsError:
         print("Credentials not available")
     except Exception as e:
         print(str(e))
 
 
-def main():
+def main(uploadFilePath=None):
+    if uploadFilePath != None:
+        directory_path = uploadFilePath
     upload_files(directory_path, bucket_name)
     pass
 if __name__ == "__main__":
@@ -34,7 +40,7 @@ if __name__ == "__main__":
     try:
         # main()
         uploadFilePath = sys.argv[1]
-        main()
+        main(uploadFilePath)
     except Exception as e:
         raise AirflowException("fail to run at error ", e)
     # main()
