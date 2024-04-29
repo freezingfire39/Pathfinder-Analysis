@@ -141,7 +141,7 @@ python_op_2 = BashOperator(
     task_id='funds.eastmoney',
     trigger_rule='all_success',
     # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
-    bash_command='python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
+    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
 )
 # python_op_21 = BashOperator(
 #     task_id='funds.eastmoney_ccmx',

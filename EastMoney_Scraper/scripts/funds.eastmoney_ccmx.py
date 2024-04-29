@@ -210,9 +210,9 @@ def botInitialization():
 # Define a function to save data to a CSV file
 def save_data(record, data):
    # Save data into folder named after the record
-   outputPath = home + "/Desktop/output_china"
-   # folder_name = os.path.join(os.path.dirname(__file__), record)
-   folder_name = os.path.join(outputPath, record)
+   # outputPath = home + "/Desktop/output_china"
+   folder_name = os.path.join(os.path.dirname(__file__), record)
+   # folder_name = os.path.join(outputPath, record)
 
    # Open or create a Holdings.csv file inside the folder
    holdings_csv = open(f'{folder_name}/Holdings.csv', 'w', newline='', encoding="utf-8-sig")
