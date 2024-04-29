@@ -10,7 +10,8 @@ import concurrent.futures # Concurrent futures module for parallel execution of 
 from datetime import datetime # Datetime module for handling date and time
 import logging # Logging module for logging errors and messages
 from time import sleep # Sleep function to pause the execution of the program
-
+from pathlib import Path
+home = str(Path.home())
 # Record the starting time of the program
 # start_time = time.time()
 
@@ -611,7 +612,9 @@ class scrapySpider(scrapy.Spider):
    # Define a method to save data to CSV files based on the record and data provided 
    def save_data(self, record, data, csv_name, first_time=False):
       # Save data into folder named after the record
-      folder_name = os.path.join(os.path.dirname(__file__), record)
+      outputPath = home + "/Desktop/output_china"
+      # folder_name = os.path.join(os.path.dirname(__file__), record)
+      folder_name = os.path.join(outputPath, record)
 
       # Save data to Fund_1.csv
       if csv_name == "Fund_1":

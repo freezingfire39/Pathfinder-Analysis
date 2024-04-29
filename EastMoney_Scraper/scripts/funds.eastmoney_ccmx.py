@@ -185,7 +185,7 @@ print("\n\n\n> Records with desired data table extracted successfully.")
 def botInitialization():
    # Initialize the Bot
    chromeOptions = Options()
-   chromeOptions.binary_location = home + "/Desktop/chrome-linux64/chrome"
+   # chromeOptions.binary_location = home + "/Desktop/chrome-linux64/chrome" # chrome binary location
    chromeOptions.add_argument("--no-sandbox")  # Bypass OS security model
    chromeOptions.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
    chromeOptions.add_argument("--headless")  # Run in headless mode, if necessary
@@ -210,7 +210,9 @@ def botInitialization():
 # Define a function to save data to a CSV file
 def save_data(record, data):
    # Save data into folder named after the record
-   folder_name = os.path.join(os.path.dirname(__file__), record)
+   outputPath = home + "/Desktop/output_china"
+   # folder_name = os.path.join(os.path.dirname(__file__), record)
+   folder_name = os.path.join(outputPath, record)
 
    # Open or create a Holdings.csv file inside the folder
    holdings_csv = open(f'{folder_name}/Holdings.csv', 'w', newline='', encoding="utf-8-sig")
