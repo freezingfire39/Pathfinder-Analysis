@@ -26,7 +26,7 @@ default_args = {
     'owner': 'app',
     'depends_on_past': False,
     # 'start_date': airflow.utils.dates.days_ago(1),
-    'start_date': datetime(year=2024, month=4, day=23, hour=0, minute=0, tzinfo=local_tz),
+    # 'start_date': datetime(year=2024, month=4, day=23, hour=0, minute=0, tzinfo=local_tz),
     'email': ['None'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -34,7 +34,7 @@ default_args = {
 }
 
 dag = DAG(
-    'daily_running-ny0_00', default_args=default_args,
+    'daily_running-funds.eastmoney', default_args=default_args,
     user_defined_filters= {'localtz': localize_ny_tz}
     # schedule_interval='0 0 * * *'
     # schedule_interval=timedelta(days=1)
