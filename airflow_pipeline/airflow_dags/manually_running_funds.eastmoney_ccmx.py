@@ -143,12 +143,18 @@ python_op_1 = PythonOperator(
 #     # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
 #     bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
 # )
-python_op_21 = BashOperator(
+# python_op_21 = BashOperator(
+#     task_id='funds.eastmoney_ccmx',
+#     trigger_rule='all_success',
+#     dag=dag,
+#     bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney_ccmx.py'
+# )
+python_op_22 = BashOperator(
     task_id='funds.eastmoney_ccmx',
     trigger_rule='all_success',
-    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney_ccmx.py'
+    dag=dag,
+    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/funds.eastmoney_ccmx_linux.py'
 )
-
 # python_op_2.set_upstream(python_op_0)
 python_op_21.set_upstream(python_op_0)
 
