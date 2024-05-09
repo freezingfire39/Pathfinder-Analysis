@@ -16,6 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait # WebDriverWait class to
 from selenium.webdriver.support import expected_conditions as EC # EC provides a set of predefined conditions to wait until satisfied
 from selenium.webdriver.chrome.service import Service # Service class to manage the ChromeDriver server 
 from webdriver_manager.chrome import ChromeDriverManager # ChromeDriverManager class to install the ChromeDriver
+from selenium.webdriver.chrome.service import Service
 
 # # Record the starting time of the program
 # start_time = time.time()
@@ -208,7 +209,8 @@ def botInitialization():
    # options.add_argument('--headless')
    # options.add_argument('--no-sandbox')
    options.add_argument('--disable-dev-shm-usage')
-   driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+   service=Service(ChromeDriverManager().install())
+   driver = webdriver.Chrome(service=service, options=options)
    return driver
 
 # Define a function to save data to a CSV file
