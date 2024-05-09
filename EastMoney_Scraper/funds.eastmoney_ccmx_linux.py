@@ -210,7 +210,7 @@ def botInitialization():
    # options.add_argument('--no-sandbox')
    options.add_argument('--disable-dev-shm-usage')
    service=Service(ChromeDriverManager().install())
-   driver = webdriver.Chrome(service=service, options=options)
+   driver = webdriver.Chrome(ChromeDriverManager.install(), options=options)
    return driver
 
 # Define a function to save data to a CSV file
