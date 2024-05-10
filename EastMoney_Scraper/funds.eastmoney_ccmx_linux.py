@@ -16,7 +16,7 @@ from selenium.webdriver.support.ui import WebDriverWait # WebDriverWait class to
 from selenium.webdriver.support import expected_conditions as EC # EC provides a set of predefined conditions to wait until satisfied
 from selenium.webdriver.chrome.service import Service # Service class to manage the ChromeDriver server 
 from webdriver_manager.chrome import ChromeDriverManager # ChromeDriverManager class to install the ChromeDriver
-from webdriver_manager.utils import ChromeType
+from webdriver_manager.core.os_manager import ChromeType
 
 # # Record the starting time of the program
 # start_time = time.time()
