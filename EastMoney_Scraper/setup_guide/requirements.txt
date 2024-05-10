@@ -1,5 +1,6 @@
 Scrapy==2.5.0
-selenium==3.141.0
+//selenium==3.141.0
+selenium==4.1.0
 pandas
 requests
 pyopenssl==22.0.0
