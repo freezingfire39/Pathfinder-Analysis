@@ -17,6 +17,8 @@ from selenium.webdriver.support import expected_conditions as EC # EC provides a
 from selenium.webdriver.chrome.service import Service # Service class to manage the ChromeDriver server 
 from webdriver_manager.chrome import ChromeDriverManager # ChromeDriverManager class to install the ChromeDriver
 from webdriver_manager.core.os_manager import ChromeType
+from pathlib import Path
+home = str(Path.home())
 
 # # Record the starting time of the program
 # start_time = time.time()
@@ -210,8 +212,10 @@ def botInitialization():
    # options.add_argument('--no-sandbox')
    options.add_argument('--disable-dev-shm-usage')
    # service=Service(ChromeDriverManager().install())
-   service = Service(executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
-   driver = webdriver.Chrome(service, options=options)
+   # service = Service(executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
+   # driver = webdriver.Chrome(service, options=options)
+   chromePath = home + "/Desktop/chromedriver-linux64/chromedriver"  # Path to the Chrome driver executable
+   driver = webdriver.Chrome(executable_path=chromePath, options=options)  # Initialize the Chrome driver
    return driver
 
 # Define a function to save data to a CSV file
