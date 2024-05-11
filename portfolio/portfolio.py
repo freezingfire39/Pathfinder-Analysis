@@ -1,4 +1,4 @@
-import utils.method
+import utils.enums
 import os
 from typing import List
 import pandas as pd
@@ -23,14 +23,15 @@ class Fund:
 
 class Portfolio:
 
-    def __init__(self, amount: float, eft_tags: List[str], method: utils.method.Method, fdir: str):
+    def __init__(self, amount: float, eft_tags: List[str], fdir: str):
         self.tot_amount = amount
         self.etf_symbols = eft_tags
         self.fdir = fdir
-        self.portfolio = dict()
+        self._portfolio = dict()
+        self._size = 0
 
     def is_valid(self) -> bool:
-        return self._is_valid_symbol() and self._is_valid_amount() and self._is_valid_method()
+        return self._is_valid_symbol() and self._is_valid_amount()
 
     def _is_valid_symbol(self) -> bool:
 
@@ -47,7 +48,14 @@ class Portfolio:
         return Fund(symbol)
 
     def load(self):
+        self._size = len(self.etf_symbols)
         for symbol in self.etf_symbols:
             fund = self.read_symbol(symbol)
             fund.load(self.fdir)
-            self.portfolio[symbol] = fund
+            self._portfolio[symbol] = fund
+
+    def get_portfolio(self) -> dict:
+        return self._portfolio
+
+    def get_size(self) -> int:
+        return self._size
