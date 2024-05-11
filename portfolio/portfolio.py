@@ -27,8 +27,9 @@ class Portfolio:
         self.tot_amount = amount
         self.etf_symbols = eft_tags
         self.fdir = fdir
-        self._portfolio = dict()
+        self._funds = dict()
         self._size = 0
+        self._weights = dict()
 
     def is_valid(self) -> bool:
         return self._is_valid_symbol() and self._is_valid_amount()
@@ -52,10 +53,10 @@ class Portfolio:
         for symbol in self.etf_symbols:
             fund = self.read_symbol(symbol)
             fund.load(self.fdir)
-            self._portfolio[symbol] = fund
+            self._funds[symbol] = fund
 
-    def get_portfolio(self) -> dict:
-        return self._portfolio
+    def get_funds(self) -> dict:
+        return self._funds
 
     def get_size(self) -> int:
         return self._size

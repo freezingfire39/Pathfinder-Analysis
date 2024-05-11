@@ -17,7 +17,7 @@ class EquallyWeightedOptimizer(PortfolioOptimizer):
 
     def optimize_portfolio(self, portfolio: Portfolio):
         # Implement equally weighted optimization logic
-        return {key:self.capital/portfolio.get_size() for key in portfolio.get_portfolio().keys()}
+        return {key:self.capital/portfolio.get_size() for key in portfolio.get_funds().keys()}
 
 class MinimalVolatilityOptimizer(PortfolioOptimizer):
     def optimize_portfolio(self, portfolio):
