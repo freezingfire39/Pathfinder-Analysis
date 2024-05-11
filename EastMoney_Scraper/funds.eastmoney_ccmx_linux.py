@@ -211,6 +211,7 @@ def botInitialization():
    # options.add_argument('--headless')
    # options.add_argument('--no-sandbox')
    options.add_argument('--disable-dev-shm-usage')
+   options.binary_location = home + "/Desktop/chrome-linux64/chrome"
    # service=Service(ChromeDriverManager().install())
    # service = Service(executable_path=ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install())
    # driver = webdriver.Chrome(service, options=options)
