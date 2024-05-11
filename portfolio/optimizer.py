@@ -1,14 +1,23 @@
 from abc import ABC, abstractmethod
 
+from portfolio.portfolio import Portfolio
+
+
 class PortfolioOptimizer(ABC):
+
+    def __init__(self, capital):
+        self.capital = capital
     @abstractmethod
-    def optimize_portfolio(self, portfolio):
+    def optimize_portfolio(self, portfolio: Portfolio):
         pass
 
 class EquallyWeightedOptimizer(PortfolioOptimizer):
-    def optimize_portfolio(self, portfolio):
+    def __init__(self, capital):
+        super().__init__(capital)
+
+    def optimize_portfolio(self, portfolio: Portfolio):
         # Implement equally weighted optimization logic
-        pass
+        return {key:self.capital/portfolio.get_size() for key in portfolio.get_portfolio().keys()}
 
 class MinimalVolatilityOptimizer(PortfolioOptimizer):
     def optimize_portfolio(self, portfolio):
