@@ -50,5 +50,36 @@ class MinimalVolatilityOptimizer(PortfolioOptimizer):
         pass
 
 class MaxSharpeRatioOptimizer(PortfolioOptimizer):
-    def optimize_portfolio(self, portfolio):
-        # Implement max Sharpe ratio optimization logic
+    def __init__(self, capital, funds_data, risk_free_rate=0.0):
+        super().__init__(capital)
+        self._funds_data = funds_data
+        self._risk_free_rate = risk_free_rate
+
+    def optimize_portfolio(self, funds):
+        num_funds = len(funds)
+        returns = self._calculate_returns()
+
+        initial_allocation = np.ones(num_funds) / num_funds  # Equal allocation initially
+
+        mean_returns = np.mean(returns, axis=0)
+        cov_matrix = np.cov(returns, rowvar=False)
+
+        def negative_sharpe_ratio(weights):
+            portfolio_return = np.dot(weights, mean_returns)
+            portfolio_volatility = np.sqrt(np.dot(weights.T, np.dot(cov_matrix, weights)))
+            sharpe_ratio = (portfolio_return - self._risk_free_rate) / portfolio_volatility
+            return -sharpe_ratio
+
+        # constraints: weights sum to 1
+        constraints = ({'type': 'eq', 'fun': lambda x: np.sum(x) - 1})
+
+        # bounds for weights: 0 <= weights <= 1
+        bounds = tuple((0, 1) for _ in range(num_funds))
+        optimized_weights = minimize(negative_sharpe_ratio, initial_allocation, method='SLSQP', bounds=bounds, constraints=constraints).x
+
+        allocated_money = self.capital * optimized_weights
+
+        return list(zip(funds, allocated_money))
+
+    def _calculate_returns(self):
+        pass
