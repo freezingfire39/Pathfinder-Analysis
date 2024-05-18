@@ -104,7 +104,7 @@ if __name__ == '__main__':
 
     optimizer = fac.create(enums.OptimizerType.MIN_VOLATILITY, portfolio=p)
     optimizer.optimize_portfolio()
-    print(p.weights)
+
     
 
 
