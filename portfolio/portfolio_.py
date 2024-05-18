@@ -2,6 +2,7 @@ import utils.enums
 import os
 from typing import List
 import pandas as pd
+import json
 
 class Fund:
     def __init__(self, name: str):
@@ -50,6 +51,9 @@ class Portfolio:
         self._funds = dict()
         self._size = 0
         self._weights = dict()
+
+    def __repr__(self):
+        return json.dumps(self.portfolio.weights)
 
     def is_valid(self) -> bool:
         return self._is_valid_symbol() and self._is_valid_amount()
