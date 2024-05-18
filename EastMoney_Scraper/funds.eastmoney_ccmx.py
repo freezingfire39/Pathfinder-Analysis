@@ -14,8 +14,8 @@ from selenium.webdriver.chrome.options import Options # Options class to configu
 from selenium.webdriver.common.by import By # By class to locate elements by different strategies
 from selenium.webdriver.support.ui import WebDriverWait # WebDriverWait class to wait for a certain condition to occur before proceeding
 from selenium.webdriver.support import expected_conditions as EC # EC provides a set of predefined conditions to wait until satisfied
-from selenium.webdriver.chrome.service import Service # Service class to manage the ChromeDriver server 
-from webdriver_manager.chrome import ChromeDriverManager # ChromeDriverManager class to install the ChromeDriver
+# from selenium.webdriver.chrome.service import Service # Service class to manage the ChromeDriver server 
+# from webdriver_manager.chrome import ChromeDriverManager # ChromeDriverManager class to install the ChromeDriver
 
 # # Record the starting time of the program
 # start_time = time.time()
@@ -88,6 +88,7 @@ sleep(2) # Pause for 2 seconds
 
 # Initialize a list to store those records that has desired data table
 table_records = []
+# table_records = ["000001"]
 
 # Define a class named scrapySpider which inherits from scrapy.Spider
 class scrapySpider(scrapy.Spider):
@@ -205,10 +206,11 @@ print("\n\n\n> Records with desired data table extracted successfully.")
 # Define a function to initialize the bot, by setting up the Chrome driver
 def botInitialization():
    options = Options()
+   options.add_argument('--no-sandbox')
    options.add_argument('--headless')
-   # options.add_argument('--no-sandbox')
    options.add_argument('--disable-dev-shm-usage')
-   driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
+   
+   driver = webdriver.Chrome('PATH_HERE/chromedriver', chrome_options = options)
    return driver
 
 # Define a function to save data to a CSV file
