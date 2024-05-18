@@ -54,7 +54,7 @@ class MinimalVolatilityOptimizer(PortfolioOptimizer):
 
         allocated_money = self.portfolio.tot_amount * optimized_weights
 
-        weights = { num_funds[i]: allocated_money[i]  for i in range(num_funds)}
+        weights = { self.portfolio.etf_symbols[i]: allocated_money[i]  for i in range(num_funds)}
         self.portfolio.set_weights(weights)
 
 class MaxSharpeRatioOptimizer(PortfolioOptimizer):
@@ -86,7 +86,7 @@ class MaxSharpeRatioOptimizer(PortfolioOptimizer):
         optimized_weights = minimize(negative_sharpe_ratio, initial_allocation, method='SLSQP', bounds=bounds, constraints=constraints).x
 
         allocated_money = self.portfolio.tot_amount * optimized_weights
-        weights = {num_funds[i]: allocated_money[i] for i in range(num_funds)}
+        weights = {self.portfolio.etf_symbols[i]: allocated_money[i] for i in range(num_funds)}
         self.portfolio.set_weights(weights)
 
 
@@ -104,4 +104,7 @@ if __name__ == '__main__':
 
     optimizer = fac.create(enums.OptimizerType.MIN_VOLATILITY, portfolio=p)
     optimizer.optimize_portfolio()
+    print(p.weights)
+    
+
 
