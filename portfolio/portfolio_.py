@@ -12,9 +12,6 @@ class Fund:
         self.returns = None
         self.industry = None
 
-    def __repr__(self):
-        pass
-
     def load(self, directory: str):
         self._load_background(directory)
         # self._load_holdings(directory)
@@ -50,10 +47,10 @@ class Portfolio:
         self.fdir = fdir
         self._funds = dict()
         self._size = 0
-        self._weights = dict()
+        self._weights = list()
 
     def __repr__(self):
-        return json.dumps(self.portfolio.weights)
+        return json.dumps(self._weights)
 
     def is_valid(self) -> bool:
         return self._is_valid_symbol() and self._is_valid_amount()
@@ -80,14 +77,23 @@ class Portfolio:
             fund.load(self.fdir)
             self._funds[symbol] = fund
 
-    def get_funds(self) -> dict[str, Fund]:
+    @property
+    def funds(self) -> dict[str, Fund]:
         return self._funds
 
-    def get_size(self) -> int:
+    @property
+    def size(self):
         return self._size
 
-    def set_weights(self, weights: dict[str, float]):
-        self.weights = weights
+    @property
+    def weights(self):
+        return self._weights
+
+    @weights.setter
+    def weights(self, weights: dict[str, float]):
+        self._weights = weights
+
+
 
 
 if __name__ == '__main__':
