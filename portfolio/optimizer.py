@@ -23,7 +23,7 @@ class PortfolioOptimizer(ABC):
             else:
                 merged_df = merged_df.join(sym_return.rename(columns={'return': symbol}), how='outer')
 
-        return merged_df
+        return merged_df.dropna()
 
 class EquallyWeightedOptimizer(PortfolioOptimizer):
 
@@ -71,7 +71,7 @@ class MaxSharpeRatioOptimizer(PortfolioOptimizer):
 
     def optimize_portfolio(self):
         # check funds 1 year history
-        num_funds = self.portfolio.size()
+        num_funds = self.portfolio.size
         returns = self._calculate_returns()
 
         initial_allocation = np.ones(num_funds) / num_funds  # Equal allocation initially
@@ -101,7 +101,7 @@ class MaxSharpeRatioOptimizer(PortfolioOptimizer):
 
 if __name__ == '__main__':
     from factory import OptimizerFactory
-
+    from analyzer import *
     from portfolio.utils import enums
     fac = OptimizerFactory()
     fac.register_optimizer(enums.OptimizerType.EQUAL_WEIGHT, EquallyWeightedOptimizer)
@@ -111,11 +111,15 @@ if __name__ == '__main__':
     p = Portfolio(1e6, eft_tags=['000001','000003'],fdir=fdir)
     p.load()
 
-    optimizer = fac.create(enums.OptimizerType.MIN_VOLATILITY, portfolio=p)
+    optimizer = fac.create(enums.OptimizerType.MAX_SHARPE_RATIO, portfolio=p)
     optimizer.optimize_portfolio()
 
     print(p)
+    p.calc_historical_returns()
+    analyzer = Analyzer(p)
+    analyzer.rolling_sharpe()
+    analyzer.sharpe()
 
-    
+
 
 
