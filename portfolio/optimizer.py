@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+from typing import List, Dict, Any
+
 import numpy as np
 import pandas as pd
 from scipy.optimize import minimize
@@ -15,7 +17,7 @@ class PortfolioOptimizer(ABC):
     def _calculate_returns(self):
         merged_df = None
         for symbol in self.portfolio.etf_symbols:
-            sym_return = self.portfolio.get_funds()[symbol].get_returns()
+            sym_return = self.portfolio.funds[symbol].get_returns()
             if merged_df is None:
                 merged_df = sym_return.rename(columns={'return': symbol})
             else:
@@ -27,12 +29,15 @@ class EquallyWeightedOptimizer(PortfolioOptimizer):
 
     def optimize_portfolio(self):
         # Implement equally weighted optimization logic
-        return {key:self.portfolio.tot_amount/self.portfolio.get_size() for key in self.portfolio.get_funds().keys()}
+        weights: list[dict[str, str | Any]] = [dict(fund=self.portfolio.etf_symbols[i],
+                                                    weight=1/self.portfolio.size,
+                                                    amount=self.portfolio.tot_amount/self.portfolio.size) for i in range(self.portfolio.size)]
+        return weights
 
 class MinimalVolatilityOptimizer(PortfolioOptimizer):
     def optimize_portfolio(self):
         # Implement minimal volatility optimization logic
-        num_funds = self.portfolio.get_size()
+        num_funds = self.portfolio.size
         initial_allocation = np.ones(num_funds) / num_funds  # Equal allocation initially
         returns =self._calculate_returns()
         returns.dropna(inplace=True)
@@ -54,8 +59,10 @@ class MinimalVolatilityOptimizer(PortfolioOptimizer):
 
         allocated_money = self.portfolio.tot_amount * optimized_weights
 
-        weights = { self.portfolio.etf_symbols[i]: allocated_money[i]  for i in range(num_funds)}
-        self.portfolio.set_weights(weights)
+        weights: list[dict[str, str | Any]] = [dict(fund=self.portfolio.etf_symbols[i],
+                                                    weight=optimized_weights[i],
+                                                    amount=allocated_money[i]) for i in range(num_funds)]
+        self.portfolio.weights = weights
 
 class MaxSharpeRatioOptimizer(PortfolioOptimizer):
     def __init__(self, portfolio: Portfolio, risk_free_rate=0.0):
@@ -64,7 +71,7 @@ class MaxSharpeRatioOptimizer(PortfolioOptimizer):
 
     def optimize_portfolio(self):
         # check funds 1 year history
-        num_funds = self.portfolio.get_size()
+        num_funds = self.portfolio.size()
         returns = self._calculate_returns()
 
         initial_allocation = np.ones(num_funds) / num_funds  # Equal allocation initially
@@ -86,8 +93,10 @@ class MaxSharpeRatioOptimizer(PortfolioOptimizer):
         optimized_weights = minimize(negative_sharpe_ratio, initial_allocation, method='SLSQP', bounds=bounds, constraints=constraints).x
 
         allocated_money = self.portfolio.tot_amount * optimized_weights
-        weights = {self.portfolio.etf_symbols[i]: allocated_money[i] for i in range(num_funds)}
-        self.portfolio.set_weights(weights)
+        weights: list[dict[str, str | Any]] = [ dict(fund = self.portfolio.etf_symbols[i],
+                                                     weight=optimized_weights[i],
+                                                     amount=allocated_money[i]) for i in range(num_funds)]
+        self.portfolio.weights = weights
 
 
 if __name__ == '__main__':
