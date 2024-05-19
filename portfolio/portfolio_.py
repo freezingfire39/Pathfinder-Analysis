@@ -1,3 +1,5 @@
+import numpy as np
+
 import utils.enums
 import os
 from typing import List
@@ -48,6 +50,7 @@ class Portfolio:
         self._funds = dict()
         self._size = 0
         self._weights = list()
+        self.returns = pd.DataFrame()
 
     def __repr__(self):
         return json.dumps(self._weights)
@@ -93,6 +96,24 @@ class Portfolio:
     def weights(self, weights: dict[str, float]):
         self._weights = weights
 
+
+    def _calculate_returns(self):
+        merged_df = None
+        for symbol in self.etf_symbols:
+            sym_return = self.funds[symbol].get_returns()
+            if merged_df is None:
+                merged_df = sym_return.rename(columns={'return': symbol})
+            else:
+                merged_df = merged_df.join(sym_return.rename(columns={'return': symbol}), how='outer')
+
+        return merged_df.dropna()
+
+    def calc_historical_returns(self):
+        if len(self.weights) == 0:
+            return
+        weight_vector = np.array([ item["weight"] for item in self._weights])
+        returns = self._calculate_returns().dot((weight_vector.reshape(-1, 1)))
+        self.returns = returns.rename(columns={0:"return"})
 
 
 
