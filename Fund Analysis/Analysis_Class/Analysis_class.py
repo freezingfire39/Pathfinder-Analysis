@@ -684,6 +684,13 @@ def market_capture_ratio(returns, returns_daily, rolling_window=90):
 def corr_analysis(returns,comp, security_code):
     comp[security_code] = returns['累计净值']
     corr_df = comp.corr(method='pearson')
+    corr_df_2=corr_df.drop([security_code],axis=1)
+    if "510050.SS" in comp.columns:
+        returns['index_peers']=0
+        returns['index_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
+    else:
+        returns['industry_peers']=0
+        returns['industry_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
     #reset symbol as index (rather than 0-X)
     corr_df.head().reset_index()
     plt.figure(figsize=(13, 8))
@@ -691,6 +698,7 @@ def corr_analysis(returns,comp, security_code):
     plt.figure()
     corr_df = corr_df[security_code].drop(corr_df[security_code].idxmax())
     print (corr_df)
+
     comp_1_name = corr_df.idxmax()
     comp_2_name = corr_df.idxmin()
     returns['positive_comp'] = 0
