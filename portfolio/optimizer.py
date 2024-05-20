@@ -111,14 +111,17 @@ if __name__ == '__main__':
     p = Portfolio(1e6, eft_tags=['000001','000003'],fdir=fdir)
     p.load()
 
-    optimizer = fac.create(enums.OptimizerType.MAX_SHARPE_RATIO, portfolio=p)
+    optimizer = fac.create(enums.OptimizerType.MIN_VOLATILITY, portfolio=p)
     optimizer.optimize_portfolio()
 
     print(p)
     p.calc_historical_returns()
     analyzer = Analyzer(p)
-    analyzer.rolling_sharpe()
-    analyzer.sharpe()
+    print(analyzer.rolling_sharpe())
+    print(analyzer.rolling_volatility())
+    print(analyzer.max_drawdown())
+
+
 
 
 
