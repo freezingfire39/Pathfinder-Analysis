@@ -14,16 +14,27 @@ import seaborn
 from matplotlib.ticker import FuncFormatter
 import utils
 
-def rolling_sharpe(returns, risk_free_rate=0.0, window=60):
+def rolling_sharpe(returns, rank_file_path,security_code,risk_free_rate=0.0, window=250):
 
     returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     returns['rolling_SR'].plot()
     if returns['rolling_SR'][-1] < (returns['return'].mean()/returns['return'].std())-0.1:
         print ("This fund's has performed below its historical average in the last 6 months.")
+        #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
     elif returns['rolling_SR'][-1] > (returns['return'].mean()/returns['return'].std())+0.1:
         print ("This fund's has performed below its historical average in the last 6 months.")
+        #print ("本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。")
     else:
         print ("This fund's has performed inline with its historical average in the last 6 months.")
+        #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
+        
+    rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_rank.csv').set_index('Unnamed: 0')
+    if returns['rolling_SR'][-1] > 0.8:
+
+        new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
+        
     return returns
 
 
@@ -220,7 +231,7 @@ def get_top_drawdowns(returns, top=10):
     return drawdowns
 
 
-def gen_drawdown_table(returns, top=10):
+def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
     """
     Places top drawdowns in a table.
 
@@ -279,13 +290,34 @@ def gen_drawdown_table(returns, top=10):
     returns['drawdown_duration'][-1] = df_drawdowns['Duration'].max()
     returns['drawdown_amount'][-1] = df_drawdowns['Net drawdown in %'].max()
     print (returns.tail(10))
-    if df_drawdowns['Duration'].mean()>300:
+    if df_drawdowns['Duration'].mean()>400:
         print ("compare to industry average, this security has longer drawdowns")
+        #print ("本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。")
+    elif df_drawdowns['Duration'].mean()<300:
+        print ("compare to industry average, this security has shorter drawdowns")
+        #print ("本基金的回撤时间小于类似产品的平均，意味着在亏损的时候会需要更少的时间回到原点。")
+    else:
+        print ("This security's drawdown duration is inline with industry average")
+        #print ("本基金的回撤时间与类似产品的平均基本一致。")
+        
+    rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
+    if returns['drawdown_duration'][-1] < 300:
 
+        new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
+        
+    rank_file = pd.read_csv(rank_file_path+'drawdown_amount_rank.csv').set_index('Unnamed: 0')
+    if returns['drawdown_amount'][-1] < 0.2:
+
+        new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
+        
     return returns
     
-def max_drawdown_analysis(returns):
-    returns = gen_drawdown_table(returns)
+def max_drawdown_analysis(returns, rank_file_path,security_code):
+    returns = gen_drawdown_table(returns, rank_file_path,security_code)
     plot_drawdown_underwater(returns)
     return returns
     
@@ -543,7 +575,7 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
 def event_analysis(returns):
     create_interesting_times_tear_sheet(returns)
 
-def alpha_beta_analysis(returns, comp, window=90):
+def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=90):
 
     returns['alpha'] = 0
     returns['alpha'] = returns['alpha'].astype('float64')
@@ -581,13 +613,47 @@ def alpha_beta_analysis(returns, comp, window=90):
     
     if returns['alpha'][-1]>0.1:
         print ("This fund has outperformed the benchmark")
+        #print ("本基金对比基准指数取得了较明显的超额收益")
+    elif returns['alpha'][-1]<-0.1:
+        print ("This fund has outperformed the benchmark")
+        #print ("本基金对比基准指数有较明显的超额亏损")
     else:
         print ("This fund has not outperformed the benchmark")
+        #print ("本基金回报对比指数基本一致")
+    if returns['beta'][-1]>1.2:
+        print ("This fund is considerably more volatile than the benchmark")
+        #print ("本基金对比基准指数有更高的波动率")
+    elif returns['beta'][-1]<-1.2:
+        print ("This fund is considerably less volatile than the market")
+        #print ("本基金对比基准指数有较低的波动率")
+    else:
+        print ("This fund's volatilty is in line with benchmark")
+        #print ("本基金对比基准指数的波动率基本一致)
+    rank_file = pd.read_csv(rank_file_path+'alpha_rank.csv').set_index('Unnamed: 0')
+    if returns['alpha'][-1] > 0.1:
+
+        new_row = {'ticker': security_code, 'value': returns['alpha'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'alpha_rank.csv')
+        
+    rank_file = pd.read_csv(rank_file_path+'positive_beta_rank.csv').set_index('Unnamed: 0')
+    if returns['beta'][-1] > 1.5:
+
+        new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
+        
+    rank_file = pd.read_csv(rank_file_path+'negative_beta_rank.csv').set_index('Unnamed: 0')
+    if returns['beta'][-1] < 0.:
+
+        new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'negative_beta_rank.csv')
     
     
     return returns
 
-def market_capture_ratio(returns, returns_daily, rolling_window=90):
+def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,rolling_window=90):
     """
     Function to calculate the upside and downside capture for a given set of returns.
     The function is set up so that the investment's returns are in the first column of the dataframe
@@ -626,17 +692,23 @@ def market_capture_ratio(returns, returns_daily, rolling_window=90):
     if df_mkt_capture['Upside Capture'][0]>1 and df_mkt_capture['Downside Capture'][0]>1:
         if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Upside Capture'][0]>0:
             print ("This fund moves more than the index. However, it is able to generate more gains in a up market than loss in a down market, makes it a better choice than the index. ")
+            #print ("本基金在基准指数上行和下行的时候能经历了更大的波动，但在上行的时候取得的超额收益大于下行时候的超额亏损，表现整体高于了基准指数。")
         else:
             print ("This fund moves more than the index, but it suffers more loss in a down market than gains in a up market, make the index a better choice. ")
+            #print ("本基金在基准指数上行和下行的时候能经历了更大的波动，但在上行的时候取得的超额收益小于下行时候的超额亏损，表现整体弱于基准指数。")
     elif df_mkt_capture['Upside Capture'][0]>1 and df_mkt_capture['Downside Capture'][0]<1:
         print ("This fund makes more money in a up market and loses less money in a down market. ")
+        #print ("本基金在基准指数上行的时候取得了更高的超额收益，但在基金指数下行的时候经历了较低的亏损，表现显著高于了基准指数。")
     elif df_mkt_capture['Upside Capture'][0]<1 and df_mkt_capture['Downside Capture'][0]>1:
         print ("This fund makes less money in a up market and loses more money in a down market. ")
+        #print ("本基金在基准指数上行的时候取得了更低的超额收益，但在基金指数下行的时候经历了更大的亏损，表现显著低于了基准指数。")
     else:
         if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Upside Capture'][0]>0:
             print ("This fund moves less than the index. However, it is able to generate more gains in a up market than loss in a down market, makes it a better choice than the index.")
+            #print ("本基金在基准指数上行和下行的时候能经历了更小的波动，但在上行的时候取得的超额收益大于下行时候的超额亏损，表现整体优于基准指数。")
         else:
             print ("This fund moves less than the index, but it suffers more loss in a down market than gains in a up market, make the index a better choice. ")
+            #print ("本基金在基准指数上行和下行的时候能经历了更小的波动，但在上行的时候取得的超额收益小于下行时候的超额亏损，表现整体弱于基准指数。")
     
     returns_daily['Upside_Capture_mean']=0
     returns_daily['Downside_Capture_mean']=0
@@ -674,134 +746,376 @@ def market_capture_ratio(returns, returns_daily, rolling_window=90):
         returns_daily['Upside_Capture'][i] = df_mkt_capture['Upside Capture'][0]
         returns_daily['Downside_Capture'][i] = df_mkt_capture['Downside Capture'][0]
     
+    rank_file = pd.read_csv(rank_file_path+'upside_capture_rank.csv').set_index('Unnamed: 0')
+    if returns_daily['Upside_Capture'][-1] > 30:
+
+        new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'upside_capture_rank.csv')
     
     
-    
-    
+    rank_file = pd.read_csv(rank_file_path+'downside_capture_rank.csv').set_index('Unnamed: 0')
+    if returns_daily['Downside_Capture'][-1] < 15:
+
+        new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
+            
     return returns_daily
 
 
-def corr_analysis(returns,comp, security_code):
+def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2):
+    security_code = str(security_code)
+    
     comp[security_code] = returns['累计净值']
     corr_df = comp.corr(method='pearson')
-    corr_df_2=corr_df.drop([security_code],axis=1)
-    if "510050.SS" in comp.columns:
-        returns['index_peers']=0
-        returns['index_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
-    else:
-        returns['industry_peers']=0
-        returns['industry_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
+    print (corr_df)
     #reset symbol as index (rather than 0-X)
+
+    corr_df_2=corr_df.drop([security_code],axis=1)
+    
     corr_df.head().reset_index()
     plt.figure(figsize=(13, 8))
     seaborn.heatmap(corr_df, annot=True, cmap='RdYlGn')
     plt.figure()
     corr_df = corr_df[security_code].drop(corr_df[security_code].idxmax())
     print (corr_df)
-
     comp_1_name = corr_df.idxmax()
     comp_2_name = corr_df.idxmin()
+
+    if "510050.SS" in comp.columns:
+        returns['index_peers']=0
+        returns['index_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
+
+        
+    else:
+        returns['industry_peers']=0
+        returns['industry_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
+        
+        
     returns['positive_comp'] = 0
     returns['negative_comp'] = 0
     returns['positive_comp'] = returns['positive_comp'].astype(str)
     returns['negative_comp'] = returns['negative_comp'].astype(str)
-    if corr_df[comp_1_name] > 0.8:
+    if corr_df[comp_1_name] > 0.9:
         ##save comp_1_name
         if comp_1_name=="510050.SS":
             print ("This etf correlates with A50")
+            #print ("本基金与中证50（大盘股）有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'A50.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'A50.csv')
+                
         elif comp_1_name=="159901.SZ":
             print ("This etf correlates with Shenzhen 100")
+            #print ("本基金与深圳100（深A大盘股）有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Shenzhen100.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Shenzhen100.csv')
+            
+            
         elif comp_1_name=="159949.SZ":
             print ("This etf correlates with Chuangye 50")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Chuangye50.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Chuangye50.csv')
+                
+            #print ("本基金与创业板有较强的相关性。")
         elif comp_1_name=="510300.SS":
             print ("This etf correlates with Hushen 300")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Hushen300.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Hushen300.csv')
+            
+            #print ("本基金与沪深300有较强的相关性。")
         elif comp_1_name=="510500.SS":
             print ("This etf correlates with Zhongzheng 500")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Zhongzheng500.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Zhongzheng500.csv')
+            
+            #print ("本基金与中证500（中盘股）有较强的相关性。")
         elif comp_1_name=="512100.SS":
             print ("This etf correlates with Zhongzheng 1000")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Zhongzheng1000.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Zhongzheng1000.csv')
+            
+            #print ("本基金与中证1000（小盘股）有较强的相关性。")
         elif comp_1_name=="588000.SS":
             print ("This etf correlates with Kechuang 50")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Kechuang50.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Kechuang50.csv')
+            
+            #print ("本基金与科创板有较强的相关性。")
         elif comp_1_name=="510900.SS":
             print ("This etf correlates with Hang Seng Index")
+            #print ("本基金与香港恒生指数有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Hangseng.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Hangseng.csv')
+            
             
         elif comp_1_name=="510230.SS":
             print ("This etf correlates with Finance Sector")
+            #print ("本基金与金融板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Finance.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Finance.csv')
+            
+            
         elif comp_1_name=="512010.SS":
             print ("This etf correlates with Pharmaceutical Sector")
+            #print ("本基金与医药板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Pharmaceutical.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Pharmaceutical.csv')
+                
         elif comp_1_name=="512170.SS":
             print ("This etf correlates with Healthcare Sector")
+            #print ("本基金与医疗板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Healthcare.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Healthcare.csv')
+                
         elif comp_1_name=="515170.SS":
             print ("This etf correlates with Food & Beverage Sector")
+            #print ("本基金与食品饮料板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'FoodBeverage.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'FoodBeverage.csv')
+            
+            
         elif comp_1_name=="516160.SS":
             print ("This etf correlates with Energy Sector")
+            #print ("本基金与能源板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Energy.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Energy.csv')
+            
+            
         elif comp_1_name=="512480.SS":
             print ("This etf correlates with Semiconductor")
+            #print ("本基金与半导体板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Semiconductor.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Semiconductor.csv')
+            
         elif comp_1_name=="515230.SS":
             print ("This etf correlates with Software")
+            #print ("本基金与软件板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Software.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Software.csv')
+            
+            
         elif comp_1_name=="512660.SS":
             print ("This etf correlates with Military")
+            #print ("本基金与军工板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Military.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Military.csv')
+            
         elif comp_1_name=="516220.SS":
             print ("This etf correlates with Chemicals")
+            #print ("本基金与化工板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Chemicals.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Chemicals.csv')
+            
+            
         elif comp_1_name=="516800.SS":
             print ("This etf correlates with Manufacturing")
+            #print ("本基金与制造业板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Manufacturing.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Manufacturing.csv')
+                
+            
         elif comp_1_name=="512400.SS":
             print ("This etf correlates with Metal")
+            #print ("本基金与有色金属板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Metal.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Metal.csv')
+            
+            
         elif comp_1_name=="159825.SZ":
             print ("This etf correlates with Agriculture")
+            #print ("本基金与农业板块有较强的相关性。")
+            
+            rank_file = pd.read_csv(rank_file_path_2+'Agriculture.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Agriculture.csv')
+                
+                
         elif comp_1_name=="516950.SS":
             print ("This etf correlates with Infrastructure")
+            #print ("本基金与基建板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Infrastructure.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Infrastructure.csv')
+            
         elif comp_1_name=="516070.SS":
             print ("This etf correlates with Environmental")
-    if corr_df[comp_2_name] < -0.8:
+            #print ("本基金与环保板块有较强的相关性。")
+            rank_file = pd.read_csv(rank_file_path_2+'Environmental.csv').set_index('Unnamed: 0')
+            if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
+
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                rank_file.loc[len(rank_file)] = new_row
+                rank_file.to_csv(rank_file_path_2+'Environmental.csv')
+            
+            
+    if corr_df[comp_2_name] < -0.9:
         ##save comp_2_name
         if comp_1_name=="510050.SS":
             print ("This etf negatively correlates with A50")
+            #print ("本基金与中证50（大盘股）有较强的负相关性。")
         elif comp_1_name=="159901.SZ":
             print ("This etf negatively correlates with Shenzhen 100")
+            #print ("本基金与深圳100（深A大盘股）有较强的负相关性。")
         elif comp_1_name=="159949.SZ":
             print ("This etf negatively correlates with Chuangye 50")
+            #print ("本基金与创业板有较强的负相关性。")
         elif comp_1_name=="510500.SS":
             print ("This etf negatively correlates with Hushen 300")
+            #print ("本基金与沪深300有较强的负相关性。")
         elif comp_1_name=="512100.SS":
             print ("This etf negatively correlates with Zhongzheng 500")
+            #print ("本基金与中证500（中盘股）有较强的负相关性。")
         elif comp_1_name=="512100.SS":
             print ("This etf negatively correlates with Zhongzheng 1000")
+            #print ("本基金与中证1000（小盘股）有较强的负相关性。")
         elif comp_1_name=="512100.SS":
             print ("This etf negatively correlates with Kechuang 50")
+            #print ("本基金与科创板有较强的负相关性。")
         elif comp_1_name=="510900.SS":
             print ("This etf negatively correlates with Hang Seng Index")
+            #print ("本基金与香港恒生指数有较强的负相关性。")
             
         elif comp_1_name=="510230.SS":
             print ("This etf negatively correlates with Finance Sector")
+            #print ("本基金与金融板块有较强的负相关性。")
         elif comp_1_name=="512010.SS":
             print ("This etf negatively correlates with Pharmaceutical Sector")
+            #print ("本基金与医药板块有较强的负相关性。")
         elif comp_1_name=="512170.SS":
             print ("This etf negatively correlates with Healthcare Sector")
+            #print ("本基金与医疗板块有较强的负相关性。")
         elif comp_1_name=="515170.SS":
             print ("This etf negatively correlates with Food & Beverage Sector")
+            #print ("本基金与食品饮料板块有较强的负相关性。")
         elif comp_1_name=="516160.SS":
             print ("This etf negatively correlates with Energy Sector")
+            #print ("本基金与能源板块有较强的负相关性。")
         elif comp_1_name=="512480.SS":
             print ("This etf negatively correlates with Semiconductor")
+            #print ("本基金与半导体板块有较强的负相关性。")
         elif comp_1_name=="515230.SS":
             print ("This etf negatively correlates with Software")
+            #print ("本基金与软件板块有较强的相关性。")
         elif comp_1_name=="512660.SS":
             print ("This etf negatively correlates with Military")
+            #print ("本基金与军工板块有较强的负相关性。")
         elif comp_1_name=="516220.SS":
             print ("This etf negatively correlates with Chemicals")
+            #print ("本基金与化工板块有较强的负相关性。")
         elif comp_1_name=="516800.SS":
             print ("This etf negatively correlates with Manufacturing")
+            #print ("本基金与制造业板块有较强的负相关性。")
         elif comp_1_name=="512400.SS":
             print ("This etf negatively correlates with Metal")
+            #print ("本基金与有色金属板块有较强的负相关性。")
         elif comp_1_name=="159825.SZ":
             print ("This etf negatively correlates with Agriculture")
+            #print ("本基金与农业板块有较强的负相关性。")
         elif comp_1_name=="516950.SS":
             print ("This etf negatively correlates with Infrastructure")
+            #print ("本基金与基建板块有较强的负相关性。")
         elif comp_1_name=="516070.SS":
             print ("This etf negatively correlates with Environmental")
+            #print ("本基金与环保板块有较强的负相关性。")
         
     else:
         print ("No clear correlation")
+        #print ("本基金投资风格较多元。")
     returns['positive_comp'][-1] = comp_1_name
     returns['negative_comp'][-1] = comp_2_name
     print (returns['negative_comp'][-1])
@@ -813,7 +1127,7 @@ def corr_analysis(returns,comp, security_code):
 
 
 
-def rolling_volatility(returns, comp, rolling_vol_window=90):
+def rolling_volatility(returns, comp, rank_file_path,security_code,rolling_vol_window=90):
     """
     Determines the rolling volatility of a strategy.
 
@@ -844,23 +1158,75 @@ def rolling_volatility(returns, comp, rolling_vol_window=90):
             df_drop.append(i)
     comp = comp.drop(df_drop, axis=0)
     comp = comp.pct_change()
+
     returns['vol'] = returns['return'].rolling(rolling_vol_window).std() \
         * np.sqrt(250)
     returns['comp_vol'] = comp.rolling(rolling_vol_window).std() \
         * np.sqrt(250)
     if returns['vol'].mean() > 1.2*returns['comp_vol'].mean():
         print ('The fund is more volatile than index.')
+        #print ("本基金的波动率显著高于基准指数。")
     elif returns['vol'].mean() < 0.8*returns['comp_vol'].mean():
         print ('The fund is less volatile than index.')
+        #print ("本基金的波动率显著低于基准指数。")
     else:
         print ('The fund has similar volatility to the index. ')
+        #print ("本基金的波动率与基准指数基本一致。")
         
     if returns['vol'][-1]>1.2*returns['vol'].mean():
         print ('The fund has become more volatile recently')
+        #print ("本基金的波动率近期有明显上升。")
     elif returns['vol'][-1]<0.8*returns['vol'].mean():
         print ('The fund has become less volatile recently')
+        #print ("本基金的波动率近期有明显下降。")
     else:
         print ('The volatility has been consistent recently')
+        #print ("本基金的波动率近期较为稳定。")
     
+    rank_file = pd.read_csv(rank_file_path+'volatility_rank.csv').set_index('Unnamed: 0')
+    if returns['vol'][-1] < 0.1:
 
+        new_row = {'ticker': security_code, 'value': returns['vol'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(rank_file_path+'volatility_rank.csv')
+        
+        
+    return returns
+
+
+def plot_drawdown_underwater(returns):
+    """
+    Plots how far underwaterr returns are over time, or plots current
+    drawdown vs. date.
+
+    Parameters
+    ----------
+    returns : pd.Series
+        Daily returns of the strategy, noncumulative.
+         - See full explanation in tears.create_full_tear_sheet.
+    ax : matplotlib.Axes, optional
+        Axes upon which to plot.
+    **kwargs, optional
+        Passed to plotting function.
+
+    Returns
+    -------
+    ax : matplotlib.Axes
+        The axes that were plotted on.
+    """
+
+    #if ax is None:
+    #    ax = plt.gca()
+
+    #y_axis_formatter = FuncFormatter(utils.percentage)
+    #ax.yaxis.set_major_formatter(FuncFormatter(y_axis_formatter))
+    returns['underwater']=0
+    returns['underwater'] = returns['underwater'].astype('float64')
+    df_cum_rets = ep.cum_returns(returns['return'], starting_value=1.0)
+    running_max = np.maximum.accumulate(df_cum_rets)
+    returns['underwater'] = -100 * ((running_max - df_cum_rets) / running_max)
+    #(returns['underwater']).plot(ax=ax, kind='area', color='coral', alpha=0.7, **kwargs)
+    #ax.set_ylabel('Drawdown')
+    #ax.set_title('Underwater plot')
+    #ax.set_xlabel('')
     return returns
