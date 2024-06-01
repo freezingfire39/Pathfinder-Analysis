@@ -13,6 +13,8 @@ from sklearn.linear_model import LinearRegression
 import seaborn
 from matplotlib.ticker import FuncFormatter
 import utils
+import statsmodels.api as sm
+from statsmodels import regression
 
 def rolling_sharpe(returns, rank_file_path,security_code,risk_free_rate=0.0, window=250):
 
@@ -577,19 +579,29 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
     
 def event_analysis(returns):
     create_interesting_times_tear_sheet(returns)
+    
+    
+def linreg(x,y):
+    x = sm.add_constant(x)
+    model = regression.linear_model.OLS(y,x).fit()
 
-def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=90):
+    # We are removing the constant
+    x = x[:, 1]
+    return model.params[0], model.params[1]
+
+def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=250):
 
     returns['alpha'] = 0
     returns['alpha'] = returns['alpha'].astype('float64')
     returns['beta'] = 0
     returns['beta'] = returns['beta'].astype('float64')
     comp.dropna(inplace=True)
+    returns_2 = returns.copy()
     df_drop=[]
-    for i in returns.index:
+    for i in returns_2.index:
         if i not in comp.index:
             df_drop.append(i)
-    returns = returns.drop(df_drop, axis=0)
+    returns_2 = returns_2.drop(df_drop, axis=0)
 
 
     df_drop=[]
@@ -599,21 +611,23 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=90):
     comp = comp.drop(df_drop, axis=0)
     comp = comp.pct_change()
 
-    for i in range(len(returns)):
+    for i in range(len(returns_2)):
         if i<window:
             pass
         else:
         
-            df_temp_1 = returns.iloc[i-window:i]
+            df_temp_1 = returns_2.iloc[i-window:i]
             df_temp_2 = comp.iloc[i-window:i]
 
-            (beta, alpha) = stats.linregress(df_temp_2, df_temp_1['return'])[0:2]
-            returns['alpha'][i]=alpha
-            returns['beta'][i]=beta
+            X = df_temp_1['return'][1:].values
+            Y = df_temp_2[1:].values
+            alpha, beta = linreg(X,Y)
+            returns_2['alpha'][i]=alpha
+            returns_2['beta'][i]=beta
             
-    returns['alpha'].plot()
-    returns['beta'].plot()
-    
+
+    returns['alpha'] = returns_2['alpha']
+    returns['beta'] = returns_2['beta']
     if returns['alpha'][-1]>0.1:
         print ("This fund has outperformed the benchmark")
         #print ("本基金对比基准指数取得了较明显的超额收益")
@@ -659,7 +673,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=90):
     
     return returns
 
-def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,rolling_window=90):
+def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,rolling_window=250):
     """
     Function to calculate the upside and downside capture for a given set of returns.
     The function is set up so that the investment's returns are in the first column of the dataframe
@@ -693,6 +707,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,r
 
     # 3) Combine to produce our final dataframe
     df_mkt_capture = pd.concat([up_ratio, down_ratio], axis=1)
+    print (df_mkt_capture)
 
     df_mkt_capture.columns = ['Upside Capture', 'Downside Capture']
     if df_mkt_capture['Upside Capture'][0]>1 and df_mkt_capture['Downside Capture'][0]>1:
@@ -1157,7 +1172,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
 
 
 
-def rolling_volatility(returns, comp, rank_file_path,security_code,rolling_vol_window=90):
+def rolling_volatility(returns, comp, rank_file_path,security_code,rolling_vol_window=250):
     """
     Determines the rolling volatility of a strategy.
 
@@ -1174,19 +1189,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,rolling_vol_w
     pd.Series
         Rolling volatility.
     """
-    
-    df_drop=[]
-    for i in returns.index:
-        if i not in comp.index:
-            df_drop.append(i)
-    returns = returns.drop(df_drop, axis=0)
 
-
-    df_drop=[]
-    for i in comp.index:
-        if i not in returns.index:
-            df_drop.append(i)
-    comp = comp.drop(df_drop, axis=0)
     comp = comp.pct_change()
 
     returns['vol'] = returns['return'].rolling(rolling_vol_window).std() \

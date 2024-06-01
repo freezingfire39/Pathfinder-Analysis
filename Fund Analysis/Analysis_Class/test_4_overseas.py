@@ -15,6 +15,8 @@ print (Ticker)
 df_target = pd.read_csv('Fund_1.csv')
 
 
+
+
 df_target = df_target.iloc[::-1]
 risk_free_rate=0.0
 df_target.set_index('净值日期',inplace=True)
@@ -48,37 +50,34 @@ df_target['net_return']=df_target['return']-(custody_fee+management_fee)/Trading
 
 
 
-index_comps = pd.read_csv('index_comps.csv').set_index('Date')
-industry_comps = pd.read_csv('industry_comps.csv').set_index('Date')
+index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16") ##use 003718
+print (index_comps)
+index_comps = index_comps['Close']
+
 index_comps.index = pd.to_datetime(index_comps.index)
-industry_comps.index = pd.to_datetime(industry_comps.index)
-
-
-comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path, rank_file_path)
 
 
 
-comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path, rank_file_path)
+
+
 
 
 
 
 
 df_target['rolling_mean'] = df_target['return'].rolling(trading_days).mean()
-df_target['comp_mean'] = industry_comps[comp_1_name].rolling(trading_days).mean()
+df_target['comp_mean'] = index_comps.rolling(trading_days).mean()
 
 df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, security_code = Ticker)
 
 df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, security_code = Ticker)
 
-if comp_1_name in industry_comps:
-    df_target = Analysis_class.alpha_beta_analysis(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
-else:
-    df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
+
+df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps,rank_file_path = rank_file_path, security_code = Ticker)
 
 
 
-df_target['comp_1'] = industry_comps[comp_1_name]
+df_target['comp_1'] = index_comps
 df1 = df_target[['累计净值', 'comp_1']]
 
 # Resample to month end and calculate the monthly percent change
@@ -88,10 +87,9 @@ df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank
 
 print (df_target)
 
-if comp_1_name in industry_comps:
-    df_target = Analysis_class.rolling_volatility(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
-else:
-    df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
+
+df_target = Analysis_class.rolling_volatility(df_target, index_comps,rank_file_path = rank_file_path, security_code = Ticker)
+
 
 df_target = Analysis_class.plot_drawdown_underwater(df_target)
 
@@ -101,7 +99,7 @@ Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmar
 
 
 
-df_target.to_csv('sample_feature.csv')
+df_target.to_csv('sample_feature_3.csv')
 #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 
 
