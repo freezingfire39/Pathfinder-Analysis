@@ -18,7 +18,7 @@ def main(start_symbol, end_symbol, input_file_path):
         formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
         # print(formatted_number)
         symbol_file_path = input_file_path + "/" + formatted_number
-        print symbol_file_path
+        print (symbol_file_path)
     pass
 
 
