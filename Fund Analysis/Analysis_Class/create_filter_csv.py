@@ -1,4 +1,6 @@
 import pandas as pd
+from pathlib import Path
+home = str(Path.home())
 
 asset_type='stock_'
 #asset_type='bond_'
@@ -7,7 +9,7 @@ asset_type='stock_'
 
 
 
-path = ''+asset_type
+path = home + '/Desktop/output_search' + asset_type
 
 rolling_sharpe_df = pd.DataFrame(columns=['ticker','value'])
 rolling_sharpe_df['ticker']=rolling_sharpe_df['ticker'].astype(str)
