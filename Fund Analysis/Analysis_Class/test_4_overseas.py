@@ -11,7 +11,8 @@ asset_type='overseas_'
 
 input_file_path='Fund_1.csv'  ##ticker_information fund_1
 background_file_path='Background.csv'
-return_rank_file_path=asset_type+'return_rank.csv'  ##return_rank_csv
+return_rank_file_path=asset_type+'return_rank.csv'
+cagr_rank_file_path=asset_type+'CAGR_rank.csv'  ##return_rank_csv
 rank_file_path=''+asset_type  ##all other filter csv
 
 save_file_path='sample_feature.csv'
@@ -36,14 +37,21 @@ df_target.set_index('净值日期',inplace=True)
 df_target.index = pd.to_datetime(df_target.index)
 df_target['return'] = df_target['累计净值'].pct_change()
 
-df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)
+df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
 rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-if df_target['annual_return'][-1] > 1.3:
+if df_target['annual_return'][-1] > 0.05:
 
     new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(return_rank_file_path)
 
+df_target['CAGR'] = 0
+
+df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1])**(1/(len(df_target_2)/trading_days))
+rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
+new_row = {'ticker': Ticker, 'value': df_target['CAGR'].iloc[-1]}
+rank_file.loc[len(rank_file)] = new_row
+rank_file.to_csv(cagr_rank_file_path)
 
 ##calculate net return
 df_background = pd.read_csv(background_file_path)

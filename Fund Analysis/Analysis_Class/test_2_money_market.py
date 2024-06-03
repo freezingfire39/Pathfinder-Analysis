@@ -16,10 +16,11 @@ input_file_path='Fund_2.csv'
 background_file_path='Background.csv'
 rank_file_path=asset_type+''
 return_rank_file_path=asset_type+'return_rank.csv'
+cagr_rank_file_path=asset_type+'CAGR_rank.csv'  ##return_rank_csv
 Trading_days = 250
 trading_days=250
 save_file_path='sample_feature.csv'
-
+Ticker = "000001"
 df_target_2 =pd.read_csv(input_file_path)
 
 
@@ -43,7 +44,7 @@ custody_fee = df_background['托管费率'].iloc[0].split("%")[0]
 custody_fee = float(custody_fee)/100
 
 
-sales_fee = df_background['销售服务费率'].iloc[0].split("%")[0]
+sales_fee = df_background['托管费率'].iloc[0].split("%")[0]
 sales_fee = float(sales_fee )/100
 
 df_target_2['net_return']=df_target_2['return']-(custody_fee+management_fee+sales_fee)/Trading_days
@@ -53,16 +54,21 @@ df_target_2['累计净值'] =(1+df_target_2['return']).cumprod()
 
 df_target_2['CAGR'] = 0
 
-df_target_2['CAGR'][-1] = (df_target_2['累计净值'][-1])**(1/(len(df_target)/trading_days))
+df_target_2['CAGR'].iloc[-1] = (df_target_2['累计净值'].iloc[-1])**(1/(len(df_target_2)/trading_days))
+
+df_target_2['annual_return'] = (1+df_target_2['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
 
 rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-if df_target['annual_return'][-1] > 1.3:
+if df_target_2['annual_return'].iloc[-1] > 0.02:
 
-    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    new_row = {'ticker': Ticker, 'value': df_target_2['annual_return'].iloc[-1]}
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(return_rank_file_path)
 
-
+rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
+new_row = {'ticker': Ticker, 'value': df_target_2['CAGR'].iloc[-1]}
+rank_file.loc[len(rank_file)] = new_row
+rank_file.to_csv(cagr_rank_file_path)
 
 #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
