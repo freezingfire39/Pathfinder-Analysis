@@ -1,10 +1,7 @@
 import os,sys
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
-import investpy
 import datetime
-import common
 from airflow.exceptions import AirflowException
 from pathlib import Path
 home = str(Path.home())
