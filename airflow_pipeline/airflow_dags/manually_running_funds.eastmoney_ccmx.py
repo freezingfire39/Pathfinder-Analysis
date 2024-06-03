@@ -35,8 +35,8 @@ default_args = {
 
 dag = DAG(
     'manually_running-funds.eastmoney_ccmx', default_args=default_args,
-    user_defined_filters= {'localtz': localize_ny_tz},
-    catchup=False
+    user_defined_filters= {'localtz': localize_ny_tz}
+    # catchup=False
     # schedule_interval='0 0 * * *'
     # schedule_interval=timedelta(days=1)
 )
