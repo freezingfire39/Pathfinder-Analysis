@@ -7,6 +7,16 @@ from pathlib import Path
 home = str(Path.home())
 import pytz
 
+def readBackground(symbol_file_path):
+    print ("start reading file path:", symbol_file_path)
+    try:
+        background_csv = pd.read_csv(symbol_file_path + '/Background.csv')
+    except:
+        print ("fail to read background.csv file. skip this file")
+        return 0
+    type = background_csv['基金类型'].iloc[0]
+    print ("type:", type)
+
 def main(start_symbol, end_symbol, input_file_path):
     # iterator from [start_symbol to end_symbol]
     # read Background.csv column 基金类型
@@ -15,8 +25,8 @@ def main(start_symbol, end_symbol, input_file_path):
         formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
         # print(formatted_number)
         symbol_file_path = input_file_path + "/" + formatted_number
-        print (symbol_file_path)
-    pass
+        # print (symbol_file_path)
+        readBackground(symbol_file_path)
 
 
 if __name__ == '__main__':
