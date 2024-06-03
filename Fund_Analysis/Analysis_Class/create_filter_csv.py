@@ -9,7 +9,7 @@ asset_type='stock_'
 
 
 
-path = home + '/Desktop/output_search' + asset_type
+path = home + '/Desktop/output_search/' + asset_type
 
 rolling_sharpe_df = pd.DataFrame(columns=['ticker','value'])
 rolling_sharpe_df['ticker']=rolling_sharpe_df['ticker'].astype(str)
