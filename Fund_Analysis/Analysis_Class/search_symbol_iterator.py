@@ -16,7 +16,14 @@ def readBackground(symbol_file_path):
         return 0
     type = background_csv['基金类型'].iloc[0]
     print ("type:", type)
-
+    if "货币型" in type:
+        return 1
+    elif "债券型" in type:
+        return 2
+    elif "指数型" in type or "QDII" in type:
+        return 3
+    else:# "混合型"
+        return 4
 def main(start_symbol, end_symbol, input_file_path):
     # iterator from [start_symbol to end_symbol]
     # read Background.csv column 基金类型
@@ -26,8 +33,8 @@ def main(start_symbol, end_symbol, input_file_path):
         # print(formatted_number)
         symbol_file_path = input_file_path + "/" + formatted_number
         # print (symbol_file_path)
-        readBackground(symbol_file_path)
-
+        type = readBackground(symbol_file_path)
+        print("type number:", type)
 
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
