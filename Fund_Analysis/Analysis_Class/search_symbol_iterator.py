@@ -26,6 +26,7 @@ def readBackground(symbol_file_path):
     else:# "混合型"
         return 4
 def trigger_python_script(script_path, params):
+    print ("trigger: " + script_path + " " + params)
     result = subprocess.run(['python', script_path, params], text=True, capture_output=True)
     print("Standard Output:")
     print(result.stdout)
