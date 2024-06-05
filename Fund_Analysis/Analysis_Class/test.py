@@ -44,7 +44,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['CAGR'] = 0
 
-    df_target['CAGR'][-1] = (df_target['累计净值'][-1]/df_target['累计净值'][0])**(1/(len(df_target)/trading_days))
+    df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
 
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
     if df_target['annual_return'][-1] > 0.05:
