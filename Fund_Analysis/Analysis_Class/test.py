@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 home = str(Path.home())
 
-def main(symbol_file_path,symbol):
+def main(symbol_file_path,symbol,search_file_path):
     asset_type='stock_'
     #asset_type='bond_'
     #asset_type='money_market_'
@@ -15,11 +15,11 @@ def main(symbol_file_path,symbol):
 
     input_file_path=symbol_file_path + 'Fund_1.csv'  ##ticker_information fund_1
     background_file_path=symbol_file_path + 'Background.csv'
-    return_rank_file_path=asset_type+'return_rank.csv'
-    cagr_rank_file_path=asset_type+'CAGR_rank.csv'  ##return_rank_csv
+    return_rank_file_path=search_file_path+asset_type+'return_rank.csv'
+    cagr_rank_file_path=search_file_path+asset_type+'CAGR_rank.csv'  ##return_rank_csv
     rank_file_path=''+asset_type  ##all other filter csv
-    comp_file_path='/home/app/Desktop/output_search/index_comps.csv'
-    comp_file_path_2='/home/app/Desktop/output_search/industry_comps.csv'
+    comp_file_path=search_file_path+'+index_comps.csv'
+    comp_file_path_2=search_file_path+'industry_comps.csv'
     save_file_path=symbol_file_path +'sample_feature.csv'
     # Ticker = "000001"
     Ticker = symbol
@@ -136,10 +136,11 @@ def main(symbol_file_path,symbol):
 
 if __name__ == '__main__':
     file_path = home + '/Desktop/output_china/' # for daily download file
+    search_file_path = home + '/Desktop/output_search/'
     try:
         symbol = sys.argv[1]
         symbol_file_path = file_path + symbol + "/"
-        main(symbol_file_path, symbol)
+        main(symbol_file_path, symbol,search_file_path)
     except Exception as e:
         error_message = f"Failed to run at error: {str(e)}"
         raise Exception(error_message)(e)
