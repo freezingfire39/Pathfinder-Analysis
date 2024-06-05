@@ -141,5 +141,6 @@ if __name__ == '__main__':
         symbol_file_path = file_path + symbol + "/"
         main(symbol_file_path, symbol)
     except Exception as e:
-        raise Exception("fail to run at error " + e.message)
+        error_message = f"Failed to run at error: {str(e)}"
+        raise Exception(error_message)(e)
 
