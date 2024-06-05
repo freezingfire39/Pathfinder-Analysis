@@ -38,19 +38,19 @@ def trigger_python_script(script_path, params):
 
 # "货币型"  1 test_2_money_market
 def trigger_test_2_money_market(formatted_number):
-    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test_2_money_market.py', formatted_number)
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_2_money_market.py', formatted_number)
     pass
 # "债券型" 2 test_3_bonds
 def trigger_test_3_bonds(formatted_number):
-    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test_3_bonds.py', formatted_number)
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_3_bonds.py', formatted_number)
     pass
 # "指数型" or "QDII" 3 run test_4_overseas
 def trigger_test_4_overseas(formatted_number):
-    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test_4_overseas.py', formatted_number)
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_4_overseas.py', formatted_number)
     pass
 # "混合型" 4 run test.py
 def trigger_test(formatted_number):
-    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test.py',formatted_number)
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test.py',formatted_number)
     pass
 def main(start_symbol, end_symbol, input_file_path):
     # iterator from [start_symbol to end_symbol]
