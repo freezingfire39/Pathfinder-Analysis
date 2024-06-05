@@ -6,6 +6,7 @@ from airflow.exceptions import AirflowException
 from pathlib import Path
 home = str(Path.home())
 import pytz
+import subprocess
 
 def readBackground(symbol_file_path):
     print ("start reading file path:", symbol_file_path)
@@ -24,6 +25,33 @@ def readBackground(symbol_file_path):
         return 3
     else:# "混合型"
         return 4
+def trigger_python_script(script_path, params):
+    result = subprocess.run(['python', script_path, params], text=True, capture_output=True)
+    print("Standard Output:")
+    print(result.stdout)
+    print("Standard Error:")
+    print(result.stderr)
+    if result.returncode == 0:
+        print ("job succeed, " + script_path + " " + params)
+    else:
+        print (f"Error in running the script. Return code: {result.returncode}, script: {script_path} {params} ")
+
+# "货币型"  1 test_2_money_market
+def trigger_test_2_money_market(formatted_number):
+    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test_2_money_market.py', formatted_number)
+    pass
+# "债券型" 2 test_3_bonds
+def trigger_test_3_bonds(formatted_number):
+    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test_3_bonds.py', formatted_number)
+    pass
+# "指数型" or "QDII" 3 run test_4_overseas
+def trigger_test_4_overseas(formatted_number):
+    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test_4_overseas.py', formatted_number)
+    pass
+# "混合型" 4 run test.py
+def trigger_test(formatted_number):
+    trigger_python_script(home + '/Desktop/Fund_Analysis/Analysis_Class/test.py',formatted_number)
+    pass
 def main(start_symbol, end_symbol, input_file_path):
     # iterator from [start_symbol to end_symbol]
     # read Background.csv column 基金类型
@@ -35,6 +63,17 @@ def main(start_symbol, end_symbol, input_file_path):
         # print (symbol_file_path)
         type = readBackground(symbol_file_path)
         print("type number:", type)
+        if type == 0:
+            continue
+        elif type == 1:
+            trigger_test_2_money_market(formatted_number)
+        elif type == 2:
+            trigger_test_3_bonds(formatted_number)
+        elif type == 3:
+            trigger_test_4_overseas(formatted_number)
+        else:
+            trigger_test(formatted_number)
+
 
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
