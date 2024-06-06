@@ -813,7 +813,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
         
     else:
         returns['industry_peers']=0
-        returns['industry_peers'][-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
+        returns['industry_peers'].iloc[-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
         
         
     returns['positive_comp'] = 0
