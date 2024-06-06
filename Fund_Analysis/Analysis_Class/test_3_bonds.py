@@ -17,7 +17,7 @@ def main(symbol_file_path,symbol,search_file_path):
     input_file_path=symbol_file_path+'Fund_1.csv'  ##ticker_information fund_1
     background_file_path=symbol_file_path+'Background.csv'
     return_rank_file_path=search_file_path+asset_type+'return_rank.csv'  ##return_rank_csv
-    rank_file_path=''+asset_type
+    rank_file_path=search_file_path+asset_type
     cagr_rank_file_path=search_file_path+asset_type+'CAGR_rank.csv'   ##all other filter csv
     save_file_path=symbol_file_path+'sample_feature.csv'
 
