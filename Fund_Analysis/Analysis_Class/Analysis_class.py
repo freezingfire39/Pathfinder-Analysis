@@ -764,8 +764,8 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,r
         # 3) Combine to produce our final dataframe
         df_mkt_capture = pd.concat([up_ratio, down_ratio], axis=1)
         df_mkt_capture.columns = ['Upside Capture', 'Downside Capture']
-        returns_daily['Upside_Capture'][i] = df_mkt_capture['Upside Capture'][0]
-        returns_daily['Downside_Capture'][i] = df_mkt_capture['Downside Capture'][0]
+        returns_daily['Upside_Capture'].iloc[i] = df_mkt_capture['Upside Capture'].iloc[0]
+        returns_daily['Downside_Capture'].iloc[i] = df_mkt_capture['Downside Capture'].iloc[0]
     
     rank_file = pd.read_csv(rank_file_path+'upside_capture_rank.csv').set_index('Unnamed: 0')
     if returns_daily['Upside_Capture'][-1] > 30:
