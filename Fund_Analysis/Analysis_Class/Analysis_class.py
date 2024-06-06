@@ -304,7 +304,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
         #print ("本基金的回撤时间与类似产品的平均基本一致。")
         
     rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
-    if returns['drawdown_duration'][-1] < 300:
+    if returns['drawdown_duration'].iloc[-1] < 300:
 
         new_row = {'ticker': '="'+security_code+'"', 'value': returns['drawdown_duration'][-1]}
         rank_file.loc[len(rank_file)] = new_row
@@ -312,7 +312,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
         rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
         
     rank_file = pd.read_csv(rank_file_path+'drawdown_amount_rank.csv').set_index('Unnamed: 0')
-    if returns['drawdown_amount'][-1] < 0.2:
+    if returns['drawdown_amount'].iloc[-1] < 0.2:
 
         new_row = {'ticker': '="'+security_code+'"', 'value': returns['drawdown_amount'][-1]}
         rank_file.loc[len(rank_file)] = new_row
