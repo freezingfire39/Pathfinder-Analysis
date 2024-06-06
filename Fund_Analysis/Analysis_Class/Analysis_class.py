@@ -290,8 +290,8 @@ def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
     returns['drawdown_amount'] = returns['drawdown_amount'].astype(int)
     print (df_drawdowns['Duration'].max())
-    returns['drawdown_duration'][-1] = df_drawdowns['Duration'].max()
-    returns['drawdown_amount'][-1] = df_drawdowns['Net drawdown in %'].max()
+    returns['drawdown_duration'].iloc[-1] = df_drawdowns['Duration'].max()
+    returns['drawdown_amount'].iloc[-1] = df_drawdowns['Net drawdown in %'].max()
     print (returns.tail(10))
     if df_drawdowns['Duration'].mean()>400:
         print ("compare to industry average, this security has longer drawdowns")
