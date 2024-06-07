@@ -142,82 +142,68 @@ python_op_21 = BashOperator(
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '010001 020000'
 )
 python_op_22 = BashOperator(
     task_id='search_symbol_iterator_020001-030000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '020001 030000'
 )
 python_op_23 = BashOperator(
     task_id='search_symbol_iterator_030001-040000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '030001 040000'
 )
 python_op_24 = BashOperator(
     task_id='search_symbol_iterator_040001-050000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '040001 050000'
 )
 python_op_25 = BashOperator(
     task_id='search_symbol_iterator_050001-060000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '050001 060000'
 )
 python_op_26 = BashOperator(
     task_id='search_symbol_iterator_060001-070000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '060001 070000'
 )
 python_op_27 = BashOperator(
     task_id='search_symbol_iterator_070001-080000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '070001 080000'
 )
 python_op_28 = BashOperator(
     task_id='search_symbol_iterator_080001-090000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '080001 090000'
 )
 python_op_29 = BashOperator(
     task_id='search_symbol_iterator_090001-100000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
-                 '000001 010000'
+                 '090001 100000'
 )
-python_op_2.set_upstream(python_op_0)
-python_op_21.set_upstream(python_op_0)
-python_op_22.set_upstream(python_op_0)
-python_op_23.set_upstream(python_op_0)
-python_op_24.set_upstream(python_op_0)
-python_op_25.set_upstream(python_op_0)
-python_op_26.set_upstream(python_op_0)
-python_op_27.set_upstream(python_op_0)
-python_op_28.set_upstream(python_op_0)
-python_op_29.set_upstream(python_op_0)
 
-python_op_1.set_upstream(python_op_2)
-python_op_1.set_upstream(python_op_21)
-python_op_1.set_upstream(python_op_22)
-python_op_1.set_upstream(python_op_23)
-python_op_1.set_upstream(python_op_24)
-python_op_1.set_upstream(python_op_25)
-python_op_1.set_upstream(python_op_26)
-python_op_1.set_upstream(python_op_27)
-python_op_1.set_upstream(python_op_28)
-python_op_1.set_upstream(python_op_29)
+
+python_op_0 >> python_op_2 >> python_op_21 >> python_op_22 >> python_op_23 >> python_op_24 >> python_op_25 >> python_op_26\
+>> python_op_27 >> python_op_28 >> python_op_29 >> python_op_1
+
+
+
