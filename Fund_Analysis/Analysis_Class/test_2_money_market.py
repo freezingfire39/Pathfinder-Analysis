@@ -78,10 +78,11 @@ def main(symbol_file_path,symbol,search_file_path):
 
 if __name__ == '__main__':
     file_path = home + '/Desktop/output_china/' # for daily download file
+    search_file_path = home + '/Desktop/output_search/'
     try:
         symbol = sys.argv[1]
         symbol_file_path = file_path + symbol + "/"
-        main(symbol_file_path, symbol)
+        main(symbol_file_path, symbol,search_file_path)
     except Exception as e:
         error_message = f"Failed to run at error: {str(e)}"
         raise Exception(error_message)(e)
