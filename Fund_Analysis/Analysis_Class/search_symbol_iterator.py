@@ -7,6 +7,14 @@ from pathlib import Path
 home = str(Path.home())
 import pytz
 import subprocess
+import logging
+logging.basicConfig(
+    filename=home + '/Desktop/error.log',  # Log file path
+    filemode='a',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
+    level=logging.ERROR,  # Logging level set to ERROR
+    format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
+    datefmt='%Y-%m-%d %H:%M:%S'  # Timestamp format
+)
 
 def readBackground(symbol_file_path):
     print ("start reading file path:", symbol_file_path)
@@ -15,16 +23,21 @@ def readBackground(symbol_file_path):
     except:
         print ("fail to read background.csv file. skip this file")
         return 0
-    type = background_csv['基金类型'].iloc[0]
-    print ("type:", type)
-    if "货币型" in type:
-        return 1
-    elif "债券型" in type:
-        return 2
-    elif "指数型" in type or "QDII" in type:
-        return 3
-    else:# "混合型"
-        return 4
+    try:
+        type = background_csv['基金类型'].iloc[0]
+        print ("type:", type)
+        if "货币型" in type:
+            return 1
+        elif "债券型" in type:
+            return 2
+        elif "指数型" in type or "QDII" in type:
+            return 3
+        else:# "混合型"
+            return 4
+    except:
+        logging.error("Faild to read file path: %s",symbol_file_path)
+        return 0
+
 def trigger_python_script(script_path, params):
     print ("trigger: " + script_path + " " + params)
     result = subprocess.run(['python', script_path, params], text=True, capture_output=True)
