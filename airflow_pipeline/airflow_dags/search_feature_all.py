@@ -300,7 +300,7 @@ python_op_224 = BashOperator(
                  '4600 4800'
 )
 python_op_225 = BashOperator(
-    task_id='search_symbol_iterator_4800 5000',
+    task_id='search_symbol_iterator_4800-5000',
     trigger_rule='all_success',
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
