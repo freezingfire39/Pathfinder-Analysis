@@ -10,13 +10,17 @@ from itertools import islice
 import subprocess
 import logging
 logging.basicConfig(
-    filename=home + '/Desktop/error.log',  # Log file path
-    filemode='w',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
+      # Log file path
+    filemode='a',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
     level=logging.ERROR,  # Logging level set to ERROR
     format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
-    datefmt='%Y-%m-%d %H:%M:%S'  # Timestamp format
+    datefmt='%Y-%m-%d %H:%M:%S',  # Timestamp format
+    handlers=[
+        logging.FileHandler(home + '/Desktop/error.log'),
+        logging.StreamHandler
+    ]
 )
-
+logger = logging.Logger("search_symbol_logger")
 def readBackground(symbol_file_path):
     print ("start reading file path:", symbol_file_path)
     try:
@@ -37,7 +41,7 @@ def readBackground(symbol_file_path):
             return 4
     except:
         error_log = "Faild to read file path: "+ str(symbol_file_path)
-        logging.error(error_log)
+        logger.error(error_log)
         return 0
 
 def trigger_python_script(script_path, params):

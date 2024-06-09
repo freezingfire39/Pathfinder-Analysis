@@ -10,12 +10,17 @@ from itertools import islice
 import subprocess
 import logging
 logging.basicConfig(
-    filename=home + '/Desktop/info.log',  # Log file path
-    filemode='w',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
+      # Log file path
+    filemode='a',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
     level=logging.INFO,  # Logging level set to ERROR
     format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
-    datefmt='%Y-%m-%d %H:%M:%S'  # Timestamp format
+    datefmt='%Y-%m-%d %H:%M:%S',  # Timestamp format
+    handlers=[
+        logging.FileHandler(home + '/Desktop/info.log'),
+        logging.StreamHandler
+    ]
 )
+logger = logging.Logger("test")
 def get_files_from_folders(dir):
     files = []
     for item in os.listdir(dir):
@@ -58,9 +63,9 @@ def main(files):
         else:
             all_type.append(type)
             info_log = "add type: " + str(type) + ", symbol:" + str(file)
-            logging.info(info_log)
-            logging.info("add type: " + str(type))
-            logging.info(", symbol:" + str(file))
+            logger.info(info_log)
+            logger.info("add type: " + str(type))
+            logger.info(", symbol:" + str(file))
     pass
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
