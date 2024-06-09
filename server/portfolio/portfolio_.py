@@ -1,6 +1,6 @@
 import numpy as np
 
-import utils.enums
+import portfolio.utils.enums
 import os
 from typing import List
 import pandas as pd
@@ -122,9 +122,6 @@ if __name__ == '__main__':
     from portfolio.optimizer import PortfolioOptimizer, EquallyWeightedOptimizer, MinimalVolatilityOptimizer, \
         MaxSharpeRatioOptimizer
     fac = OptimizerFactory()
-    fac.register_optimizer(utils.enums.OptimizerType.EQUAL_WEIGHT, EquallyWeightedOptimizer)
-    fac.register_optimizer(utils.enums.OptimizerType.MIN_VOLATILITY, MinimalVolatilityOptimizer)
-    fac.register_optimizer(utils.enums.OptimizerType.MAX_SHARPE_RATIO, MaxSharpeRatioOptimizer)
     fdir = "D:/workspace/Pathfinder-Analysis/sample"
     p = Portfolio(1e6, eft_tags=['000001','000003'],fdir=fdir)
     p.load()
