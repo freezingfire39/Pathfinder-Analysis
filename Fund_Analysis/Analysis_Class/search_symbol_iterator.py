@@ -88,13 +88,16 @@ def main(start_symbol, end_symbol, input_file_path):
         else:
             trigger_test(formatted_number)
 
-
+def get_files_from_folders(dir):
+    for item in os.listdir(dir):
+        print(item)
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
     # output_file_path = home + '/Desktop/output_china'
     try:
         start_symbol = int(sys.argv[1])
         end_symbol = int(sys.argv[2])
+        get_files_from_folders(input_file_path)
         main(start_symbol, end_symbol, input_file_path)
     except Exception as e:
         raise AirflowException("fail to run at error ", e)
