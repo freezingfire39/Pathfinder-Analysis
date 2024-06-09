@@ -8,19 +8,16 @@ home = str(Path.home())
 import pytz
 from itertools import islice
 import subprocess
-import logging
-logging.basicConfig(
-      # Log file path
-    filemode='a',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
-    level=logging.INFO,  # Logging level set to ERROR
-    # format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
-    # datefmt='%Y-%m-%d %H:%M:%S',  # Timestamp format
-    handlers=[
-        logging.FileHandler(home + '/Desktop/info.log'),
-        logging.StreamHandler
-    ]
-)
-logger = logging.Logger("test")
+import logging4
+
+logger = logging4.Logger(name="MyLogger")
+formatter = '[[time]] - [[name]] - [[level_name]] - [[msg]]'
+# add/del channel
+# logger.add_channel(filename='log.txt', level=logging4.WARNING)
+# logger.add_channel(filename=sys.stdout, level=logging4.ERROR, formatter=formatter)
+logger.add_channel(filename=home + '/Desktop/info.log', level=logging4.INFO, formatter=formatter)
+# logger.del_channel(filename='log2.txt')
+
 def get_files_from_folders(dir):
     files = []
     for item in os.listdir(dir):
@@ -64,9 +61,9 @@ def main(files):
             all_type.append(type)
             info_log = "add type: " + str(type) + ", symbol:" + str(file)
             logger.info(info_log)
-            logger.info("add type: " + str(type))
-            logger.info(", symbol:" + str(file))
-            logger.info("end log")
+            # logger.info("add type: " + str(type))
+            # logger.info(", symbol:" + str(file))
+            # logger.info("end log")
     pass
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
