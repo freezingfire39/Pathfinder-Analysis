@@ -6,6 +6,7 @@ from airflow.exceptions import AirflowException
 from pathlib import Path
 home = str(Path.home())
 import pytz
+from itertools import islice
 import subprocess
 import logging
 logging.basicConfig(
@@ -66,14 +67,18 @@ def trigger_test_4_overseas(formatted_number):
 def trigger_test(formatted_number):
     trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test.py',formatted_number)
     pass
-def main(start_symbol, end_symbol, input_file_path):
+def main(start_symbol, end_symbol, input_file_path, files):
     # iterator from [start_symbol to end_symbol]
     # read Background.csv column 基金类型
     # 货币型(test_2_money_market)，债券型(test_3_bonds)， 指数型 - 海外股票 / QDII(test_4_overseas), else (test.py)
-    for i in range(start_symbol, (end_symbol+1)):
-        formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
+    # for i in range(start_symbol, (end_symbol+1)):
+    #     formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
+    selected_items = list(islice(files.items(), int(start_symbol), int(end_symbol)))
+    for key, value in selected_items:
         # print(formatted_number)
-        symbol_file_path = input_file_path + "/" + formatted_number
+        # symbol_file_path = input_file_path + "/" + formatted_number
+        print ("key:%s, value:%s ", key, value)
+        symbol_file_path = input_file_path + "/" + value
         # print (symbol_file_path)
         type = readBackground(symbol_file_path)
         print("type number:", type)
@@ -89,15 +94,19 @@ def main(start_symbol, end_symbol, input_file_path):
             trigger_test(formatted_number)
 
 def get_files_from_folders(dir):
+    files = []
     for item in os.listdir(dir):
-        print(item)
+        # print(item)
+        files.append(item)
+    print ("total file count: %s, from folder: %s", files.count(), dir)
+    return files
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
     # output_file_path = home + '/Desktop/output_china'
     try:
         start_symbol = int(sys.argv[1])
         end_symbol = int(sys.argv[2])
-        get_files_from_folders(input_file_path)
-        main(start_symbol, end_symbol, input_file_path)
+        files = get_files_from_folders(input_file_path)
+        main(start_symbol, end_symbol, input_file_path, files)
     except Exception as e:
         raise AirflowException("fail to run at error ", e)
