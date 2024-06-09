@@ -13,8 +13,8 @@ logging.basicConfig(
       # Log file path
     filemode='a',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
     level=logging.INFO,  # Logging level set to ERROR
-    format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
-    datefmt='%Y-%m-%d %H:%M:%S',  # Timestamp format
+    # format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
+    # datefmt='%Y-%m-%d %H:%M:%S',  # Timestamp format
     handlers=[
         logging.FileHandler(home + '/Desktop/info.log'),
         logging.StreamHandler
