@@ -36,7 +36,7 @@ def readBackground(symbol_file_path):
         else:# "混合型"
             return 4
     except:
-        logging.error("Faild to read file path: %s",symbol_file_path)
+        logging.error("Faild to read file path: "+ str(symbol_file_path))
         return 0
 
 def trigger_python_script(script_path, params):
