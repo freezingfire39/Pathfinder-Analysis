@@ -82,13 +82,13 @@ def main(start_symbol, end_symbol, input_file_path, files):
         if type == 0:
             continue
         elif type == 1:
-            trigger_test_2_money_market(formatted_number)
+            trigger_test_2_money_market(file)
         elif type == 2:
-            trigger_test_3_bonds(formatted_number)
+            trigger_test_3_bonds(file)
         elif type == 3:
-            trigger_test_4_overseas(formatted_number)
+            trigger_test_4_overseas(file)
         else:
-            trigger_test(formatted_number)
+            trigger_test(file)
 
 def get_files_from_folders(dir):
     files = []
