@@ -66,6 +66,7 @@ def main(files):
             logger.info(info_log)
             logger.info("add type: " + str(type))
             logger.info(", symbol:" + str(file))
+            logger.info("end log")
     pass
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
