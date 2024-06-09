@@ -98,7 +98,7 @@ def get_files_from_folders(dir):
     for item in os.listdir(dir):
         # print(item)
         files.append(item)
-    print (f"total file count: {files.count()}, from folder: {dir}")
+    print (f"total file count: {len(files)}, from folder: {dir}")
     return files
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
