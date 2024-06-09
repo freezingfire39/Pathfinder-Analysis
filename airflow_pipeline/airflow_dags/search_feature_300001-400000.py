@@ -102,7 +102,7 @@ def download_ops_scripts(**ctx):
 
 def initialize_configuration(**ctx):
     # check out and download the latest git repo
-    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout Analysis-Class"
+    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout main"
     os.system(cmd)
     cmd = "git -C ~/Desktop/Pathfinder-Analysis pull"
     os.system(cmd)
