@@ -77,7 +77,7 @@ def main(start_symbol, end_symbol, input_file_path, files):
     for key, value in selected_items:
         # print(formatted_number)
         # symbol_file_path = input_file_path + "/" + formatted_number
-        print ("key:%s, value:%s ", key, value)
+        print (f"key:{key}, value:{value} ")
         symbol_file_path = input_file_path + "/" + value
         # print (symbol_file_path)
         type = readBackground(symbol_file_path)
@@ -98,7 +98,7 @@ def get_files_from_folders(dir):
     for item in os.listdir(dir):
         # print(item)
         files.append(item)
-    print ("total file count: %s, from folder: %s", files.count(), dir)
+    print (f"total file count: {files.count()}, from folder: {dir}")
     return files
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
