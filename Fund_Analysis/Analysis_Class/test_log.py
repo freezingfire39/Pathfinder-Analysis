@@ -57,7 +57,8 @@ def main(files):
             pass
         else:
             all_type.append(type)
-            logging.info("add type: " + str(type) + ", symbol:" + str(file))
+            info_log = "add type: " + str(type) + ", symbol:" + str(file)
+            logging.info(info_log)
     pass
 if __name__ == '__main__':
     input_file_path = home + '/Desktop/output_china'
