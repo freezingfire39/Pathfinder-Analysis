@@ -95,6 +95,7 @@ def get_files_from_folders(dir):
     for item in os.listdir(dir):
         # print(item)
         files.append(item)
+    files.sort()
     print (f"total file count: {len(files)}, from folder: {dir}")
     return files
 if __name__ == '__main__':
