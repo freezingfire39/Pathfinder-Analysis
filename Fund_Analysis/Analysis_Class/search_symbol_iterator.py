@@ -73,7 +73,7 @@ def main(start_symbol, end_symbol, input_file_path, files):
     # 货币型(test_2_money_market)，债券型(test_3_bonds)， 指数型 - 海外股票 / QDII(test_4_overseas), else (test.py)
     # for i in range(start_symbol, (end_symbol+1)):
     #     formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
-    for file in files[int(start_symbol), int(end_symbol)]:
+    for file in files[int(start_symbol): int(end_symbol)]:
         # print(formatted_number)
         # symbol_file_path = input_file_path + "/" + formatted_number
         symbol_file_path = input_file_path + "/" + file
