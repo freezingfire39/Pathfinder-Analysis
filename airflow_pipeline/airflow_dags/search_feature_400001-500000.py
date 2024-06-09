@@ -34,7 +34,7 @@ default_args = {
 }
 
 dag = DAG(
-    'daily_running-funds.eastmoney', default_args=default_args,
+    'search_feature_400001-500000', default_args=default_args,
     user_defined_filters= {'localtz': localize_ny_tz}
     # catchup=False
     # schedule_interval='0 0 * * *'
@@ -102,7 +102,7 @@ def download_ops_scripts(**ctx):
 
 def initialize_configuration(**ctx):
     # check out and download the latest git repo
-    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout main"
+    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout Analysis-Class"
     os.system(cmd)
     cmd = "git -C ~/Desktop/Pathfinder-Analysis pull"
     os.system(cmd)
@@ -129,28 +129,76 @@ python_op_1 = PythonOperator(
     dag=dag
 )
 
-# python_op_2 = PythonOperator(
-#     task_id='funds.eastmoney',
-#     python_callable=python_script,
-#     provide_context=True,
-#     trigger_rule='all_success',
-#     op_kwargs={'script_name':home + '/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts'
-#                                     '/funds.eastmoney.py', 'params': ' '},
-#     dag=dag
-# )
 python_op_2 = BashOperator(
-    task_id='funds.eastmoney',
+    task_id='search_symbol_iterator_400001-410000',
     trigger_rule='all_success',
     dag=dag,
-    # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
-    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '400001 410000'
 )
-# python_op_21 = BashOperator(
-#     task_id='funds.eastmoney_ccmx',
-#     trigger_rule='all_success',
-#     bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney_ccmx.py'
-# )
+python_op_21 = BashOperator(
+    task_id='search_symbol_iterator_410001-420000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '410001 420000'
+)
+python_op_22 = BashOperator(
+    task_id='search_symbol_iterator_420001-430000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '420001 430000'
+)
+python_op_23 = BashOperator(
+    task_id='search_symbol_iterator_430001-440000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '430001 440000'
+)
+python_op_24 = BashOperator(
+    task_id='search_symbol_iterator_440001-450000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '440001 450000'
+)
+python_op_25 = BashOperator(
+    task_id='search_symbol_iterator_450001-460000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '450001 460000'
+)
+python_op_26 = BashOperator(
+    task_id='search_symbol_iterator_460001-470000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '460001 470000'
+)
+python_op_27 = BashOperator(
+    task_id='search_symbol_iterator_470001-480000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '470001 480000'
+)
+python_op_28 = BashOperator(
+    task_id='search_symbol_iterator_480001-490000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '480001 490000'
+)
+python_op_29 = BashOperator(
+    task_id='search_symbol_iterator_490001-500000',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
+                 '490001 500000'
+)
 
-python_op_2.set_upstream(python_op_0)
-# python_op_21.set_upstream(python_op_0)
-
+python_op_0 >> python_op_2 >> python_op_21 >> python_op_22 >> python_op_23 >> python_op_24 >> python_op_25 >> python_op_26\
+>> python_op_27 >> python_op_28 >> python_op_29 >> python_op_1
