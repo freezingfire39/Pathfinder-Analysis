@@ -11,7 +11,7 @@ import subprocess
 import logging
 logging.basicConfig(
     filename=home + '/Desktop/info.log',  # Log file path
-    filemode='a',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
+    filemode='w',  # 'a' means append (add to the existing file), 'w' would overwrite the file each time
     level=logging.INFO,  # Logging level set to ERROR
     format='%(asctime)s - %(levelname)s - %(message)s',  # Includes timestamp, log level, and message
     datefmt='%Y-%m-%d %H:%M:%S'  # Timestamp format
