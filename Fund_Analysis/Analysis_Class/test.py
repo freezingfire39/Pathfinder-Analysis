@@ -49,13 +49,13 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
     if df_target['annual_return'][-1] > 0.05:
 
-        new_row = {'ticker': '="'+Ticker+'"', 'value': df_target['annual_return'][-1]}
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
 
 
     rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
-    new_row = {'ticker': '="'+Ticker+'"', 'value': df_target['CAGR'][-1]}
+    new_row = {'ticker': Ticker, 'value': df_target['CAGR'][-1]}
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
 
@@ -92,7 +92,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-
+    df_target['comp_1'] = index_comps[comp_1_name]
+    df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
 
     df_target['rolling_mean'] = df_target['return'].rolling(trading_days).mean()
     df_target['comp_mean'] = index_comps[comp_1_name].rolling(trading_days).mean()
@@ -107,8 +108,6 @@ def main(symbol_file_path,symbol,search_file_path):
         df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
 
 
-
-    df_target['comp_1'] = index_comps[comp_1_name]
     df1 = df_target[['累计净值', 'comp_1']]
 
     # Resample to month end and calculate the monthly percent change
