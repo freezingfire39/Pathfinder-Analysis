@@ -46,7 +46,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
     if df_target['annual_return'][-1] > 0.05:
 
-        new_row = {'ticker': '="'+Ticker+'"', 'value': df_target['annual_return'][-1]}
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
 
@@ -54,7 +54,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
     rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
-    new_row = {'ticker': '="'+Ticker+'"', 'value': df_target['CAGR'].iloc[-1]}
+    new_row = {'ticker': Ticker, 'value': df_target['CAGR'].iloc[-1]}
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
 
@@ -78,12 +78,13 @@ def main(symbol_file_path,symbol,search_file_path):
 
     index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16") ##use 003718
     print (index_comps)
+    df_target['comp_1'] =index_comps['Close'].pct_change()
     index_comps = index_comps['Close']
 
     index_comps.index = pd.to_datetime(index_comps.index)
 
 
-
+    df_target['excess_return']=df_target['return']-df_target['comp_1']
 
 
 
