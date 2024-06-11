@@ -15,6 +15,7 @@ formatter = '[[time]] - [[name]] - [[level_name]] - [[msg]]'
 # add/del channel
 # logger.add_channel(filename='log.txt', level=logging4.WARNING)
 # logger.add_channel(filename=sys.stdout, level=logging4.ERROR, formatter=formatter)
+logger.add_channel(filename=home + '/Desktop/info.log', level=logging4.INFO, formatter=formatter)
 logger.add_channel(filename=home + '/Desktop/error.log', level=logging4.ERROR, formatter=formatter)
 # logger.del_channel(filename='log2.txt')
 def readBackground(symbol_file_path):
@@ -27,14 +28,24 @@ def readBackground(symbol_file_path):
     try:
         type = background_csv['基金类型'].iloc[0]
         print ("type:", type)
-        if "货币型" in type:
+        logger.info("read " + symbol_file_path + ", background type is:" + type)
+        test1_array = ['混合型-灵活', '混合型-偏股', '指数型-股票', '股票型', '混合型-偏债', '混合型-绝对收益', '混合型-平衡',
+                       'FOF-稳健型', 'FOF-进取型', 'FOF-均衡型']
+        test2_array = ['货币型-普通货币']
+        test3_array = ['债券型-混合二级', '债券型-长债', '债券型-混合一级', '债券型-中短债', '指数型-固收', 'QDII-纯债', 'QDII-混合债']
+        test4_array = ['QDII-普通股票', '指数型-海外股票', '指数型-其他', 'QDII-混合偏股', 'QDII-混合灵活', 'QDII-商品',
+                       'QDII-混合平衡', 'QDII-REITs', '商品', 'QDII-FOF']
+        if type in test1_array:
             return 1
-        elif "债券型" in type:
+        elif type in test2_array:
             return 2
-        elif "指数型" in type or "QDII" in type:
+        elif type in test3_array:
             return 3
-        else:# "混合型"
+        elif type in test4_array:
             return 4
+        else:
+            logger.error("symbol:" + symbol_file_path + ", type not define:" + type)
+            return 0
     except:
         error_log = "Faild to read file path: "+ str(symbol_file_path)
         logger.error(error_log)
@@ -49,29 +60,34 @@ def trigger_python_script(script_path, params):
     print(result.stderr)
     if result.returncode == 0:
         print ("job succeed, " + script_path + " " + params)
+        logger.info("trigger: " + script_path + " " + params)
     else:
         print (f"Error in running the script. Return code: {result.returncode}, script: {script_path} {params} ")
-
-# "货币型"  1 test_2_money_market
-def trigger_test_2_money_market(formatted_number):
-    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_2_money_market.py', formatted_number)
-    pass
-# "债券型" 2 test_3_bonds
-def trigger_test_3_bonds(formatted_number):
-    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_3_bonds.py', formatted_number)
-    pass
-# "指数型" or "QDII" 3 run test_4_overseas
-def trigger_test_4_overseas(formatted_number):
-    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_4_overseas.py', formatted_number)
-    pass
-# "混合型" 4 run test.py
+        logger.error("fail to trigger: " + script_path + " " + params)
+# 混合型-灵活, 混合型-偏股, 指数型-股票, 股票型, 混合型-偏债, 混合型-绝对收益, 混合型-平衡, FOF-稳健型, FOF-进取型, FOF-均衡型
+# return 1 run test.py
 def trigger_test(formatted_number):
     trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test.py',formatted_number)
     pass
+# 货币型-普通货币
+# return 2 test_2_money_market
+def trigger_test_2_money_market(formatted_number):
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_2_money_market.py', formatted_number)
+    pass
+# 债券型-混合二级, 债券型-长债, 债券型-混合一级, 债券型-中短债, 指数型-固收, QDII-纯债, QDII-混合债
+# return 3 test_3_bonds
+def trigger_test_3_bonds(formatted_number):
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_3_bonds.py', formatted_number)
+    pass
+# QDII-普通股票, 指数型-海外股票, 指数型-其他, QDII-混合偏股, QDII-混合灵活, QDII-商品, QDII-混合平衡, QDII-REITs, 商品, QDII-FOF
+# return 4 run test_4_overseas
+def trigger_test_4_overseas(formatted_number):
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_4_overseas.py', formatted_number)
+    pass
+
 def main(start_symbol, end_symbol, input_file_path, files):
     # iterator from [start_symbol to end_symbol]
     # read Background.csv column 基金类型
-    # 货币型(test_2_money_market)，债券型(test_3_bonds)， 指数型 - 海外股票 / QDII(test_4_overseas), else (test.py)
     # for i in range(start_symbol, (end_symbol+1)):
     #     formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
     for file in files[int(start_symbol): int(end_symbol)]:
@@ -80,16 +96,16 @@ def main(start_symbol, end_symbol, input_file_path, files):
         symbol_file_path = input_file_path + "/" + file
         type = readBackground(symbol_file_path)
         print("type number:", type)
-        if type == 0:
-            continue
-        elif type == 1:
-            trigger_test_2_money_market(file)
-        elif type == 2:
-            trigger_test_3_bonds(file)
-        elif type == 3:
-            trigger_test_4_overseas(file)
-        else:
+        if type == 1:
             trigger_test(file)
+        elif type == 2:
+            trigger_test_2_money_market(file)
+        elif type == 3:
+            trigger_test_3_bonds(file)
+        elif type == 4:
+            trigger_test_4_overseas(file)
+        else: # type == 0
+            continue
 
 def get_files_from_folders(dir):
     files = []
