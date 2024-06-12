@@ -34,7 +34,7 @@ default_args = {
 }
 
 dag = DAG(
-    'daily_running-funds.eastmoney', default_args=default_args,
+    'create_search_filter_comps', default_args=default_args,
     user_defined_filters= {'localtz': localize_ny_tz}
     # catchup=False
     # schedule_interval='0 0 * * *'
@@ -102,7 +102,7 @@ def download_ops_scripts(**ctx):
 
 def initialize_configuration(**ctx):
     # check out and download the latest git repo
-    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout main"
+    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout Analysis-Class"
     os.system(cmd)
     cmd = "git -C ~/Desktop/Pathfinder-Analysis pull"
     os.system(cmd)
@@ -129,28 +129,20 @@ python_op_1 = PythonOperator(
     dag=dag
 )
 
-# python_op_2 = PythonOperator(
-#     task_id='funds.eastmoney',
-#     python_callable=python_script,
-#     provide_context=True,
-#     trigger_rule='all_success',
-#     op_kwargs={'script_name':home + '/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts'
-#                                     '/funds.eastmoney.py', 'params': ' '},
-#     dag=dag
-# )
+
 python_op_2 = BashOperator(
-    task_id='funds.eastmoney',
+    task_id='create_filter_csv',
     trigger_rule='all_success',
     dag=dag,
-    # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
-    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
+    bash_command='cd /home/app/Desktop/output_search && python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/create_filter_csv.py'
 )
-# python_op_21 = BashOperator(
-#     task_id='funds.eastmoney_ccmx',
-#     trigger_rule='all_success',
-#     bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney_ccmx.py'
-# )
-
+python_op_21 = BashOperator(
+    task_id='create_comps',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='cd /home/app/Desktop/output_search && python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/create_comps.py'
+)
 python_op_2.set_upstream(python_op_0)
-# python_op_21.set_upstream(python_op_0)
-
+python_op_21.set_upstream(python_op_0)
+python_op_1.set_upstream(python_op_2)
+python_op_1.set_upstream(python_op_21)
