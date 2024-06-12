@@ -2,5 +2,5 @@ from django.urls import path
 from .views import OptimizePortfolioView
 
 urlpatterns = [
-    path('optimize/', OptimizePortfolioView.as_view(), name='optimize portfolio'),
+    path('api/v1/py/analysis/', OptimizePortfolioView.as_view(), name='analyze portfolio'),
 ]

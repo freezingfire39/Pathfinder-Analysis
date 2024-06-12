@@ -102,7 +102,7 @@ class MaxSharpeRatioOptimizer(PortfolioOptimizer):
 if __name__ == '__main__':
     from factory import OptimizerFactory
     from analyzer import *
-    from portfolio.utils import enums
+    from utils import enums
     fac = OptimizerFactory()
     fdir = "D:/workspace/Pathfinder-Analysis/sample"
     p = Portfolio(1e6, eft_tags=['000001','000003'],fdir=fdir)
@@ -114,9 +114,10 @@ if __name__ == '__main__':
     print(p.weights)
     p.calc_historical_returns()
     analyzer = Analyzer(p)
-    print(analyzer.rolling_sharpe())
-    print(analyzer.rolling_volatility())
-    print(analyzer.max_drawdown())
+    print(analyzer.history())
+    # print(analyzer.rolling_sharpe())
+    # print(analyzer.rolling_volatility())
+    # print(analyzer.max_drawdown())
 
 
 

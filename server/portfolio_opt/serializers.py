@@ -13,9 +13,18 @@ class OptimizedPortfolioSerializer(serializers.Serializer):
     amount = serializers.FloatField()
 
 class TimeSeriesSerializer(serializers.Serializer):
-    date = serializers.DateField()
+    date = serializers.DateTimeField()
     value = serializers.FloatField()
 
 class PortfolioSerializer(serializers.Serializer):
-    component = serializers.ListField(child=OptimizedPortfolioSerializer())
-    returns = serializers.ListField(child=TimeSeriesSerializer())
+    component = OptimizedPortfolioSerializer(many=True)
+    returns = TimeSeriesSerializer(many=True)
+
+class AnalysisSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    values = TimeSeriesSerializer(many=True)
+    comment = serializers.CharField()
+
+class AnalyzerOutputSerializer(serializers.Serializer):
+    portfolio = PortfolioSerializer()
+    analysis = AnalysisSerializer(many=True)

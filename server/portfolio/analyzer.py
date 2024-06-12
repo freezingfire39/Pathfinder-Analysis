@@ -5,6 +5,8 @@ class Analyzer:
     def __init__(self, portfolio):
         self.portfolio = portfolio
         self.returns = self.portfolio.returns
+    def history(self):
+        return self._to_json(self.portfolio.returns["return"])
 
     def rolling_sharpe(self, risk_free_rate=0.0, window=120):
         returns = self.returns.copy()
@@ -19,7 +21,7 @@ class Analyzer:
             comment = "This fund's has performed inline with its historical average in the last 6 months."
 
         sr = returns["rolling_SR"]
-        return self._to_json(sr), comment
+        return self._to_json(sr, "rolling_SR"), comment
 
     def sharpe(self, risk_free_rate=0.0):
         returns = self.returns.copy()
@@ -43,13 +45,15 @@ class Analyzer:
         drawdown = (cumulative_returns - max_cumulative_returns) / max_cumulative_returns
         drawdown_json = self._to_json(drawdown)
 
-        return drawdown_json
+        return drawdown_json, ""
 
 
-    def _to_json(self, series):
+    def _to_json(self, series, col="return"):
         df = series.to_frame()
+        df.dropna(inplace=True)
         df.reset_index(inplace=True)
-        df_json = df.to_json(orient='records', date_format='iso')
+        df.rename(columns={col:"value"}, inplace=True)
+        df_json = df.to_dict(orient='records')
         return df_json
 
 
