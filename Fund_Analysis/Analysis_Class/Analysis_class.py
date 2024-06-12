@@ -37,6 +37,7 @@ def rolling_sharpe(returns, rank_file_path,security_code,asset_type,risk_free_ra
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
+    returns['excess_return'].fillna(method='ffill',inplace=True)
     returns['excess_SR'] = returns['excess_return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     if asset_type=='bond_':
     
