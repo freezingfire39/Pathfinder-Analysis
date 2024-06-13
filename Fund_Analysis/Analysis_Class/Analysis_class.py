@@ -16,7 +16,7 @@ import utils
 import statsmodels.api as sm
 from statsmodels import regression
 
-def rolling_sharpe(returns, rank_file_path,security_code,risk_free_rate=0.0, window=250):
+def rolling_sharpe(returns, rank_file_path,security_code,asset_type,risk_free_rate=0.0, window=250):
 
     returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     returns['rolling_SR'].plot()
@@ -37,7 +37,25 @@ def rolling_sharpe(returns, rank_file_path,security_code,risk_free_rate=0.0, win
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
+    returns['excess_return'].fillna(method='ffill',inplace=True)
     returns['excess_SR'] = returns['excess_return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
+    if asset_type=='bond_':
+    
+        if returns['return'].corr(returns['comp_1'])>0.8:
+            if returns['excess_SR'][-1]>0.2:
+                print ('This fund has adopted similar strategy to 10 year treasury bond but it has generated stronger return recently.')
+            elif returns['excess_SR'][-1]<-0.2:
+                print ('This fund has adopted similar strategy to 10 year treasury bond but it has generated weaker return recently.')
+            else:
+                print ('This fund has adopted similar strategy to 10 year treasury bond and its performance is also similar.')
+
+        else:
+            if returns['excess_SR'][-1]>0.2:
+                print ('This fund has adopted different strategy to 10 year treasury bond but it has generated stronger return recently.')
+            elif returns['excess_SR'][-1]<-0.2:
+                print ('This fund has adopted different strategy to 10 year treasury bond but it has generated weaker return recently.')
+            else:
+                print ('This fund has adopted different strategy to 10 year treasury bond but its performance is similar.')
     return returns
 
 
