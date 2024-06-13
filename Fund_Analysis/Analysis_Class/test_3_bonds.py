@@ -49,6 +49,31 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
 
+
+
+
+    df_test_4 = df_target['申购状态'].resample('D')
+    df_test_4 = df_test_4.fillna(method='ffill')
+    print (df_test_4)
+    df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
+    df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
+    if len(df_test_1)==0:
+        print ("This fund is always open")
+    elif len(df_test_2)==0:
+        print ("This fund is not open to invest yet")
+    else:
+        if df_target['申购状态'][-1]=="开放申购":
+            print ("open for purchase or redemption")
+        else:
+            print ("not open for purchase or redemption")
+
+        close_days = df_test_1.index[-1]-df_test_2.index[-1]
+        print (close_days) ##how many days since it is open
+        df_test_2 = df_test_2.to_frame()
+        df_test_2['flag']=1
+        df_test_5 = df_test_2['flag'].resample('Y').sum()
+        print (int(df_test_5.mean()))  ##how many days in a year
+
     df_target['CAGR'] = 0
 
     df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
