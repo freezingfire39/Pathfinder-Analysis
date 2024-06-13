@@ -12,12 +12,14 @@ import numpy as np
 from scipy.optimize import minimize
 from django.conf import settings
 from portfolio.analyzer import Analyzer
+from pathlib import Path
 
 
 class OptimizePortfolioView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.fdir = settings.RETURNS_DATA_FILE_PATH
+        home = str(Path.home())
+        self.fdir = home + '/Desktop/output_china'
         self.fac = OptimizerFactory()
     def post(self, request):
         input_serializer = OptimizationInputSerializer(data=request.data)
