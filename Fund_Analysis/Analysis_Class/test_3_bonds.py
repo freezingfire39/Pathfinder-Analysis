@@ -39,20 +39,7 @@ def main(symbol_file_path,symbol,search_file_path):
     risk_free_rate=0.0
     df_target.set_index('净值日期',inplace=True)
     df_target.index = pd.to_datetime(df_target.index)
-    df_target['return'] = df_target['累计净值'].pct_change()
-
-    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
-
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
-
-
-
-
-    df_test_4 = df_target['申购状态'].resample('D')
+        df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
     print (df_test_4)
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
@@ -96,6 +83,37 @@ def main(symbol_file_path,symbol,search_file_path):
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
         print (int(df_test_5.mean()))  ##how many days in a year
+
+
+    df_target = df_target['累计净值'].resample('D').last()
+    df_target = df_target.to_frame()
+    df_target.reset_index(inplace=True)
+    from pandas.tseries.offsets import BDay
+    isBusinessDay = BDay().onOffset
+    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
+    df_target = df_target[match_series]
+    df_target.set_index('净值日期',inplace=True)
+    df_target = df_target.fillna(method='ffill')
+
+
+
+
+
+    
+    df_target['return'] = df_target['累计净值'].pct_change()
+
+    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
+    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > 0.05:
+
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(return_rank_file_path)
+
+
+
+
+
 
     df_target['CAGR'] = 0
 
