@@ -42,7 +42,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_comments'])
-    rolling_sharpe_df.to_csv('comments.csv')
+    rolling_sharpe_df.to_csv(symbol_file_path + 'comments.csv')
     
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
@@ -138,13 +138,13 @@ def main(symbol_file_path,symbol,search_file_path):
     industry_comps.index = pd.to_datetime(industry_comps.index)
 
 
-    comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path, rank_file_path)
+
 
 
 
     comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path, rank_file_path)
 
-
+    comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path, rank_file_path)
 
     df_target['comp_1'] = index_comps[comp_1_name]
     df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
@@ -152,7 +152,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['rolling_mean'] = df_target['return'].rolling(trading_days).mean()
     df_target['comp_mean'] = index_comps[comp_1_name].rolling(trading_days).mean()
 
-    df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, security_code = Ticker)
+    df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path, asset_type=asset_type, security_code = Ticker)
 
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, security_code = Ticker)
 
