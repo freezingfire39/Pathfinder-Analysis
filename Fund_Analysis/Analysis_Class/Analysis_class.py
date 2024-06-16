@@ -334,7 +334,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_drawdowns['Valley date'] = pd.to_datetime(df_drawdowns['Valley date'])
     df_drawdowns['Recovery date'] = pd.to_datetime(
         df_drawdowns['Recovery date'])
-    
+    df_drawdowns.to_csv('drawdown.csv')
     returns['drawdown_duration'] = 0
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
@@ -1324,7 +1324,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
 
 
 
-def rolling_volatility(returns, comp, rank_file_path,security_code,rolling_vol_window=250):
+def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_path,rolling_vol_window=250):
     """
     Determines the rolling volatility of a strategy.
 
@@ -1350,24 +1350,38 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,rolling_vol_w
         * np.sqrt(250)
     returns['comp_vol'] = comp.rolling(rolling_vol_window).std() \
         * np.sqrt(250)
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('Unnamed: 0')
     if returns['vol'].mean() > 1.2*returns['comp_vol'].mean():
-        print ('The fund is more volatile than index.')
+        comment_csv.at[comment_csv.index[-1],'volatility_comments'']  = "本基金的波动率显著高于基准指数。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        
+        #print ('The fund is more volatile than index.')
         #print ("本基金的波动率显著高于基准指数。")
     elif returns['vol'].mean() < 0.8*returns['comp_vol'].mean():
-        print ('The fund is less volatile than index.')
+        comment_csv.at[comment_csv.index[-1],'volatility_comments'']  = "本基金的波动率显著低于基准指数。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ('The fund is less volatile than index.')
         #print ("本基金的波动率显著低于基准指数。")
     else:
-        print ('The fund has similar volatility to the index. ')
+        comment_csv.at[comment_csv.index[-1],'volatility_comments'']  = "本基金的波动率与基准指数基本一致。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ('The fund has similar volatility to the index. ')
         #print ("本基金的波动率与基准指数基本一致。")
-        
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('Unnamed: 0')
     if returns['vol'][-1]>1.2*returns['vol'].mean():
-        print ('The fund has become more volatile recently')
+        comment_csv.at[comment_csv.index[-1],'volatility_comments'']  += "本基金的波动率近期有明显上升。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ('The fund has become more volatile recently')
         #print ("本基金的波动率近期有明显上升。")
     elif returns['vol'][-1]<0.8*returns['vol'].mean():
-        print ('The fund has become less volatile recently')
+        comment_csv.at[comment_csv.index[-1],'volatility_comments'']  += ""本基金的波动率近期有明显下降。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ('The fund has become less volatile recently')
         #print ("本基金的波动率近期有明显下降。")
     else:
-        print ('The volatility has been consistent recently')
+        comment_csv.at[comment_csv.index[-1],'volatility_comments'']  += "本基金的波动率近期较为稳定。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ('The volatility has been consistent recently')
         #print ("本基金的波动率近期较为稳定。")
     
     rank_file = pd.read_csv(rank_file_path+'volatility_rank.csv').set_index('Unnamed: 0')
