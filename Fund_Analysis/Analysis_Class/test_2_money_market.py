@@ -24,7 +24,9 @@ def main(symbol_file_path,symbol,search_file_path):
     Ticker = symbol
     df_target_2 =pd.read_csv(input_file_path)
 
+    df_target_2 = df_target_2.iloc[::-1]
 
+    df_target_2.set_index('净值日期',inplace=True)
     df_target_2['7日年化收益率（%）'] = df_target_2['7日年化收益率（%）'].str.rstrip('%').astype('float') / 100.0
 
     df_target_2['return'] = (df_target_2['7日年化收益率（%）']+1)**(1/trading_days)-1
