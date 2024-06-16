@@ -837,7 +837,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,r
     return returns_daily
 
 
-def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2):
+def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,input_file_path):
     security_code = str(security_code)
     
     comp[security_code] = returns['累计净值']
@@ -865,15 +865,24 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
         returns['industry_peers']=0
         returns['industry_peers'].iloc[-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
         
-        
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     returns['positive_comp'] = 0
     returns['negative_comp'] = 0
+    returns['benchmark_name'] = 0
     returns['positive_comp'] = returns['positive_comp'].astype(str)
     returns['negative_comp'] = returns['negative_comp'].astype(str)
+    returns['benchmark_name'] = returns['benchmark_name'].astype(str)
+    returns['benchmark_name_2'] = 0
+    returns['benchmark_name_2'] = returns['benchmark_name_2'].astype(str)
     if corr_df[comp_1_name] > 0.9:
         ##save comp_1_name
         if comp_1_name=="510050.SS":
-            print ("This etf correlates with A50")
+            returns.at[returns.index[-1],'benchmark_name'] = 'A50'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与A50有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            
+            
+            #print ("This etf correlates with A50")
             #print ("本基金与中证50（大盘股）有较强的相关性。")
             rank_file = pd.read_csv(rank_file_path_2+'A50.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -884,7 +893,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 rank_file.to_csv(rank_file_path_2+'A50.csv')
                 
         elif comp_1_name=="159901.SZ":
-            print ("This etf correlates with Shenzhen 100")
+            returns.at[returns.index[-1],'benchmark_name'] = '深圳100（深A大盘股）'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与深圳100（深A大盘股）有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            
+            #print ("This etf correlates with Shenzhen 100")
             #print ("本基金与深圳100（深A大盘股）有较强的相关性。")
             rank_file = pd.read_csv(rank_file_path_2+'Shenzhen100.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -896,7 +909,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="159949.SZ":
-            print ("This etf correlates with Chuangye 50")
+            #print ("This etf correlates with Chuangye 50")
+            returns.at[returns.index[-1],'benchmark_name'] = '创业板'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与创业板有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             
             rank_file = pd.read_csv(rank_file_path_2+'Chuangye50.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -908,8 +924,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 
             #print ("本基金与创业板有较强的相关性。")
         elif comp_1_name=="510300.SS":
-            print ("This etf correlates with Hushen 300")
-            
+            #print ("This etf correlates with Hushen 300")
+            returns.at[returns.index[-1],'benchmark_name'] = '沪深300'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与沪深300有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Hushen300.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -920,7 +938,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             #print ("本基金与沪深300有较强的相关性。")
         elif comp_1_name=="510500.SS":
-            print ("This etf correlates with Zhongzheng 500")
+            #print ("This etf correlates with Zhongzheng 500")
+            returns.at[returns.index[-1],'benchmark_name'] = '中证500（中盘股）'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与中证500（中盘股）有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             
             rank_file = pd.read_csv(rank_file_path_2+'Zhongzheng500.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -932,8 +953,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             #print ("本基金与中证500（中盘股）有较强的相关性。")
         elif comp_1_name=="512100.SS":
-            print ("This etf correlates with Zhongzheng 1000")
-            
+            #print ("This etf correlates with Zhongzheng 1000")
+            returns.at[returns.index[-1],'benchmark_name'] = '中证1000（小盘股）'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与中证1000（小盘股）有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Zhongzheng1000.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -944,8 +967,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             #print ("本基金与中证1000（小盘股）有较强的相关性。")
         elif comp_1_name=="588000.SS":
-            print ("This etf correlates with Kechuang 50")
-            
+            #print ("This etf correlates with Kechuang 50")
+            returns.at[returns.index[-1],'benchmark_name'] = '科创板'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与科创板有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Kechuang50.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -958,6 +983,9 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
         elif comp_1_name=="510900.SS":
             print ("This etf correlates with Hang Seng Index")
             #print ("本基金与香港恒生指数有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name'] = '香港恒生指数'
+            comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与香港恒生指数有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             
             rank_file = pd.read_csv(rank_file_path_2+'Hangseng.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -969,8 +997,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="510230.SS":
-            print ("This etf correlates with Finance Sector")
+            #print ("This etf correlates with Finance Sector")
             #print ("本基金与金融板块有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '金融板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与金融板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             
             rank_file = pd.read_csv(rank_file_path_2+'Finance.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -984,6 +1015,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
         elif comp_1_name=="512010.SS":
             print ("This etf correlates with Pharmaceutical Sector")
             #print ("本基金与医药板块有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '医药板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与医药板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            
             rank_file = pd.read_csv(rank_file_path_2+'Pharmaceutical.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -993,8 +1028,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 rank_file.to_csv(rank_file_path_2+'Pharmaceutical.csv')
                 
         elif comp_1_name=="512170.SS":
-            print ("This etf correlates with Healthcare Sector")
+            #print ("This etf correlates with Healthcare Sector")
             #print ("本基金与医疗板块有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '医疗板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与医疗板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Healthcare.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1004,8 +1042,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 rank_file.to_csv(rank_file_path_2+'Healthcare.csv')
                 
         elif comp_1_name=="515170.SS":
-            print ("This etf correlates with Food & Beverage Sector")
+            #print ("This etf correlates with Food & Beverage Sector")
             #print ("本基金与食品饮料板块有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '食品饮料板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与食品饮料板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'FoodBeverage.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1016,8 +1057,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="516160.SS":
-            print ("This etf correlates with Energy Sector")
+            #print ("This etf correlates with Energy Sector")
             #print ("本基金与能源板块有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '能源板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与能源板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Energy.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1028,9 +1072,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="512480.SS":
-            print ("This etf correlates with Semiconductor")
+            #print ("This etf correlates with Semiconductor")
             #print ("本基金与半导体板块有较强的相关性。")
-            
+            returns.at[returns.index[-1],'benchmark_name_2'] = '半导体板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与半导体板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Semiconductor.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1040,9 +1086,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 rank_file.to_csv(rank_file_path_2+'Semiconductor.csv')
             
         elif comp_1_name=="515230.SS":
-            print ("This etf correlates with Software")
+            #print ("This etf correlates with Software")
             #print ("本基金与软件板块有较强的相关性。")
-            
+            returns.at[returns.index[-1],'benchmark_name_2'] = '软件板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与软件板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Software.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1053,9 +1101,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="512660.SS":
-            print ("This etf correlates with Military")
+            #print ("This etf correlates with Military")
             #print ("本基金与军工板块有较强的相关性。")
-            
+            returns.at[returns.index[-1],'benchmark_name_2'] = '军工板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与军工板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Military.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1065,9 +1115,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 rank_file.to_csv(rank_file_path_2+'Military.csv')
             
         elif comp_1_name=="516220.SS":
-            print ("This etf correlates with Chemicals")
+            #print ("This etf correlates with Chemicals")
             #print ("本基金与化工板块有较强的相关性。")
-            
+            returns.at[returns.index[-1],'benchmark_name_2'] = '化工板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与化工板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Chemicals.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1078,9 +1130,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="516800.SS":
-            print ("This etf correlates with Manufacturing")
+            #print ("This etf correlates with Manufacturing")
             #print ("本基金与制造业板块有较强的相关性。")
-            
+            returns.at[returns.index[-1],'benchmark_name_2'] = '制造业板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与制造业板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Manufacturing.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1091,8 +1145,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 
             
         elif comp_1_name=="512400.SS":
-            print ("This etf correlates with Metal")
+            #print ("This etf correlates with Metal")
             #print ("本基金与有色金属板块有较强的相关性。")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '有色金属板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与有色金属板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Metal.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1103,9 +1160,11 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
             
             
         elif comp_1_name=="159825.SZ":
-            print ("This etf correlates with Agriculture")
+            #print ("This etf correlates with Agriculture")
             #print ("本基金与农业板块有较强的相关性。")
-            
+            returns.at[returns.index[-1],'benchmark_name_2'] = '农业板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与农业板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             rank_file = pd.read_csv(rank_file_path_2+'Agriculture.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
@@ -1116,7 +1175,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 
                 
         elif comp_1_name=="516950.SS":
-            print ("This etf correlates with Infrastructure")
+            #print ("This etf correlates with Infrastructure")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '基建板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与基建板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             #print ("本基金与基建板块有较强的相关性。")
             rank_file = pd.read_csv(rank_file_path_2+'Infrastructure.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
@@ -1127,7 +1189,10 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2)
                 rank_file.to_csv(rank_file_path_2+'Infrastructure.csv')
             
         elif comp_1_name=="516070.SS":
-            print ("This etf correlates with Environmental")
+            #print ("This etf correlates with Environmental")
+            returns.at[returns.index[-1],'benchmark_name_2'] = '环保板块'
+            comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与环保板块有较强的相关性。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
             #print ("本基金与环保板块有较强的相关性。")
             rank_file = pd.read_csv(rank_file_path_2+'Environmental.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
