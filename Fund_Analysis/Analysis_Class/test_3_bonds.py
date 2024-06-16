@@ -112,7 +112,6 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     df_target = df_target.resample('D').last()
-    df_target = df_target.to_frame()
     df_target.reset_index(inplace=True)
     from pandas.tseries.offsets import BDay
     isBusinessDay = BDay().onOffset
