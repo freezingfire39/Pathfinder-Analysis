@@ -98,7 +98,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['redeem_days_2']=0
     if len(df_test_1)==0:
         df_target.at[df_target.index[-1],'purchase_comments']  = "本基金一直都是开放赎回。"
-    
+
     
     #print ("This fund is always open for investment")
     elif len(df_test_2)==0:
@@ -113,12 +113,28 @@ def main(symbol_file_path,symbol,search_file_path):
 
         close_days = df_test_1.index[-1]-df_test_2.index[-1]
 
-        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放赎回已经过去了"+close_days+"天。"
+        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放赎回已经过去了"+str(close_days)+"天。"
         df_test_2 = df_test_2.to_frame()
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
-        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
+        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放赎回"
 
+
+    df_target = df_target.resample('D').last()
+    df_target.reset_index(inplace=True)
+    from pandas.tseries.offsets import BDay
+    isBusinessDay = BDay().onOffset
+    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
+    df_target = df_target[match_series]
+    df_target.set_index('净值日期',inplace=True)
+    df_target = df_target.fillna(method='ffill')
+
+
+
+
+    df_target['benchmark_name']=0
+    df_target.at[df_target.index[-1],'benchmark_name']  = "标普500"
+    
     
     df_target['CAGR'] = 0
 
