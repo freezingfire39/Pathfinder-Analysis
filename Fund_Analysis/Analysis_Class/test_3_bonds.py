@@ -40,8 +40,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.set_index('净值日期',inplace=True)
     df_target.index = pd.to_datetime(df_target.index)
 
-    df_target['benchmark_name']=0
-    df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
+
     
     rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
     rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
@@ -112,7 +111,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
 
 
-    df_target = df_target['累计净值'].resample('D').last()
+    df_target = df_target.resample('D').last()
     df_target = df_target.to_frame()
     df_target.reset_index(inplace=True)
     from pandas.tseries.offsets import BDay
@@ -125,7 +124,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-
+    df_target['benchmark_name']=0
+    df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
     
     df_target['return'] = df_target['累计净值'].pct_change()
 
