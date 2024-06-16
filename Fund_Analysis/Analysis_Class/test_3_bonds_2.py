@@ -39,27 +39,43 @@ def main(symbol_file_path,symbol,search_file_path):
     risk_free_rate=0.0
     df_target.set_index('净值日期',inplace=True)
     df_target.index = pd.to_datetime(df_target.index)
-        df_test_4 = df_target['申购状态'].resample('D')
+
+
+    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
+    rolling_sharpe_df.to_csv('comments.csv')
+
+    
+    df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
     print (df_test_4)
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
+    
+    df_target['purchase_comments']=0
+    df_target['purchase_days']=0
+    df_target['purchase_days_2']=0
     if len(df_test_1)==0:
-        print ("This fund is always open for investment")
+        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金一直都是开放认购。"
+    
+    
+    #print ("This fund is always open for investment")
     elif len(df_test_2)==0:
-        print ("This fund is not open to invest yet")
+        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金尚未开放认购。"
     else:
         if df_target['申购状态'][-1]=="开放申购":
-            print ("open for purchase")
+            df_target.at[df_target.index[-1],'purchase_comments']  = "本基金目前开放认购。"
+        #print ("open for purchase")
         else:
-            print ("not open for purchase")
+            df_target.at[df_target.index[-1],'purchase_comments']  = "本基金目前不开放认购。"
+        #print ("not open for purchase")
 
         close_days = df_test_1.index[-1]-df_test_2.index[-1]
-        print (close_days) ##how many days since it is open
+
+        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放申购已经过去了"+close_days+"天。"
         df_test_2 = df_test_2.to_frame()
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
-        print (int(df_test_5.mean()))  ##how many days in a year
+        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放认购"
 
     
     df_test_4 = df_target['赎回状态'].resample('D')
@@ -67,22 +83,31 @@ def main(symbol_file_path,symbol,search_file_path):
     print (df_test_4)
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
+    df_target['redeem_comments']=0
+    df_target['redeem_days']=0
+    df_target['redeem_days_2']=0
     if len(df_test_1)==0:
-        print ("This fund is always open for redemption")
+        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金一直都是开放赎回。"
+    
+    
+    #print ("This fund is always open for investment")
     elif len(df_test_2)==0:
-        print ("This fund is not open to redemption yet")
+        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金尚未开放赎回。"
     else:
-        if df_target['申购状态'][-1]=="开放赎回":
-            print ("open for redemption")
+        if df_target['申购状态'][-1]=="开放申购":
+            df_target.at[df_target.index[-1],'purchase_comments']  = "本基金目前开放赎回。"
+        #print ("open for purchase")
         else:
-            print ("not open for redemption")
+            df_target.at[df_target.index[-1],'purchase_comments']  = "本基金目前不开放赎回。"
+        #print ("not open for purchase")
 
         close_days = df_test_1.index[-1]-df_test_2.index[-1]
-        print (close_days) ##how many days since it is open
+
+        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放赎回已经过去了"+close_days+"天。"
         df_test_2 = df_test_2.to_frame()
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
-        print (int(df_test_5.mean()))  ##how many days in a year
+        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
 
 
     df_target = df_target['累计净值'].resample('D').last()
@@ -162,12 +187,12 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['rolling_mean'] = df_target['return'].rolling(trading_days).mean()
     df_target['comp_mean'] = index_comps.rolling(trading_days).mean()
 
-    df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, security_code = Ticker, asset_type = asset_type)
+    df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker, asset_type = asset_type)
 
-    df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, security_code = Ticker)
+    df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
 
-    df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps,rank_file_path = rank_file_path, security_code = Ticker)
+    df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
 
 
@@ -178,12 +203,12 @@ def main(symbol_file_path,symbol,search_file_path):
     # Resample to month end and calculate the monthly percent change
     df_rets_monthly = df1.resample('M').last().pct_change().dropna()
 
-    df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, security_code = Ticker)
+    df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
     print (df_target)
 
 
-    df_target = Analysis_class.rolling_volatility(df_target, index_comps,rank_file_path = rank_file_path, security_code = Ticker)
+    df_target = Analysis_class.rolling_volatility(df_target, index_comps,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
 
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
