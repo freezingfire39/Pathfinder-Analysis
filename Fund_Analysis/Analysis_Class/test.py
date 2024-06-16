@@ -196,7 +196,7 @@ def main(symbol_file_path,symbol,search_file_path):
     else:
         df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
-    df_target = Analysis_class.plot_drawdown_underwater(df_target,input_file_path = symbol_file_path)
+    df_target = Analysis_class.plot_drawdown_underwater(df_target)
 
     Analysis_class.create_interesting_times_tear_sheet(df_target['return'])
     Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
