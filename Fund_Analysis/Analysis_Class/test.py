@@ -162,9 +162,9 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path=rank_file_path,input_file_path = symbol_file_path)
+    comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path=rank_file_path,rank_file_path_2 = rank_file_path,input_file_path = symbol_file_path)
 
-    comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path=rank_file_path, input_file_path = symbol_file_path)
+    comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path=rank_file_path, rank_file_path_2 = rank_file_path,input_file_path = symbol_file_path)
 
     df_target['comp_1'] = index_comps[comp_1_name]
     df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
@@ -192,9 +192,9 @@ def main(symbol_file_path,symbol,search_file_path):
     print (df_target)
 
     if comp_1_name in industry_comps:
-        df_target = Analysis_class.rolling_volatility(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, rank_file_path_2 = rank_file_path,input_file_path = symbol_file_path,security_code = Ticker)
+        df_target = Analysis_class.rolling_volatility(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
     else:
-        df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, rank_file_path_2 = rank_file_path,input_file_path = symbol_file_path,security_code = Ticker)
+        df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
     df_target = Analysis_class.plot_drawdown_underwater(df_target,input_file_path = symbol_file_path)
 
