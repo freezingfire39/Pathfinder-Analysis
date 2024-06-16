@@ -157,9 +157,9 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path, security_code = Ticker)
 
     if comp_1_name in industry_comps:
-        df_target = Analysis_class.alpha_beta_analysis(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
+        df_target = Analysis_class.alpha_beta_analysis(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
     else:
-        df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, security_code = Ticker)
+        df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
 
     df1 = df_target[['累计净值', 'comp_1']]
