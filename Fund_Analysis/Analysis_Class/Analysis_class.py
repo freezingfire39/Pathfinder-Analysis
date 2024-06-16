@@ -284,7 +284,7 @@ def get_top_drawdowns(returns, top=10):
     return drawdowns
 
 
-def gen_drawdown_table(returns, rank_file_path,security_code,top=10,input_file_path):
+def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top=10):
     """
     Places top drawdowns in a table.
 
