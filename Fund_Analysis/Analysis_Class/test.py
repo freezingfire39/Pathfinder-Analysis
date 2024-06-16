@@ -41,7 +41,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_comments'])
+    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
     rolling_sharpe_df.to_csv(symbol_file_path + 'comments.csv')
     
 
@@ -167,7 +167,7 @@ def main(symbol_file_path,symbol,search_file_path):
     # Resample to month end and calculate the monthly percent change
     df_rets_monthly = df1.resample('M').last().pct_change().dropna()
 
-    df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, security_code = Ticker)
+    df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
     print (df_target)
 
