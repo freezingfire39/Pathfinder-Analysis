@@ -284,7 +284,7 @@ def get_top_drawdowns(returns, top=10):
     return drawdowns
 
 
-def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
+def gen_drawdown_table(returns, rank_file_path,security_code,top=10,input_file_path):
     """
     Places top drawdowns in a table.
 
@@ -381,8 +381,8 @@ def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
         
     return returns
     
-def max_drawdown_analysis(returns, rank_file_path,security_code):
-    returns = gen_drawdown_table(returns, rank_file_path,security_code)
+def max_drawdown_analysis(returns, rank_file_path,security_code,input_file_path):
+    returns = gen_drawdown_table(returns, rank_file_path,security_code,input_file_path)
     plot_drawdown_underwater(returns)
     return returns
     
