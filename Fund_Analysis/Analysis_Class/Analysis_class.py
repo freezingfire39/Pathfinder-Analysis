@@ -16,7 +16,7 @@ import utils
 import statsmodels.api as sm
 from statsmodels import regression
 
-def rolling_sharpe(returns, rank_file_path,security_code,asset_type,risk_free_rate=0.0, window=250):
+def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_type,risk_free_rate=0.0, window=250):
 
     returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     returns['rolling_SR'].plot()
