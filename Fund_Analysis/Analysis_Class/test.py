@@ -162,7 +162,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path, input_file_path = symbol_file_path, rank_file_path)
+    comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,input_file_path = symbol_file_path,rank_file_path, rank_file_path)
 
     comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path, input_file_path = symbol_file_path, rank_file_path)
 
