@@ -42,8 +42,10 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
-    rolling_sharpe_df.to_csv('comments.csv')
-
+    rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
+    
+    df_target['benchmark_name']=0
+    df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
     
     df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
@@ -110,8 +112,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
 
 
-    df_target = df_target['累计净值'].resample('D').last()
-    df_target = df_target.to_frame()
+    df_target = df_target.resample('D').last()
     df_target.reset_index(inplace=True)
     from pandas.tseries.offsets import BDay
     isBusinessDay = BDay().onOffset
