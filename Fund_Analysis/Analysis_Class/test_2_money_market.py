@@ -91,7 +91,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_test_2 = df_test_2.to_frame()
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
-        df_target_2.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放认购"
+        df_target_2.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
 
     
     df_test_4 = df_target_2['赎回状态'].resample('D')
