@@ -649,7 +649,7 @@ def linreg(x,y):
     x = x[:, 1]
     return model.params[0], model.params[1]
 
-def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=250):
+def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_path, window=250):
 
     returns['alpha'] = 0
     returns['alpha'] = returns['alpha'].astype('float64')
@@ -688,23 +688,38 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,window=250):
 
     returns['alpha'] = returns_2['alpha']
     returns['beta'] = returns_2['beta']
+
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    
     if returns['alpha'][-1]>0.1:
-        print ("This fund has outperformed the benchmark")
+        #print ("This fund has outperformed the benchmark")
+        comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金对比基准指数取得了较明显的超额收益。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金对比基准指数取得了较明显的超额收益")
     elif returns['alpha'][-1]<-0.1:
-        print ("This fund has outperformed the benchmark")
+        comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金对比基准指数有较明显的超额亏损。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This fund has outperformed the benchmark")
         #print ("本基金对比基准指数有较明显的超额亏损")
     else:
         print ("This fund has not outperformed the benchmark")
+        comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金回报对比指数基本一致。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金回报对比指数基本一致")
     if returns['beta'][-1]>1.2:
-        print ("This fund is considerably more volatile than the benchmark")
+        comment_csv.at[comment_csv.index[-1],'beta_comments']  = "本基金对比基准指数有更高的波动率。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This fund is considerably more volatile than the benchmark")
         #print ("本基金对比基准指数有更高的波动率")
     elif returns['beta'][-1]<-1.2:
-        print ("This fund is considerably less volatile than the market")
+        comment_csv.at[comment_csv.index[-1],'beta_comments']  = "本基金对比基准指数有较低的波动率。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This fund is considerably less volatile than the market")
         #print ("本基金对比基准指数有较低的波动率")
     else:
-        print ("This fund's volatilty is in line with benchmark")
+        comment_csv.at[comment_csv.index[-1],'beta_comments']  = "本基金对比基准指数的波动率基本一致。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This fund's volatilty is in line with benchmark")
         #print ("本基金对比基准指数的波动率基本一致)
     rank_file = pd.read_csv(rank_file_path+'alpha_rank.csv').set_index('Unnamed: 0')
     if returns['alpha'][-1] > 0.1:
