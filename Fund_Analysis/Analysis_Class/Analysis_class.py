@@ -748,7 +748,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     
     return returns
 
-def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,rolling_window=250):
+def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,input_file_path,rolling_window=250):
     """
     Function to calculate the upside and downside capture for a given set of returns.
     The function is set up so that the investment's returns are in the first column of the dataframe
@@ -783,27 +783,39 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,r
     # 3) Combine to produce our final dataframe
     df_mkt_capture = pd.concat([up_ratio, down_ratio], axis=1)
     print (df_mkt_capture)
-
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     df_mkt_capture.columns = ['Upside Capture', 'Downside Capture']
     if df_mkt_capture['Upside Capture'][0]>1 and df_mkt_capture['Downside Capture'][0]>1:
-        if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Upside Capture'][0]>0:
-            print ("This fund moves more than the index. However, it is able to generate more gains in a up market than loss in a down market, makes it a better choice than the index. ")
+        if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Downside Capture'][0]>0:
+            comment_csv.at[comment_csv.index[-1],'upside_capture_comments']  = "本基金在基准指数上行和下行的时候能经历了更大的波动，但在上行的时候取得的超额收益大于下行时候的超额亏损，表现整体高于了基准指数。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            #print ("This fund moves more than the index. However, it is able to generate more gains in a up market than loss in a down market, makes it a better choice than the index. ")
             #print ("本基金在基准指数上行和下行的时候能经历了更大的波动，但在上行的时候取得的超额收益大于下行时候的超额亏损，表现整体高于了基准指数。")
         else:
-            print ("This fund moves more than the index, but it suffers more loss in a down market than gains in a up market, make the index a better choice. ")
+            comment_csv.at[comment_csv.index[-1],'upside_capture_comments']  = "本基金在基准指数上行和下行的时候能经历了更大的波动，但在上行的时候取得的超额收益小于下行时候的超额亏损，表现整体弱于基准指数。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            #print ("This fund moves more than the index, but it suffers more loss in a down market than gains in a up market, make the index a better choice. ")
             #print ("本基金在基准指数上行和下行的时候能经历了更大的波动，但在上行的时候取得的超额收益小于下行时候的超额亏损，表现整体弱于基准指数。")
     elif df_mkt_capture['Upside Capture'][0]>1 and df_mkt_capture['Downside Capture'][0]<1:
-        print ("This fund makes more money in a up market and loses less money in a down market. ")
+        comment_csv.at[comment_csv.index[-1],'upside_capture_comments']  = "本基金在基准指数上行的时候取得了更高的超额收益，但在基金指数下行的时候经历了较低的亏损，表现显著高于了基准指数。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This fund makes more money in a up market and loses less money in a down market. ")
         #print ("本基金在基准指数上行的时候取得了更高的超额收益，但在基金指数下行的时候经历了较低的亏损，表现显著高于了基准指数。")
     elif df_mkt_capture['Upside Capture'][0]<1 and df_mkt_capture['Downside Capture'][0]>1:
-        print ("This fund makes less money in a up market and loses more money in a down market. ")
+        comment_csv.at[comment_csv.index[-1],'upside_capture_comments']  = "本基金在基准指数上行的时候取得了更低的超额收益，但在基金指数下行的时候经历了更大的亏损，表现显著低于了基准指数。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This fund makes less money in a up market and loses more money in a down market. ")
         #print ("本基金在基准指数上行的时候取得了更低的超额收益，但在基金指数下行的时候经历了更大的亏损，表现显著低于了基准指数。")
     else:
-        if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Upside Capture'][0]>0:
-            print ("This fund moves less than the index. However, it is able to generate more gains in a up market than loss in a down market, makes it a better choice than the index.")
+        if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Downside Capture'][0]>0:
+            comment_csv.at[comment_csv.index[-1],'upside_capture_comments']  = "本基金在基准指数上行和下行的时候能经历了更小的波动，但在上行的时候取得的超额收益大于下行时候的超额亏损，表现整体优于基准指数。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            #print ("This fund moves less than the index. However, it is able to generate more gains in a up market than loss in a down market, makes it a better choice than the index.")
             #print ("本基金在基准指数上行和下行的时候能经历了更小的波动，但在上行的时候取得的超额收益大于下行时候的超额亏损，表现整体优于基准指数。")
         else:
-            print ("This fund moves less than the index, but it suffers more loss in a down market than gains in a up market, make the index a better choice. ")
+            comment_csv.at[comment_csv.index[-1],'upside_capture_comments']  = "本基金在基准指数上行和下行的时候能经历了更小的波动，但在上行的时候取得的超额收益小于下行时候的超额亏损，表现整体弱于基准指数。"
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            #print ("This fund moves less than the index, but it suffers more loss in a down market than gains in a up market, make the index a better choice. ")
             #print ("本基金在基准指数上行和下行的时候能经历了更小的波动，但在上行的时候取得的超额收益小于下行时候的超额亏损，表现整体弱于基准指数。")
     
     returns_daily['Upside_Capture_mean']=0
