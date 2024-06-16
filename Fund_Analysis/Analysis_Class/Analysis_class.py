@@ -342,15 +342,25 @@ def gen_drawdown_table(returns, rank_file_path,security_code,top=10):
     print (df_drawdowns['Duration'].max())
     returns['drawdown_duration'].iloc[-1] = df_drawdowns['Duration'].max()
     returns['drawdown_amount'].iloc[-1] = df_drawdowns['Net drawdown in %'].max()
+
+
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    
     print (returns.tail(10))
     if df_drawdowns['Duration'].mean()>400:
-        print ("compare to industry average, this security has longer drawdowns")
+        comment_csv.at[comment_csv.index[-1],'drawdown_duration_comments']  = "本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("compare to industry average, this security has longer drawdowns")
         #print ("本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。")
     elif df_drawdowns['Duration'].mean()<300:
-        print ("compare to industry average, this security has shorter drawdowns")
+        comment_csv.at[comment_csv.index[-1],'drawdown_duration_comments']  = "本基金的回撤时间小于类似产品的平均，意味着在亏损的时候会需要更少的时间回到原点。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("compare to industry average, this security has shorter drawdowns")
         #print ("本基金的回撤时间小于类似产品的平均，意味着在亏损的时候会需要更少的时间回到原点。")
     else:
-        print ("This security's drawdown duration is inline with industry average")
+        comment_csv.at[comment_csv.index[-1],'drawdown_duration_comments']  = "本基金的回撤时间与类似产品的平均基本一致。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This security's drawdown duration is inline with industry average")
         #print ("本基金的回撤时间与类似产品的平均基本一致。")
         
     rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
