@@ -362,7 +362,23 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("This security's drawdown duration is inline with industry average")
         #print ("本基金的回撤时间与类似产品的平均基本一致。")
-        
+
+    if returns['drawdown_amount'][-1]>0.3:
+        comment_csv.at[comment_csv.index[-1],'drawdown_amount_comments']  = "本基金的最大回撤大于类似产品的平均，意味着在最坏情况的亏损的时候会相对更高。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("compare to industry average, this security has longer drawdowns")
+        #print ("本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。")
+    elif returns['drawdown_amount'][-1]<0.2:
+        comment_csv.at[comment_csv.index[-1],'drawdown_amount_comments']  = "本基金的最大回撤小于类似产品的平均，意味着在最坏情况的亏损的时候会相对更低。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("compare to industry average, this security has shorter drawdowns")
+        #print ("本基金的回撤时间小于类似产品的平均，意味着在亏损的时候会需要更少的时间回到原点。")
+    else:
+        comment_csv.at[comment_csv.index[-1],'drawdown_amount_comments']  = "本基金的最大回撤与类似产品的平均一致。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("This security's drawdown duration is inline with industry average")
+        #print ("本基金的回撤时间与类似产品的平均基本一致。")
+    
     rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
     if returns['drawdown_duration'].iloc[-1] < 300:
 
