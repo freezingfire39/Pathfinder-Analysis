@@ -19,15 +19,22 @@ from statsmodels import regression
 def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_type,risk_free_rate=0.0, window=250):
 
     returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
-    returns['rolling_SR'].plot()
-    if returns['rolling_SR'][-1] < (returns['return'].mean()/returns['return'].std())-0.1:
-        print ("This fund's has performed below its historical average in the last 6 months.")
+    
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    if returns['rolling_SR'].iloc[-1] < (returns['return'].mean()/returns['return'].std())-0.1:
+        #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
-    elif returns['rolling_SR'][-1] > (returns['return'].mean()/returns['return'].std())+0.1:
-        print ("This fund's has performed below its historical average in the last 6 months.")
+        comment_csv.at[comment_csv.index[-1],'rolling_SR_comments']  = "本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
+    elif returns['rolling_SR'].iloc[-1] > (returns['return'].mean()/returns['return'].std())+0.1:
+        #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。")
+        comment_csv.at[comment_csv.index[-1],'rolling_SR_comments']   = "本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
     else:
-        print ("This fund's has performed inline with its historical average in the last 6 months.")
+        #print ("This fund's has performed inline with its historical average in the last 6 months.")
+        comment_csv.at[comment_csv.index[-1],'rolling_SR_comments']  = "本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。"
+        comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
         
     rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_rank.csv').set_index('Unnamed: 0')
@@ -39,6 +46,31 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
     returns['excess_return'].fillna(method='ffill',inplace=True)
     returns['excess_SR'] = returns['excess_return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
+
+
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    if returns['excess_SR'].iloc[-1] < (returns['excess_return'].mean()/returns['excess_return'].std())-0.1:
+        #print ("This fund's has performed below its historical average in the last 6 months.")
+        #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
+        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现弱于对标的基准指数"+returns['benchmark_name'][-1]
+        print (comment_csv)
+        comment_csv.to_csv(input_file_path+'comments.csv')
+    elif returns['rolling_SR'].iloc[-1] > (returns['return'].mean()/returns['return'].std())+0.1:
+        #print ("This fund's has performed below its historical average in the last 6 months.")
+        #print ("本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。")
+        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现强于对标的基准指数"+returns['benchmark_name'][-1]
+        print (comment_csv)
+        comment_csv.to_csv(input_file_path+'comments.csv')
+    else:
+        #print ("This fund's has performed inline with its historical average in the last 6 months.")
+        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现持平对标的基准指数"+returns['benchmark_name'][-1]
+        print (comment_csv)
+
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
+
+
+    
     if asset_type=='bond_':
     
         if returns['return'].corr(returns['comp_1'])>0.8:
