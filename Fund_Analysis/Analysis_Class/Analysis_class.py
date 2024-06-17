@@ -707,12 +707,12 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
 
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     
-    if returns['alpha'][-1]>0.1:
+    if returns['alpha'][-1]>0.0001:
         #print ("This fund has outperformed the benchmark")
         comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金对比基准指数取得了较明显的超额收益。"
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金对比基准指数取得了较明显的超额收益")
-    elif returns['alpha'][-1]<-0.1:
+    elif returns['alpha'][-1]<-0.0001:
         comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金对比基准指数有较明显的超额亏损。"
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("This fund has outperformed the benchmark")
