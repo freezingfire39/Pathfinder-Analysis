@@ -73,7 +73,37 @@ def main(symbol_file_path,symbol,search_file_path):
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
         df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
+        
+    df_test_4 = df_target['赎回状态'].resample('D')
+    df_test_4 = df_test_4.fillna(method='ffill')
+    print (df_test_4)
+    df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
+    df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
+    df_target['redeem_comments']=0
+    df_target['redeem_days']=0
+    df_target['redeem_days_2']=0
+    if len(df_test_1)==0:
+        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金一直都是开放赎回。"
+    
+    
+    #print ("This fund is always open for investment")
+    elif len(df_test_2)==0:
+        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金尚未开放赎回。"
+    else:
+        if df_target['申购状态'][-1]=="开放申购":
+            df_target.at[df_target.index[-1],'purchase_comments']  = "本基金目前开放赎回。"
+        #print ("open for purchase")
+        else:
+            df_target.at[df_target.index[-1],'purchase_comments']  = "本基金目前不开放赎回。"
+        #print ("not open for purchase")
 
+        close_days = df_test_1.index[-1]-df_test_2.index[-1]
+
+        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放赎回已经过去了"+close_days+"天。"
+        df_test_2 = df_test_2.to_frame()
+        df_test_2['flag']=1
+        df_test_5 = df_test_2['flag'].resample('Y').sum()
+        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
 
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
@@ -84,51 +114,6 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
 
-
-    df_test_4 = df_target['申购状态'].resample('D')
-    df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
-    df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
-    df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
-    if len(df_test_1)==0:
-        print ("This fund is always open for investment")
-    elif len(df_test_2)==0:
-        print ("This fund is not open to invest yet")
-    else:
-        if df_target['申购状态'][-1]=="开放申购":
-            print ("open for purchase")
-        else:
-            print ("not open for purchase")
-
-        close_days = df_test_1.index[-1]-df_test_2.index[-1]
-        print (close_days) ##how many days since it is open
-        df_test_2 = df_test_2.to_frame()
-        df_test_2['flag']=1
-        df_test_5 = df_test_2['flag'].resample('Y').sum()
-        print (int(df_test_5.mean()))  ##how many days in a year
-
-
-    df_test_4 = df_target['赎回状态'].resample('D')
-    df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
-    df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
-    df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
-    if len(df_test_1)==0:
-        print ("This fund is always open for redemption")
-    elif len(df_test_2)==0:
-        print ("This fund is not open to redemption yet")
-    else:
-        if df_target['申购状态'][-1]=="开放赎回":
-            print ("open for redemption")
-        else:
-            print ("not open for redemption")
-
-        close_days = df_test_1.index[-1]-df_test_2.index[-1]
-        print (close_days) ##how many days since it is open
-        df_test_2 = df_test_2.to_frame()
-        df_test_2['flag']=1
-        df_test_5 = df_test_2['flag'].resample('Y').sum()
-        print (int(df_test_5.mean()))  ##how many days in a year
 
 
     df_target['CAGR'] = 0
