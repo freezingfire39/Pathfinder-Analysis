@@ -16,6 +16,63 @@ import utils
 import statsmodels.api as sm
 from statsmodels import regression
 
+
+
+def return_analysis(returns,input_file_path):
+
+    ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    if returns['return'][-1]>0.1:
+        if returns['excess_SR'][-1]>0.1:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报并且最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.to_csv(input_file_path+'comments.csv')
+
+        elif returns['excess_SR'][-1]<-0.1:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("虽然本基金取得了较强的回报，但是最近一年的表现显著低于对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.to_csv(input_file_path+'comments.csv')
+        else:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
+            comment_csv.to_csv(input_file_path+'comments.csv')
+
+    elif returns['return'][-1]<-0.1:
+        if returns['excess_SR'][-1]>0.1:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报但最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.to_csv(input_file_path+'comments.csv')
+
+        elif returns['excess_SR'][-1]<-0.1:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报并且最近一年的表现显著低于对应的基准指数"+returns['benchmark_name'][-1])
+            
+            comment_csv.to_csv(input_file_path+'comments.csv')
+        else:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
+            comment_csv.to_csv(input_file_path+'comments.csv')
+
+    else:
+        if returns['excess_SR'][-1]>0.1:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金的净值没有太大的变动但最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.to_csv(input_file_path+'comments.csv')
+            
+        elif returns['excess_SR'][-1]<-0.1:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动但最近一年的表现显著低于对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.to_csv(input_file_path+'comments.csv')
+        else:
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
+            comment_csv.to_csv(input_file_path+'comments.csv')
+
+    df_return = returns['累计净值'].resample('3M').last()
+    df_return_2 = df_return.rolling(5).apply(lambda x: x.autocorr(), raw=False)
+
+    if df_return_2.mean()>0.5:
+        comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较稳定")
+        comment_csv.to_csv(input_file_path+'comments.csv')
+
+    else:
+        comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较不稳定")
+        comment_csv.to_csv(input_file_path+'comments.csv')
+        
+    return returns
+
+
 def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_type,risk_free_rate=0.0, window=250):
 
     returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
