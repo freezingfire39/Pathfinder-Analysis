@@ -41,7 +41,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.index = pd.to_datetime(df_target.index)
 
 
-    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
+    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_comments','return_corr_comments'])
     rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
     
     df_target['benchmark_name']=0
