@@ -20,11 +20,14 @@ logger.add_channel(filename=home + '/Desktop/error.log', level=logging4.ERROR, f
 # logger.del_channel(filename='log2.txt')
 def readBackground(symbol_file_path):
     print ("start reading file path:", symbol_file_path)
+    symbols = symbol_file_path.split("/")
     try:
         background_csv = pd.read_csv(symbol_file_path + '/Background.csv')
     except:
         print ("fail to read background.csv file. skip this file")
         return 0
+    if symbols[-1] == "003816":
+        return 22
     try:
         type = background_csv['基金类型'].iloc[0]
         print ("type:", type)
@@ -32,15 +35,21 @@ def readBackground(symbol_file_path):
         test1_array = ['混合型-灵活', '混合型-偏股', '指数型-股票', '股票型', '混合型-偏债', '混合型-绝对收益', '混合型-平衡',
                        'FOF-稳健型', 'FOF-进取型', 'FOF-均衡型']
         test2_array = ['货币型-普通货币']
-        test3_array = ['债券型-混合二级', '债券型-长债', '债券型-混合一级', '债券型-中短债', '指数型-固收', 'QDII-纯债', 'QDII-混合债']
+        test22_array = ['货币型-浮动净值']
+        test3_array = ['债券型-混合二级', '债券型-长债', '债券型-混合一级', '债券型-中短债', '指数型-固收']
+        test33_array = ['QDII-纯债', 'QDII-混合债']
         test4_array = ['QDII-普通股票', '指数型-海外股票', '指数型-其他', 'QDII-混合偏股', 'QDII-混合灵活', 'QDII-商品',
                        'QDII-混合平衡', 'QDII-REITs', '商品', 'QDII-FOF']
         if type in test1_array:
             return 1
         elif type in test2_array:
             return 2
+        elif type in test22_array:
+            return 22
         elif type in test3_array:
             return 3
+        elif type in test33_array:
+            return 33
         elif type in test4_array:
             return 4
         else:
@@ -74,10 +83,18 @@ def trigger_test(formatted_number):
 def trigger_test_2_money_market(formatted_number):
     trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_2_money_market.py', formatted_number)
     pass
+# 003816, 货币型-浮动净值: test_2_money_market_2
+def trigger_test_2_money_market_2(formatted_number):
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_2_money_market_2.py', formatted_number)
+    pass
 # 债券型-混合二级, 债券型-长债, 债券型-混合一级, 债券型-中短债, 指数型-固收, QDII-纯债, QDII-混合债
 # return 3 test_3_bonds
 def trigger_test_3_bonds(formatted_number):
     trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_3_bonds.py', formatted_number)
+    pass
+# test_3_bonds_2: QDII-纯债, QDII-混合债
+def trigger_test_3_bonds_2(formatted_number):
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_3_bonds_2.py', formatted_number)
     pass
 # QDII-普通股票, 指数型-海外股票, 指数型-其他, QDII-混合偏股, QDII-混合灵活, QDII-商品, QDII-混合平衡, QDII-REITs, 商品, QDII-FOF
 # return 4 run test_4_overseas
@@ -100,8 +117,12 @@ def main(start_symbol, end_symbol, input_file_path, files):
             trigger_test(file)
         elif type == 2:
             trigger_test_2_money_market(file)
+        elif type == 22:
+            trigger_test_2_money_market_2(file)
         elif type == 3:
             trigger_test_3_bonds(file)
+        elif type == 33:
+            trigger_test_3_bonds_2(file)
         elif type == 4:
             trigger_test_4_overseas(file)
         else: # type == 0
