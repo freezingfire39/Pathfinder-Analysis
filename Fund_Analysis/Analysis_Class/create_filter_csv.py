@@ -26,6 +26,36 @@ def main(asset_type,path):
     rolling_sharpe_df.to_csv(path+'volatility_rank.csv')
 
 
+
+
+    rolling_sharpe_df.to_csv(path+'rolling_sharpe_rank.csv')
+    rolling_sharpe_df.to_csv(path+'excess_sharpe_rank.csv')
+    rolling_sharpe_df.to_csv(path+'drawdown_duration_rank.csv')
+    rolling_sharpe_df.to_csv(path+'drawdown_amount_rank.csv')
+    rolling_sharpe_df.to_csv(path+'return_rank.csv')
+    rolling_sharpe_df.to_csv(path+'CAGR_rank.csv')
+    rolling_sharpe_df.to_csv(path+'upside_capture_rank.csv')
+    rolling_sharpe_df.to_csv(path+'downside_capture_rank.csv')
+    rolling_sharpe_df.to_csv(path+'alpha_rank.csv')
+    rolling_sharpe_df.to_csv(path+'positive_beta_rank.csv')
+    rolling_sharpe_df.to_csv(path+'negative_beta_rank.csv')
+    rolling_sharpe_df.to_csv(path+'volatility_rank.csv')
+
+
+    rolling_sharpe_df.to_csv(path+'rolling_sharpe_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'excess_sharpe_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'drawdown_duration_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'drawdown_amount_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'return_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'CAGR_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'upside_capture_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'downside_capture_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'alpha_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'positive_beta_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'negative_beta_benchmark.csv')
+    rolling_sharpe_df.to_csv(path+'volatility_benchmark.csv')
+
+
     ##index
     rolling_sharpe_df.to_csv(path+'A50.csv')
     rolling_sharpe_df.to_csv(path+'Shenzhen100.csv')
