@@ -20,7 +20,7 @@ def main(symbol_file_path,symbol,search_file_path):
     cagr_rank_file_path=search_file_path+asset_type+'CAGR_rank.csv'  ##return_rank_csv
     Trading_days = 250
     trading_days=250
-    save_file_path=search_file_path+'sample_feature.csv'
+    save_file_path=symbol_file_path+'sample_feature.csv'
     # Ticker = "000001"
     Ticker = symbol
 
