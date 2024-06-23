@@ -129,8 +129,8 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['return'] = df_target['累计净值'].pct_change()
 
     for i in range(len(df_target)):
-    if df_target['return'][i] > 0.02 or df_target['return'][i] < -0.02:
-        df_target['return'][i]=0
+        if df_target['return'][i] > 0.02 or df_target['return'][i] < -0.02:
+            df_target['return'][i]=0
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
