@@ -811,7 +811,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
         
     rank_file = pd.read_csv(rank_file_path+'negative_beta_rank.csv').set_index('Unnamed: 0')
-    if returns['beta'][-1] < 0.:
+    if returns['beta'][-1] < 0.5:
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
         rank_file.loc[len(rank_file)] = new_row
