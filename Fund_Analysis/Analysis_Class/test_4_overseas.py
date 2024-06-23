@@ -51,6 +51,12 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.to_csv(return_rank_file_path)
 
 
+    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+
     rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_comments','return_corr_comments'])
     rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
