@@ -850,7 +850,18 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'negative_beta_rank.csv')
-    
+
+    rank_file = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(rank_file_path+'positive_beta_benchmark.csv')
+
+    rank_file = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': security_code, 'value': returns['alpha'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(rank_file_path+'alpha_benchmark.csv')
     
     return returns
 
