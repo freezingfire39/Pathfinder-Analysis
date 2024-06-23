@@ -95,7 +95,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
         
     rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_rank.csv').set_index('Unnamed: 0')
-    if returns['rolling_SR'][-1] > 0.8:
+    if returns['rolling_SR'][-1] > 0.5:
 
         new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1]}
         rank_file.loc[len(rank_file)] = new_row
