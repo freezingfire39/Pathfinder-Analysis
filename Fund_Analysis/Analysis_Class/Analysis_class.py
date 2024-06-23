@@ -978,13 +978,13 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
         rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
 
     rank_file = pd.read_csv(rank_file_path+'upside_capture_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['Upside_Capture'][-1]}
+    new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1]}
     rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     rank_file.to_csv(rank_file_path+'upside_capture_benchmark.csv')
 
     rank_file = pd.read_csv(rank_file_path+'downside_capture_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['Downside_Capture'][-1]}
+    new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1]}
     rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     rank_file.to_csv(rank_file_path+'downside_capture_benchmark.csv')
