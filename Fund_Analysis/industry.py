@@ -10,9 +10,9 @@ def main(input_dir, output_dir, section_percent=0.6):
     for subdir in os.listdir(input_dir):
         sub = os.path.join(input_dir, subdir)
         # checking if it is a file
+        ticker = subdir
         for filename in os.listdir(sub):
             f = os.path.join(sub, filename)
-            ticker = filename
             if (filename=="Background.csv"):
                 with open(f, encoding="utf8") as file:
                     csvreader = csv.reader(file)
