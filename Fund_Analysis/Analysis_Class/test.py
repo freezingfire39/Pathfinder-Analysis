@@ -45,36 +45,6 @@ def main(symbol_file_path,symbol,search_file_path):
     rolling_sharpe_df.to_csv(symbol_file_path + 'comments.csv')
 
 
-    df_target = df_target['累计净值'].resample('D').last()
-    df_target = df_target.to_frame()
-    df_target.reset_index(inplace=True)
-    from pandas.tseries.offsets import BDay
-    isBusinessDay = BDay().onOffset
-    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
-    df_target = df_target[match_series]
-    df_target.set_index('净值日期',inplace=True)
-    df_target = df_target.fillna(method='ffill')
-    df_target['return'] = df_target['累计净值'].pct_change()
-    
-
-    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-
-
-
-    df_target['CAGR'] = 0
-
-    df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
-
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
-
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
-
-
-
-    
     df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
     print (df_test_4)
@@ -138,6 +108,35 @@ def main(symbol_file_path,symbol,search_file_path):
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
         df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
+
+    
+    df_target = df_target['累计净值'].resample('D').last()
+    df_target = df_target.to_frame()
+    df_target.reset_index(inplace=True)
+    from pandas.tseries.offsets import BDay
+    isBusinessDay = BDay().onOffset
+    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
+    df_target = df_target[match_series]
+    df_target.set_index('净值日期',inplace=True)
+    df_target = df_target.fillna(method='ffill')
+    df_target['return'] = df_target['累计净值'].pct_change()
+    
+
+    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
+
+
+
+    df_target['CAGR'] = 0
+
+    df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
+
+    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > 0.05:
+
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(return_rank_file_path)
+
     
 
     rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
