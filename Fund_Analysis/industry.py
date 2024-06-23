@@ -56,8 +56,8 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="Read an input file and write to an output file.")
 
     # Add arguments
-    parser.add_argument('input', type=str, help='The input file path')
-    parser.add_argument('output', type=str, help='The output file path')
+    parser.add_argument('--input', type=str, help='The input file path')
+    parser.add_argument('--output', type=str, help='The output file path')
 
     # Parse the arguments
     args = parser.parse_args()
