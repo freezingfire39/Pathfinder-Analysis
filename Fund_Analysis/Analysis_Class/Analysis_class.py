@@ -445,7 +445,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
         
     rank_file = pd.read_csv(rank_file_path+'drawdown_amount_rank.csv').set_index('Unnamed: 0')
-    if returns['drawdown_amount'].iloc[-1] < 0.2:
+    if returns['drawdown_amount'].iloc[-1] < 0.25:
 
         new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1]}
         rank_file.loc[len(rank_file)] = new_row
