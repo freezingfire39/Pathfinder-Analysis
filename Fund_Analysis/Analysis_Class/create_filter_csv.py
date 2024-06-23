@@ -24,22 +24,8 @@ def main(asset_type,path):
     rolling_sharpe_df.to_csv(path+'positive_beta_rank.csv')
     rolling_sharpe_df.to_csv(path+'negative_beta_rank.csv')
     rolling_sharpe_df.to_csv(path+'volatility_rank.csv')
-
-
-
-
-    rolling_sharpe_df.to_csv(path+'rolling_sharpe_rank.csv')
     rolling_sharpe_df.to_csv(path+'excess_sharpe_rank.csv')
-    rolling_sharpe_df.to_csv(path+'drawdown_duration_rank.csv')
-    rolling_sharpe_df.to_csv(path+'drawdown_amount_rank.csv')
-    rolling_sharpe_df.to_csv(path+'return_rank.csv')
-    rolling_sharpe_df.to_csv(path+'CAGR_rank.csv')
-    rolling_sharpe_df.to_csv(path+'upside_capture_rank.csv')
-    rolling_sharpe_df.to_csv(path+'downside_capture_rank.csv')
-    rolling_sharpe_df.to_csv(path+'alpha_rank.csv')
-    rolling_sharpe_df.to_csv(path+'positive_beta_rank.csv')
-    rolling_sharpe_df.to_csv(path+'negative_beta_rank.csv')
-    rolling_sharpe_df.to_csv(path+'volatility_rank.csv')
+
 
 
     rolling_sharpe_df.to_csv(path+'rolling_sharpe_benchmark.csv')
