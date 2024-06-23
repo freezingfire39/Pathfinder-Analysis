@@ -138,7 +138,7 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.to_csv(return_rank_file_path)
 
     rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['annual_return'][-1]}
+    new_row = {'ticker': Ticker, 'value': returns['annual_return'][-1]}
     rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
