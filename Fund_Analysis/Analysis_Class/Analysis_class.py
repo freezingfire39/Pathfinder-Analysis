@@ -1521,7 +1521,12 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'volatility_rank.csv')
         
-        
+    rank_file = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': security_code, 'value': returns['vol'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(rank_file_path+'volatility_benchmark.csv')
+    
     return returns
 
 
