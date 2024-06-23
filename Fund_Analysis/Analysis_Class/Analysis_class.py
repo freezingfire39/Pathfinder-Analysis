@@ -112,6 +112,12 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     returns['excess_return'].fillna(method='ffill',inplace=True)
     returns['excess_SR'] = returns['excess_return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
 
+    rank_file = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(rank_file_path+'excess_sharpe_benchmark.csv')
+
     rank_file = pd.read_csv(rank_file_path+'excess_sharpe_rank.csv').set_index('Unnamed: 0')
     if returns['excess_SR'][-1] > 0.2:
 
