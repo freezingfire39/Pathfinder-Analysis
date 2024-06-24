@@ -926,7 +926,7 @@ def main():
 
 # Call the main function
 if __name__ == "__main__":
-   if scrape_fund == "y":
+   # if scrape_fund == "y":
       # print("\n\n > Processing CSV files...\n\n")
       main()
 
