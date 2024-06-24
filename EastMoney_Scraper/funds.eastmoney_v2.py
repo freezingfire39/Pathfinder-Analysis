@@ -123,17 +123,18 @@ def read_folder_data(folder_names):
 
 print("\n\n")
 # Take user input for whether to scrape fund data
-scrape_fund = take_input("Fund")
+# scrape_fund = take_input("Fund")
+scrape_fund = "y"
 
 # Take user input for whether to scrape background data
-scrape_background = take_input("Background")
-
+# scrape_background = take_input("Background")
+scrape_background = "y"
 # Take user input for whether to scrape industry data
-scrape_industry = take_input("Industry")
-
+# scrape_industry = take_input("Industry")
+scrape_industry = "y"
 # Take user input for whether to scrape Asset data
-scrape_Asset = take_input("Asset")
-
+# scrape_Asset = take_input("Asset")
+scrape_Asset = "y"
 # scrape_fund = "y"
 # scrape_background = "y"
 # scrape_industry = "y"
