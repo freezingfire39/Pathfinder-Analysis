@@ -921,7 +921,7 @@ def process_folder(folder):
 def main():
    # Get a list of all folders in the current directory
    outputPath = home + "/Desktop/output_china"
-   folders = [folder for folder in os.listdir(outputPath) if os.path.isdir(folder)]
+   folders = [folder for folder in os.listdir(outputPath) if os.path.isdir(os.path.join(outputPath, folder))]
    
    # Process folders concurrently using ThreadPoolExecutor
    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
