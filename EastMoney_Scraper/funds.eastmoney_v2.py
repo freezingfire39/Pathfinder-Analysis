@@ -10,7 +10,8 @@ import concurrent.futures # Concurrent futures module for parallel execution of 
 from datetime import datetime # Datetime module for handling date and time
 import logging # Logging module for logging errors and messages
 from time import sleep # Sleep function to pause the execution of the program
-
+from pathlib import Path
+home = str(Path.home())
 # Record the starting time of the program
 # start_time = time.time()
 
@@ -919,7 +920,8 @@ def process_folder(folder):
 # Define the main function
 def main():
    # Get a list of all folders in the current directory
-   folders = [folder for folder in os.listdir() if os.path.isdir(folder)]
+   outputPath = home + "/Desktop/output_china"
+   folders = [folder for folder in os.listdir(outputPath) if os.path.isdir(folder)]
    
    # Process folders concurrently using ThreadPoolExecutor
    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
