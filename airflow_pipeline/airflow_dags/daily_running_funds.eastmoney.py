@@ -37,7 +37,8 @@ dag = DAG(
     'daily_running-funds.eastmoney', default_args=default_args,
     user_defined_filters= {'localtz': localize_ny_tz},
     catchup=False,
-    schedule_interval='0 0 * * *'
+    # schedule_interval='0 0 * * *'
+    schedule_interval=None
     # schedule_interval=timedelta(days=1)
 )
 
