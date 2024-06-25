@@ -68,12 +68,11 @@ def scrape_records():
 def create_folders(records):
    print("> Creating folders for records...\n")
    sleep(2)
-
+   outputPath = home + "/Desktop/output_china"
    # Looping through each record in the provided list
    for record in records:
       # Converting the record to a string to use as folder name
-      folder_name = str(record)
-      
+      folder_name = outputPath + "/" + str(record)
       # Checking if the folder already exists
       if not os.path.exists(folder_name):
          # Creating a folder with the folder_name, since it doesn't exist
@@ -95,9 +94,9 @@ def create_folders(records):
 # Define a function to read data from the Fund_1.csv and Fund_2.csv files in the specified folders
 def read_folder_data(folder_names):
    folder_data = {}
-   
+   outputPath = home + "/Desktop/output_china"
    for folder_name in folder_names:
-      folder_path = os.path.join(os.getcwd(), folder_name)  # Assuming the folders are in the current working directory
+      folder_path = os.path.join(outputPath, folder_name)  # Assuming the folders are in the current working directory
       
       # Check if the folder exists
       if os.path.isdir(folder_path):
@@ -764,7 +763,8 @@ class scrapySpider(scrapy.Spider):
    # Define a method to save data to CSV files based on the record and data provided 
    def save_data(self, record, data, csv_name, first_time=False, date=""):
       # Save data into folder named after the record
-      folder_name = os.path.join(os.path.dirname(__file__), record)
+      outputPath = home + "/Desktop/output_china"
+      folder_name = os.path.join(outputPath, record)
 
       # Save data to Fund_1.csv
       if csv_name == "Fund_1":
