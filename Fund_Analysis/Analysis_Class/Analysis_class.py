@@ -18,7 +18,7 @@ from statsmodels import regression
 
 
 
-def return_analysis(returns,input_file_path, rank_file_path, asset_type):
+def return_analysis(returns,input_file_path, rank_file_path):
 
     ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
