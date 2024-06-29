@@ -190,7 +190,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['comp_mean'] = index_comps[comp_1_name].rolling(trading_days).mean()
 
     df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path, asset_type=asset_type, security_code = Ticker)
-    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path)
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path)
 
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path, security_code = Ticker)
 
