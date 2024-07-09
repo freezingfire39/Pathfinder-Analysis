@@ -33,4 +33,4 @@ if __name__ == '__main__':
     try:
         main(input_file_path)
     except Exception as e:
-        raise AirflowException("fail to run at error ", e)
+        raise Exception("fail to run at error ", e)
