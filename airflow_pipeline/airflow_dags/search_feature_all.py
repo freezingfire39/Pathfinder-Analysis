@@ -890,6 +890,12 @@ python_op_308 = BashOperator(
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/search_symbol_iterator.py '
                  '21400 21600'
 )
+python_op_4 = BashOperator(
+    task_id='sort_search_file',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/sort_search_file.py '
+)
 
 python_op_0 >> python_op_201 >> python_op_202 >> python_op_203 >> python_op_204 >> python_op_205 >> python_op_206 \
 >> python_op_207 >> python_op_208 >> python_op_209 >> python_op_210 >> python_op_211 >> python_op_212 >> python_op_213 \
@@ -907,7 +913,7 @@ python_op_0 >> python_op_201 >> python_op_202 >> python_op_203 >> python_op_204 
 >> python_op_291 >> python_op_292 >> python_op_293 >> python_op_294 >> python_op_295 >> python_op_296 >> python_op_297 \
 >> python_op_298 >> python_op_299 >> python_op_300 >> python_op_301 >> python_op_302 >> python_op_303 >> python_op_304 \
 >> python_op_305 >> python_op_306 >> python_op_307 >> python_op_308 \
->> python_op_1
+>> python_op_4 >> python_op_1
 
 
 
