@@ -259,6 +259,7 @@ def plot_drawdown_periods(returns, top=10, ax=None, **kwargs):
 
     df_cum_rets = ep.cum_returns(returns, starting_value=1.0)
     df_drawdowns = timeseries.gen_drawdown_table(returns, top=top)
+    df_drawdowns.to_csv('drawdown.csv')
 
     df_cum_rets.plot(ax=ax, **kwargs)
 
