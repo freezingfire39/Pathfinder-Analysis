@@ -143,7 +143,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['net_return']=df_target['return']-(custody_fee+management_fee)/Trading_days
 
-
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type)
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
     df_target.to_csv(save_file_path)
