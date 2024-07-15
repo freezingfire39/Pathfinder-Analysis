@@ -175,7 +175,8 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
 
-
+    df_target['benchmark_name']=0
+    df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
 
     index_comps = yf.download("TLT", start="2000-01-01", end="2024-10-16")
     print (index_comps)
