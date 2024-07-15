@@ -134,8 +134,8 @@ def main(symbol_file_path,symbol,search_file_path):
     df_background = pd.read_csv(background_file_path)
     print (df_background)
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
-    df_target_2['benchmark_name']=0
-    df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
+    df_target['benchmark_name']=0
+    df_target.at[df_target.index[-1],'benchmark_name']  = "货币基金平均收益"
 
     management_fee = float(management_fee)/100
     print (management_fee)
