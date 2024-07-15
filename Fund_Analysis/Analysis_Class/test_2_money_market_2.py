@@ -135,6 +135,7 @@ def main(symbol_file_path,symbol,search_file_path):
     print (df_background)
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
     df_target['benchmark_name']=0
+    df_target['excess_SR']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "货币基金平均收益"
 
     management_fee = float(management_fee)/100
