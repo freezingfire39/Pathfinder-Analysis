@@ -154,7 +154,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.to_csv(cagr_rank_file_path)
 
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
-    df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path, asset_type=asset_type)
+    df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
     df_target_2.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 
