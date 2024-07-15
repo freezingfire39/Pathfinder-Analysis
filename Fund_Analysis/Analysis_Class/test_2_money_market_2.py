@@ -134,7 +134,8 @@ def main(symbol_file_path,symbol,search_file_path):
     df_background = pd.read_csv(background_file_path)
     print (df_background)
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
-
+    df_target_2['benchmark_name']=0
+    df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
 
     management_fee = float(management_fee)/100
     print (management_fee)
@@ -143,7 +144,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['net_return']=df_target['return']-(custody_fee+management_fee)/Trading_days
 
-    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type)
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = symbol_file_path+asset_type, asset_type=asset_type)
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
     df_target.to_csv(save_file_path)
