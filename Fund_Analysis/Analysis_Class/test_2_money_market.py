@@ -153,6 +153,9 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
 
+    df_target_2['benchmark_name']=0
+    df_target_2.at[df_target.index[-1],'benchmark_name']  = "货币基金平均收益"
+
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
     df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
     df_target_2.to_csv(save_file_path)
