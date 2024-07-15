@@ -35,7 +35,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     rolling_sharpe_df = pd.DataFrame(index=df_target_2.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments', 'return_comments','return_corr_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
-    rolling_sharpe_df.to_csv('comments.csv')
+    rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
     ##calculate net return
     df_background = pd.read_csv(background_file_path)
