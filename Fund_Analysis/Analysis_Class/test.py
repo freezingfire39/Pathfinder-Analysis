@@ -166,7 +166,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
-
+    df_target['fund_name']=0
+    df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
 
     index_comps = pd.read_csv(comp_file_path).set_index('Date')
