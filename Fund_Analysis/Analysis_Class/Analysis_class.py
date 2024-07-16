@@ -126,7 +126,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     df_benchmark = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
     if returns['rolling_SR'][-1] > df_benchmark['value'].quantile(0.95):
 
-        new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
@@ -151,7 +151,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     df_benchmark = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
     if returns['excess_SR'][-1] > df_benchmark['value'].quantile(0.9):
 
-        new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'excess_sharpe_rank.csv')
@@ -526,7 +526,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
     if returns['drawdown_duration'].iloc[-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
@@ -535,7 +535,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
     if returns['drawdown_amount'].iloc[-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
@@ -947,7 +947,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     rank_file = pd.read_csv(rank_file_path+'alpha_rank.csv').set_index('Unnamed: 0')
     if returns['alpha'][-1] > df_benchmark['value'].quantile(0.95):
 
-        new_row = {'ticker': security_code, 'value': returns['alpha'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'alpha_rank.csv')
@@ -956,7 +956,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     df_benchmark = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
     if returns['beta'][-1] > df_benchmark['value'].quantile(0.95):
 
-        new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
@@ -964,7 +964,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     rank_file = pd.read_csv(rank_file_path+'negative_beta_rank.csv').set_index('Unnamed: 0')
     if returns['beta'][-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'negative_beta_rank.csv')
@@ -1137,7 +1137,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     rank_file = pd.read_csv(rank_file_path+'upside_capture_rank.csv').set_index('Unnamed: 0')
     if returns_daily['Upside_Capture'][-1] > df_benchmark['value'].quantile(0.6):
 
-        new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1]}
+        new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1], 'name': returns_daily['fund_name'][-1], 'sharpe_ratio': returns_daily['rolling_SR'][-1], 'return': returns_daily['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'upside_capture_rank.csv')
@@ -1146,7 +1146,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     rank_file = pd.read_csv(rank_file_path+'downside_capture_rank.csv').set_index('Unnamed: 0')
     if returns_daily['Downside_Capture'][-1] < df_benchmark_2['value'].quantile(0.4):
 
-        new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1]}
+        new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1], 'name': returns_daily['fund_name'][-1], 'sharpe_ratio': returns_daily['rolling_SR'][-1], 'return': returns_daily['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
@@ -1721,7 +1721,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
     df_benchmark = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
     if returns['vol'][-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['vol'][-1]}
+        new_row = {'ticker': security_code, 'value': returns['vol'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         rank_file.to_csv(rank_file_path+'volatility_rank.csv')
