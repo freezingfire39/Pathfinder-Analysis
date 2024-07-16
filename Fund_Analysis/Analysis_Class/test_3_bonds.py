@@ -121,7 +121,8 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = df_target.fillna(method='ffill')
 
 
-
+    df_target['fund_name']=0
+    df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
     df_target['benchmark_name']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
