@@ -14,41 +14,41 @@ def main(input_dir, output_dir, section_percent=0.6):
         sub = os.path.join(input_dir, subdir)
         # checking if it is a file
         ticker = subdir
-        for filename in os.listdir(sub):
-            f = os.path.join(sub, "Background.csv")
-            with open(f, encoding="utf8") as file:
-                csvreader = csv.reader(file)
-                header =next(csvreader)
-                value = next(csvreader)
-                category = value[4]
-                category_set.add(category)
 
-            f = os.path.join(sub, "Industry.csv")
-            with open(f, encoding="utf8") as file:
-                csvreader = csv.reader(file)
-                header = next(csvreader)
-                top = next(csvreader)
-                industry = top[1]
-                percentage_str = top[3]
-                percentage_float = float(percentage_str.strip('%'))/100
-                industry_set.add(industry)
-                if percentage_float > section_percent:
-                    industry_fund_map[ticker] = industry
+        f = os.path.join(sub, "Background.csv")
+        with open(f, encoding="utf8") as file:
+            csvreader = csv.reader(file)
+            header =next(csvreader)
+            value = next(csvreader)
+            category = value[4]
+            category_set.add(category)
 
-                for row in csvreader:
-                    industry = row[1]
-                    industry_set.add(industry)
+        f = os.path.join(sub, "Industry.csv")
+        with open(f, encoding="utf8") as file:
+            csvreader = csv.reader(file)
+            header = next(csvreader)
+            top = next(csvreader)
+            industry = top[1]
+            percentage_str = top[3]
+            percentage_float = float(percentage_str.strip('%'))/100
+            industry_set.add(industry)
+            if percentage_float > section_percent:
+                industry_fund_map[ticker] = industry
 
-            f = os.path.join(sub, "sample_feature.csv")
-            df = pd.read_csv(f)
-            latest_return = df['return'].iloc[-1]
-            if industry_fund_agg_details.get(industry) == None:
-                industry_fund_agg_details[industry] = {}
+            for row in csvreader:
+                i = row[1]
+                industry_set.add(i)
 
-            industry_fund_agg_details[industry][ticker]= latest_return
+        f = os.path.join(sub, "sample_feature.csv")
+        df = pd.read_csv(f)
+        latest_return = df['return'].iloc[-1]
+        if industry_fund_agg_details.get(industry) == None:
+            industry_fund_agg_details[industry] = {}
 
-    for k in industry_fund_agg.keys():
-        returns = industry_fund_agg[k]
+        industry_fund_agg_details[industry][ticker]= latest_return
+
+    for k in industry_fund_agg_details.keys():
+        returns = industry_fund_agg_details[k]
         avg = sum(returns.values())/len(returns)
         industry_fund_agg[k] = avg
 
