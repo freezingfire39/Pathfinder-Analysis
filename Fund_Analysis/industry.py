@@ -42,6 +42,8 @@ def main(input_dir, output_dir, section_percent=0.6):
                 industry_set.add(i)
 
         f = os.path.join(sub, "sample_feature.csv")
+        if not os.path.exists(f):
+            continue
         df = pd.read_csv(f)
         latest_return = df['return'].iloc[-1]
         if industry_fund_agg_details.get(industry) == None:
