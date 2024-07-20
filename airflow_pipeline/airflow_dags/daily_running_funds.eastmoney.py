@@ -26,7 +26,7 @@ default_args = {
     'owner': 'app',
     'depends_on_past': False,
     # 'start_date': airflow.utils.dates.days_ago(1),
-    # 'start_date': datetime(year=2024, month=4, day=23, hour=0, minute=0, tzinfo=local_tz),
+    'start_date': datetime(year=2024, month=6, day=20, hour=0, minute=0, tzinfo=local_tz),
     'email': ['None'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -35,9 +35,10 @@ default_args = {
 
 dag = DAG(
     'daily_running-funds.eastmoney', default_args=default_args,
-    user_defined_filters= {'localtz': localize_ny_tz}
-    # catchup=False
+    user_defined_filters= {'localtz': localize_ny_tz},
+    catchup=False,
     # schedule_interval='0 0 * * *'
+    schedule_interval=None
     # schedule_interval=timedelta(days=1)
 )
 
@@ -138,18 +139,20 @@ python_op_1 = PythonOperator(
 #                                     '/funds.eastmoney.py', 'params': ' '},
 #     dag=dag
 # )
+# python_op_2 = BashOperator(
+#     task_id='funds.eastmoney',
+#     trigger_rule='all_success',
+#     dag=dag,
+#     # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
+#     bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
+# )
 python_op_2 = BashOperator(
-    task_id='funds.eastmoney',
+    task_id='funds.eastmoney_v2',
     trigger_rule='all_success',
     dag=dag,
-    # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
-    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts/funds.eastmoney.py'
+    # bash_command='bash /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/trigger_funds.eastmoney_v2.sh'
+    bash_command='cd /home/app/Desktop/output_china && python /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/funds.eastmoney_v2.py'
 )
-# python_op_21 = BashOperator(
-#     task_id='funds.eastmoney_ccmx',
-#     trigger_rule='all_success',
-#     bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney_ccmx.py'
-# )
 
 python_op_2.set_upstream(python_op_0)
 # python_op_21.set_upstream(python_op_0)

@@ -34,7 +34,8 @@ def main(symbol_file_path,symbol,search_file_path):
     print (df_target_2['return'])
 
 
-
+    rolling_sharpe_df = pd.DataFrame(index=df_target_2.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments', 'return_comments','return_corr_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
+    rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
     ##calculate net return
     df_background = pd.read_csv(background_file_path)
@@ -57,7 +58,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    rolling_sharpe_df = pd.DataFrame(index=df_target_2.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
+    rolling_sharpe_df = pd.DataFrame(index=df_target_2.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
     rolling_sharpe_df.to_csv('comments.csv')
 
     
@@ -93,7 +94,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_test_5 = df_test_2['flag'].resample('Y').sum()
         df_target_2.at[df_target_2.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
 
-    
+    df_target_2['excess_SR']=0
     df_test_4 = df_target_2['赎回状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
     print (df_test_4)
@@ -139,13 +140,26 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
 
+
+    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target_2['annual_return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+    
+
     rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
     new_row = {'ticker': Ticker, 'value': df_target_2['CAGR'].iloc[-1]}
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
 
-    #df_target['fee_gap'] = df_target['net_return']-df_target['return']
+    df_target_2['benchmark_name']=0
+    df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
+    df_target_2['fund_name']=0
+    df_target_2.at[df_target_2.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
+    #df_target['fee_gap'] = df_target['net_return']-df_target['return']
+    df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
     df_target_2.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 

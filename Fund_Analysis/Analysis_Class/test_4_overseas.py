@@ -51,8 +51,14 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.to_csv(return_rank_file_path)
 
 
-    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_comments','return_corr_comments'])
-    rolling_sharpe_df.to_csv('comments.csv')
+    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+
+    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_comments','return_corr_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
+    rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
     
     df_test_4 = df_target['申购状态'].resample('D')
@@ -81,11 +87,11 @@ def main(symbol_file_path,symbol,search_file_path):
 
         close_days = df_test_1.index[-1]-df_test_2.index[-1]
 
-        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放申购已经过去了"+close_days+"天。"
+        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放申购已经过去了"+str(close_days)+"天。"
         df_test_2 = df_test_2.to_frame()
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
-        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放认购"
+        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
 
     
     df_test_4 = df_target['赎回状态'].resample('D')
@@ -151,7 +157,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
-
+    df_target['fund_name']=0
+    df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
 
     index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16") ##use 003718
@@ -174,7 +181,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['comp_mean'] = index_comps.rolling(trading_days).mean()
 
     df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker, asset_type=asset_type)
-    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path)
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type)
 
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 

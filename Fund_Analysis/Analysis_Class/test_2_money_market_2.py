@@ -38,8 +38,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments'])
-    rolling_sharpe_df.to_csv('comments.csv')
+    rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
+    rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
 
 
@@ -114,7 +114,11 @@ def main(symbol_file_path,symbol,search_file_path):
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
 
-
+    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
 
     df_target['CAGR'] = 0
 
@@ -130,7 +134,9 @@ def main(symbol_file_path,symbol,search_file_path):
     df_background = pd.read_csv(background_file_path)
     print (df_background)
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
-
+    df_target['benchmark_name']=0
+    df_target['excess_SR']=0
+    df_target.at[df_target.index[-1],'benchmark_name']  = "货币基金平均收益"
 
     management_fee = float(management_fee)/100
     print (management_fee)
@@ -138,8 +144,10 @@ def main(symbol_file_path,symbol,search_file_path):
     custody_fee = float(custody_fee)/100
 
     df_target['net_return']=df_target['return']-(custody_fee+management_fee)/Trading_days
+    df_target['fund_name']=0
+    df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
-
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
     df_target.to_csv(save_file_path)

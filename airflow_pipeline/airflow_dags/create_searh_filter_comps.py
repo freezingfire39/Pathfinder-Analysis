@@ -26,7 +26,7 @@ default_args = {
     'owner': 'app',
     'depends_on_past': False,
     # 'start_date': airflow.utils.dates.days_ago(1),
-    # 'start_date': datetime(year=2024, month=4, day=23, hour=0, minute=0, tzinfo=local_tz),
+    'start_date': datetime(year=2024, month=4, day=23, hour=0, minute=0, tzinfo=local_tz),
     'email': ['None'],
     'email_on_failure': False,
     'email_on_retry': False,
@@ -35,9 +35,9 @@ default_args = {
 
 dag = DAG(
     'create_search_filter_comps', default_args=default_args,
-    user_defined_filters= {'localtz': localize_ny_tz}
-    # catchup=False
-    # schedule_interval='0 0 * * *'
+    user_defined_filters= {'localtz': localize_ny_tz},
+    catchup=False,
+    schedule_interval=None
     # schedule_interval=timedelta(days=1)
 )
 
@@ -102,7 +102,7 @@ def download_ops_scripts(**ctx):
 
 def initialize_configuration(**ctx):
     # check out and download the latest git repo
-    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout Analysis-Class"
+    cmd = "git -C ~/Desktop/Pathfinder-Analysis checkout main"
     os.system(cmd)
     cmd = "git -C ~/Desktop/Pathfinder-Analysis pull"
     os.system(cmd)

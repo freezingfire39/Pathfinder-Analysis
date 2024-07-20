@@ -10,7 +10,8 @@ import concurrent.futures # Concurrent futures module for parallel execution of 
 from datetime import datetime # Datetime module for handling date and time
 import logging # Logging module for logging errors and messages
 from time import sleep # Sleep function to pause the execution of the program
-
+from pathlib import Path
+home = str(Path.home())
 # Record the starting time of the program
 # start_time = time.time()
 
@@ -67,12 +68,11 @@ def scrape_records():
 def create_folders(records):
    print("> Creating folders for records...\n")
    sleep(2)
-
+   outputPath = home + "/Desktop/output_china"
    # Looping through each record in the provided list
    for record in records:
       # Converting the record to a string to use as folder name
-      folder_name = str(record)
-      
+      folder_name = outputPath + "/" + str(record)
       # Checking if the folder already exists
       if not os.path.exists(folder_name):
          # Creating a folder with the folder_name, since it doesn't exist
@@ -94,9 +94,9 @@ def create_folders(records):
 # Define a function to read data from the Fund_1.csv and Fund_2.csv files in the specified folders
 def read_folder_data(folder_names):
    folder_data = {}
-   
+   outputPath = home + "/Desktop/output_china"
    for folder_name in folder_names:
-      folder_path = os.path.join(os.getcwd(), folder_name)  # Assuming the folders are in the current working directory
+      folder_path = os.path.join(outputPath, folder_name)  # Assuming the folders are in the current working directory
       
       # Check if the folder exists
       if os.path.isdir(folder_path):
@@ -123,17 +123,18 @@ def read_folder_data(folder_names):
 
 print("\n\n")
 # Take user input for whether to scrape fund data
-scrape_fund = take_input("Fund")
+# scrape_fund = take_input("Fund")
+scrape_fund = "y"
 
 # Take user input for whether to scrape background data
-scrape_background = take_input("Background")
-
+# scrape_background = take_input("Background")
+scrape_background = "y"
 # Take user input for whether to scrape industry data
-scrape_industry = take_input("Industry")
-
+# scrape_industry = take_input("Industry")
+scrape_industry = "y"
 # Take user input for whether to scrape Asset data
-scrape_Asset = take_input("Asset")
-
+# scrape_Asset = take_input("Asset")
+scrape_Asset = "y"
 # scrape_fund = "y"
 # scrape_background = "y"
 # scrape_industry = "y"
@@ -762,7 +763,8 @@ class scrapySpider(scrapy.Spider):
    # Define a method to save data to CSV files based on the record and data provided 
    def save_data(self, record, data, csv_name, first_time=False, date=""):
       # Save data into folder named after the record
-      folder_name = os.path.join(os.path.dirname(__file__), record)
+      outputPath = home + "/Desktop/output_china"
+      folder_name = os.path.join(outputPath, record)
 
       # Save data to Fund_1.csv
       if csv_name == "Fund_1":
@@ -918,7 +920,8 @@ def process_folder(folder):
 # Define the main function
 def main():
    # Get a list of all folders in the current directory
-   folders = [folder for folder in os.listdir() if os.path.isdir(folder)]
+   outputPath = home + "/Desktop/output_china"
+   folders = [folder for folder in os.listdir(outputPath) if os.path.isdir(os.path.join(outputPath, folder))]
    
    # Process folders concurrently using ThreadPoolExecutor
    with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
@@ -926,7 +929,7 @@ def main():
 
 # Call the main function
 if __name__ == "__main__":
-   if scrape_fund == "y":
+   # if scrape_fund == "y":
       # print("\n\n > Processing CSV files...\n\n")
       main()
 

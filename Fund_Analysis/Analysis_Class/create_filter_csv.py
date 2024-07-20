@@ -9,7 +9,7 @@ def main(asset_type,path):
 
     path = path + asset_type
 
-    rolling_sharpe_df = pd.DataFrame(columns=['ticker','value'])
+    rolling_sharpe_df = pd.DataFrame(columns=['ticker','value','name','sharpe_ratio','return'])
     rolling_sharpe_df['ticker']=rolling_sharpe_df['ticker'].astype(str)
 
     #technical
@@ -24,6 +24,9 @@ def main(asset_type,path):
     rolling_sharpe_df.to_csv(path+'positive_beta_rank.csv')
     rolling_sharpe_df.to_csv(path+'negative_beta_rank.csv')
     rolling_sharpe_df.to_csv(path+'volatility_rank.csv')
+    rolling_sharpe_df.to_csv(path+'excess_sharpe_rank.csv')
+
+
 
 
     ##index
