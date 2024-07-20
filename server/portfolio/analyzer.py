@@ -8,7 +8,7 @@ class Analyzer:
     def history(self):
         return self._to_json(self.portfolio.returns["return"])
 
-    def rolling_sharpe(self, risk_free_rate=0.0, window=120):
+    def rolling_sharpe(self, risk_free_rate=0.0, window=120): # transaction fee -> net return
         returns = self.returns.copy()
         returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(),
                                                                         raw=True)

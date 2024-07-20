@@ -2,40 +2,61 @@ import json
 import os
 import csv
 import argparse
+import pandas as pd
 
 def main(input_dir, output_dir, section_percent=0.6):
     industry_set = set()
     category_set = set()
     industry_fund_map = dict()
+    industry_fund_agg_details = dict()
+    industry_fund_agg = dict()
     for subdir in os.listdir(input_dir):
         sub = os.path.join(input_dir, subdir)
         # checking if it is a file
         ticker = subdir
         for filename in os.listdir(sub):
-            f = os.path.join(sub, filename)
-            if (filename=="Background.csv"):
-                with open(f, encoding="utf8") as file:
-                    csvreader = csv.reader(file)
-                    header =next(csvreader)
-                    value = next(csvreader)
-                    category = value[4]
-                    category_set.add(category)
+            f = os.path.join(sub, "Background.csv")
+            with open(f, encoding="utf8") as file:
+                csvreader = csv.reader(file)
+                header =next(csvreader)
+                value = next(csvreader)
+                category = value[4]
+                category_set.add(category)
 
-            if (filename=="Industry.csv"):
-                with open(f, encoding="utf8") as file:
-                    csvreader = csv.reader(file)
-                    header = next(csvreader)
-                    top = next(csvreader)
-                    industry = top[1]
-                    percentage_str = top[3]
-                    percentage_float = float(percentage_str.strip('%'))/100
+            f = os.path.join(sub, "Industry.csv")
+            with open(f, encoding="utf8") as file:
+                csvreader = csv.reader(file)
+                header = next(csvreader)
+                top = next(csvreader)
+                industry = top[1]
+                percentage_str = top[3]
+                percentage_float = float(percentage_str.strip('%'))/100
+                industry_set.add(industry)
+                if percentage_float > section_percent:
+                    industry_fund_map[ticker] = industry
+
+                for row in csvreader:
+                    industry = row[1]
                     industry_set.add(industry)
-                    if percentage_float > section_percent:
-                        industry_fund_map[ticker] = industry
 
-                    for row in csvreader:
-                        industry = row[1]
-                        industry_set.add(industry)
+            f = os.path.join(sub, "sample_feature.csv")
+            df = pd.read_csv(f)
+            latest_return = df['return'].iloc[-1]
+            if industry_fund_agg_details.get(industry) == None:
+                industry_fund_agg_details[industry] = {}
+
+            industry_fund_agg_details[industry][ticker]= latest_return
+
+    for k in industry_fund_agg.keys():
+        returns = industry_fund_agg[k]
+        avg = sum(returns.values())/len(returns)
+        industry_fund_agg[k] = avg
+
+    with open(f'{output_dir}/fund_agg_details.json', 'w',  encoding='utf-8') as json_file:
+        json.dump(industry_fund_map, json_file, ensure_ascii=False)
+
+    with open(f'{output_dir}/fund_agg.json', 'w',  encoding='utf-8') as json_file:
+        json.dump(industry_fund_agg, json_file, ensure_ascii=False)
 
     with open(f'{output_dir}/fund_industry.json', 'w',  encoding='utf-8') as json_file:
         json.dump(industry_fund_map, json_file,ensure_ascii=False)
