@@ -24,6 +24,8 @@ def main(input_dir, output_dir, section_percent=0.6):
             category_set.add(category)
 
         f = os.path.join(sub, "Industry.csv")
+        if not os.path.exists(f):
+            continue
         with open(f, encoding="utf8") as file:
             csvreader = csv.reader(file)
             header = next(csvreader)
