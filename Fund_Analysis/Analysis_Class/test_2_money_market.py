@@ -142,6 +142,14 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
     
 
+
+
+    df_target_2['benchmark_name']=0
+    df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
+    df_target_2['fund_name']=0
+    df_target_2.at[df_target_2.index[-1],'fund_name']  = str(df_background['基金简称'][0])
+
+
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
     if df_target['annual_return'][-1] > 0.05:
 
@@ -153,11 +161,6 @@ def main(symbol_file_path,symbol,search_file_path):
     new_row = {'ticker': Ticker, 'value': df_target_2['CAGR'][-1],'name': df_target_2['fund_name'][-1], 'sharpe_ratio': df_target_2['rolling_SR'][-1], 'return': df_target_2['return'][-1]}
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
-
-    df_target_2['benchmark_name']=0
-    df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
-    df_target_2['fund_name']=0
-    df_target_2.at[df_target_2.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
     df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
