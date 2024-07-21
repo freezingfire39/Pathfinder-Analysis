@@ -159,7 +159,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     ##add comments to the rest of the columns in comment csv.
     
-    comment_csv = pd.read_csv(symbol_file_path+'comments.csv').set_index('date')
+    comment_csv = pd.read_csv(symbol_file_path+'comments.csv').set_index('净值日期')
     comment_csv.at[comment_csv.index[-1],'rolling_SR_comments']  = ("基金成立时间较短，无法进行全面分析")
     comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = ("基金成立时间较短，无法进行全面分析")
     comment_csv.at[comment_csv.index[-1],'alpha_comments']  = ("基金成立时间较短，无法进行全面分析")
@@ -174,7 +174,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     
     
-    comment_csv.to_csv(input_file_path+'comments.csv')
+    comment_csv.to_csv(symbol_file_path+'comments.csv')
     
     
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
