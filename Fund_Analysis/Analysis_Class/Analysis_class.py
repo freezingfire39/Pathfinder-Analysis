@@ -16,10 +16,52 @@ import utils
 import statsmodels.api as sm
 from statsmodels import regression
 
+def resample_returns(df_returns, frequency='Q'):
+    """
+    Resample the monthly returns DataFrame to the specified frequency.
+
+    Parameters:
+        df_returns (DataFrame): DataFrame containing monthly returns.
+        frequency (str): Frequency to resample the data to. 'A' for annually, 'Q' for quarterly.
+
+    Returns:
+        DataFrame: Resampled DataFrame based on the specified frequency.
+    """
+    # change index to datetime
+    df_returns.index = pd.to_datetime(df_returns.index)
+
+    # check to see if df_returns.index[0] is a calendar year-end
+    if not df_returns.index[0].month in [1 ,4, 7, 10]:
+        # Find the index of the next data point with a month in [1, 4, 7, 10]
+        next_quarter_start = df_returns.index[df_returns.index.month.isin([1, 4, 7, 10])][0]
+
+        # Create a new df_returns dataframe that starts at the next datapoint with a month in [1, 4, 7, 10]
+        df_returns_new = df_returns[next_quarter_start:]
+    else:
+        df_returns_new = df_returns.copy()
+
+
+    if frequency == 'Q':
+        # resample to quarterly, geometrically linking the returns
+        return (1 + df_returns_new).resample('Q').prod() - 1
+
+    elif frequency == 'A':
+        # resample to annually, geometrically linking the returns
+        return (1 + df_returns_new).resample('A').prod() - 1
+    else:
+        raise ValueError("Invalid frequency. Choose 'A' for annual or 'Q' for quarterly.")
 
 
 def return_analysis(returns,input_file_path, rank_file_path, asset_type):
 
+        
+    df_returns_qtr = resample_returns(returns['return'], 'Q')
+    df_returns_qtr = df_returns_qtr.to_frame()
+    pivot_df = df_returns_qtr.pivot_table(index=df_returns_qtr.index.year, columns=df_returns_qtr.index.quarter,
+                                              values=df_returns_qtr.columns[0], aggfunc='sum')
+    pivot_df = pivot_df.reindex(columns=[1, 2, 3, 4])
+    
+    pivot_df.to_csv("return_heatmap.csv")
     ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
     df_benchmark_2 = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
