@@ -61,7 +61,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type):
                                               values=df_returns_qtr.columns[0], aggfunc='sum')
     pivot_df = pivot_df.reindex(columns=[1, 2, 3, 4])
     
-    pivot_df.to_csv("return_heatmap.csv")
+    pivot_df.to_csv(input_file_path+"return_heatmap.csv")
     ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
     df_benchmark_2 = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
@@ -305,7 +305,7 @@ def plot_drawdown_periods(returns, top=10, ax=None, **kwargs):
 
     df_cum_rets = ep.cum_returns(returns, starting_value=1.0)
     df_drawdowns = timeseries.gen_drawdown_table(returns, top=top)
-    df_drawdowns.to_csv('drawdown.csv')
+    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
 
     df_cum_rets.plot(ax=ax, **kwargs)
 
