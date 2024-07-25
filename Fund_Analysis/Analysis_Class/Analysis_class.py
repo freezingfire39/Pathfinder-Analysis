@@ -305,7 +305,7 @@ def plot_drawdown_periods(returns, top=10, ax=None, **kwargs):
 
     df_cum_rets = ep.cum_returns(returns, starting_value=1.0)
     df_drawdowns = timeseries.gen_drawdown_table(returns, top=top)
-    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
+
 
     df_cum_rets.plot(ax=ax, **kwargs)
 
@@ -519,7 +519,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_drawdowns['Valley date'] = pd.to_datetime(df_drawdowns['Valley date'])
     df_drawdowns['Recovery date'] = pd.to_datetime(
         df_drawdowns['Recovery date'])
-    df_drawdowns.to_csv('drawdown.csv')
+    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
     returns['drawdown_duration'] = 0
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
