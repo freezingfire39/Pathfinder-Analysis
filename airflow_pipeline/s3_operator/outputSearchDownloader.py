@@ -1,6 +1,5 @@
 import os
 import sys
-from airflow.exceptions import AirflowException
 import boto3
 from botocore.exceptions import NoCredentialsError
 from pathlib import Path
