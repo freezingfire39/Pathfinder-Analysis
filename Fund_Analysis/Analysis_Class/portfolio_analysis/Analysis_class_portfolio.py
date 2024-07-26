@@ -51,21 +51,20 @@ def resample_returns(df_returns, frequency='Q'):
     else:
         raise ValueError("Invalid frequency. Choose 'A' for annual or 'Q' for quarterly.")
 
-
 def return_analysis(returns,input_file_path, rank_file_path, asset_type):
 
-        
+    ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
     df_returns_qtr = resample_returns(returns['return'], 'Q')
     df_returns_qtr = df_returns_qtr.to_frame()
     pivot_df = df_returns_qtr.pivot_table(index=df_returns_qtr.index.year, columns=df_returns_qtr.index.quarter,
                                               values=df_returns_qtr.columns[0], aggfunc='sum')
     pivot_df = pivot_df.reindex(columns=[1, 2, 3, 4])
     
-    pivot_df.to_csv(input_file_path+"return_heatmap.csv")
-    ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
+    pivot_df.to_csv("return_heatmap.csv")
+
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
     df_benchmark_2 = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['return'][-1]>df_benchmark['value'].quantile(0.6):
         if returns['excess_SR'][-1]>df_benchmark_2['value'].quantile(0.6):
             comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报并且最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
@@ -103,7 +102,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type):
             comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
             comment_csv.to_csv(input_file_path+'comments.csv')
 
-    df_return = returns['累计净值'].resample('3M').last()
+    df_return = returns['return'].resample('3M').sum()
     df_return_2 = df_return.rolling(5).apply(lambda x: x.autocorr(), raw=False)
 
     if df_return_2.mean()>0.5:
@@ -117,7 +116,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type):
         
 
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['return'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'return_benchmark_comments']  = ("本基金过去一年的回报超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -147,7 +146,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
 
     returns['rolling_SR'] = returns['return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['rolling_SR'].iloc[-1] < (returns['return'].mean()/returns['return'].std())-0.1:
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
@@ -163,42 +162,14 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         comment_csv.at[comment_csv.index[-1],'rolling_SR_comments']  = "本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。"
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
-        
-    rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_rank.csv').set_index('Unnamed: 0')
-    df_benchmark = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    if returns['rolling_SR'][-1] > df_benchmark['value'].quantile(0.95):
 
-        new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
-    
-    rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'rolling_sharpe_benchmark.csv')
     
     
     returns['excess_return'].fillna(method='ffill',inplace=True)
     returns['excess_SR'] = returns['excess_return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
 
-    rank_file = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'excess_sharpe_benchmark.csv')
-
-    rank_file = pd.read_csv(rank_file_path+'excess_sharpe_rank.csv').set_index('Unnamed: 0')
-    df_benchmark = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    if returns['excess_SR'][-1] > df_benchmark['value'].quantile(0.9):
-
-        new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'excess_sharpe_rank.csv')
         
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['excess_SR'].iloc[-1] < (returns['excess_return'].mean()/returns['excess_return'].std())-0.1:
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
@@ -220,7 +191,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
 
     df_benchmark = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['rolling_SR'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'sr_benchmark_comments']  = ("本基金过去一年的夏普指数超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -238,7 +209,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         comment_csv.to_csv(input_file_path+'comments.csv')
         
     df_benchmark = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['excess_SR'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'excess_sharpe_benchmark_comments']  = ("本基金过去一年对比指数的超额夏普超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -305,7 +276,7 @@ def plot_drawdown_periods(returns, top=10, ax=None, **kwargs):
 
     df_cum_rets = ep.cum_returns(returns, starting_value=1.0)
     df_drawdowns = timeseries.gen_drawdown_table(returns, top=top)
-
+    df_drawdowns.to_csv('drawdown.csv')
 
     df_cum_rets.plot(ax=ax, **kwargs)
 
@@ -519,7 +490,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_drawdowns['Valley date'] = pd.to_datetime(df_drawdowns['Valley date'])
     df_drawdowns['Recovery date'] = pd.to_datetime(
         df_drawdowns['Recovery date'])
-    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
+    df_drawdowns.to_csv('drawdown.csv')
     returns['drawdown_duration'] = 0
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
@@ -529,7 +500,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     returns['drawdown_amount'].iloc[-1] = df_drawdowns['Net drawdown in %'].max()
 
 
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     
     print (returns.tail(10))
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
@@ -564,35 +535,9 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("This security's drawdown duration is inline with industry average")
         #print ("本基金的回撤时间与类似产品的平均基本一致。")
-    df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
-    rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
-    if returns['drawdown_duration'].iloc[-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
-        
-    rank_file = pd.read_csv(rank_file_path+'drawdown_amount_rank.csv').set_index('Unnamed: 0')
-    df_benchmark = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
-    if returns['drawdown_amount'].iloc[-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
 
-    rank_file = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'drawdown_amount_benchmark.csv')
-    
-    rank_file = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'drawdown_duration_benchmark.csv')
     
     
     
@@ -600,7 +545,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     
     
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['drawdown_duration'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'drawdown_duration_benchmark_comments']  = ("本基金历史最大回撤时间小于市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -619,7 +564,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         
         
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['drawdown_amount'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'drawdown_amount_benchmark_comments']  = ("本基金历史最大回撤金额小于市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -950,7 +895,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     returns['alpha'] = returns_2['alpha']
     returns['beta'] = returns_2['beta']
 
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     df_benchmark = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
     
     if returns['alpha'][-1]>df_benchmark['value'].quantile(0.6):
@@ -985,47 +930,13 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("This fund's volatilty is in line with benchmark")
         #print ("本基金对比基准指数的波动率基本一致)
-    df_benchmark = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
-    rank_file = pd.read_csv(rank_file_path+'alpha_rank.csv').set_index('Unnamed: 0')
-    if returns['alpha'][-1] > df_benchmark['value'].quantile(0.95):
 
-        new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'alpha_rank.csv')
         
-    rank_file = pd.read_csv(rank_file_path+'positive_beta_rank.csv').set_index('Unnamed: 0')
-    df_benchmark = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
-    if returns['beta'][-1] > df_benchmark['value'].quantile(0.95):
 
-        new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
-        
-    rank_file = pd.read_csv(rank_file_path+'negative_beta_rank.csv').set_index('Unnamed: 0')
-    if returns['beta'][-1] < df_benchmark['value'].quantile(0.05):
-
-        new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'negative_beta_rank.csv')
-
-    rank_file = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'positive_beta_benchmark.csv')
-
-    rank_file = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['alpha'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'alpha_benchmark.csv')
     
     
     df_benchmark = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['alpha'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'alpha_benchmark_comments']  = ("本基金过去一年的阿尔法超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -1044,7 +955,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     
     
     df_benchmark = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['beta'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'beta_benchmark_comments']  = ("本基金过去一年的贝塔超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -1101,7 +1012,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     # 3) Combine to produce our final dataframe
     df_mkt_capture = pd.concat([up_ratio, down_ratio], axis=1)
     print (df_mkt_capture)
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     df_mkt_capture.columns = ['Upside Capture', 'Downside Capture']
     
     df_benchmark = pd.read_csv(rank_file_path+'upside_capture_benchmark.csv').set_index('Unnamed: 0')
@@ -1176,40 +1087,14 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
         returns_daily['Upside_Capture'].iloc[i] = df_mkt_capture['Upside Capture'].iloc[0]
         returns_daily['Downside_Capture'].iloc[i] = df_mkt_capture['Downside Capture'].iloc[0]
     
-    rank_file = pd.read_csv(rank_file_path+'upside_capture_rank.csv').set_index('Unnamed: 0')
-    if returns_daily['Upside_Capture'][-1] > df_benchmark['value'].quantile(0.6):
 
-        new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1], 'name': returns_daily['fund_name'][-1], 'sharpe_ratio': returns_daily['rolling_SR'][-1], 'return': returns_daily['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'upside_capture_rank.csv')
-    
-    
-    rank_file = pd.read_csv(rank_file_path+'downside_capture_rank.csv').set_index('Unnamed: 0')
-    if returns_daily['Downside_Capture'][-1] < df_benchmark_2['value'].quantile(0.4):
 
-        new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1], 'name': returns_daily['fund_name'][-1], 'sharpe_ratio': returns_daily['rolling_SR'][-1], 'return': returns_daily['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
-
-    rank_file = pd.read_csv(rank_file_path+'upside_capture_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'upside_capture_benchmark.csv')
-
-    rank_file = pd.read_csv(rank_file_path+'downside_capture_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'downside_capture_benchmark.csv')
     
     
     
     
     df_benchmark = pd.read_csv(rank_file_path+'upside_capture_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if df_mkt_capture['Upside Capture'][0]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'upside_benchmark_comments']  = ("本基金过去一年在上行市场的表现超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -1227,7 +1112,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
         comment_csv.to_csv(input_file_path+'comments.csv')
         
     df_benchmark = pd.read_csv(rank_file_path+'downside_capture_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if df_mkt_capture['Downside Capture'][0]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'downside_benchmark_comments']  = ("本基金过去一年在下行市场的表现超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -1252,7 +1137,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
 def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,input_file_path):
     security_code = str(security_code)
     
-    comp[security_code] = returns['累计净值']
+    comp[security_code] = (1+returns['return']).cumprod()
     corr_df = comp.corr(method='pearson')
     print (corr_df)
     #reset symbol as index (rather than 0-X)
@@ -1277,7 +1162,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
         returns['industry_peers']=0
         returns['industry_peers'].iloc[-1] = corr_df_2.columns[np.argsort(-1*corr_df_2.tail(1).values,axis=1)[:, :3]]
         
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     returns['positive_comp'] = 0
     returns['negative_comp'] = 0
     returns['benchmark_name'] = 0
@@ -1725,7 +1610,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
         * np.sqrt(250)
     returns['comp_vol'] = comp.rolling(rolling_vol_window).std() \
         * np.sqrt(250)
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['vol'].mean() > 1.2*returns['comp_vol'].mean():
         comment_csv.at[comment_csv.index[-1],'volatility_comments']  = "本基金的波动率显著高于基准指数。"
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -1742,7 +1627,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ('The fund has similar volatility to the index. ')
         #print ("本基金的波动率与基准指数基本一致。")
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['vol'][-1]>1.2*returns['vol'].mean():
         comment_csv.at[comment_csv.index[-1],'volatility_comments']  += "本基金的波动率近期有明显上升。"
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -1759,25 +1644,12 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
         #print ('The volatility has been consistent recently')
         #print ("本基金的波动率近期较为稳定。")
     
-    rank_file = pd.read_csv(rank_file_path+'volatility_rank.csv').set_index('Unnamed: 0')
-    df_benchmark = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
-    if returns['vol'][-1] < df_benchmark['value'].quantile(0.05):
 
-        new_row = {'ticker': security_code, 'value': returns['vol'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'volatility_rank.csv')
-        
-    rank_file = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': security_code, 'value': returns['vol'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'volatility_benchmark.csv')
     
     
     
     df_benchmark = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
-    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+    comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('date')
     if returns['vol'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'volatility_benchmark_comments']  = ("本基金过去一年的波动率超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')

@@ -200,6 +200,21 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['comp_mean'] = index_comps.rolling(trading_days).mean()
 
     df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker, asset_type = asset_type)
+
+
+    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > 0.05:
+
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(return_rank_file_path)
+        
+    rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target['CAGR'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    rank_file.to_csv(cagr_rank_file_path)
+
+    
     df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type)
 
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
