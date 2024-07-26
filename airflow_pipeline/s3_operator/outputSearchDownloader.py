@@ -38,5 +38,5 @@ def download_files(bucket_name, local_directory):
 
 
 
-local_directory = '/home/app/Desktop/output_search'
+local_directory = directory_path + 'output_search'
 download_files(bucket_name, local_directory)
