@@ -940,8 +940,8 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
             df_temp_1 = returns_2.iloc[i-window:i]
             df_temp_2 = comp.iloc[i-window:i]
 
-            X = df_temp_1['return'][1:].values
-            Y = df_temp_2[1:].values
+            X = df_temp_2['return'][1:].values
+            Y = df_temp_1[1:].values
             alpha, beta = linreg(X,Y)
             returns_2['alpha'][i]=alpha
             returns_2['beta'][i]=beta
