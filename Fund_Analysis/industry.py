@@ -4,7 +4,7 @@ import csv
 import argparse
 import pandas as pd
 
-def main(input_dir, output_dir, section_percent=0.6):
+def main(input_dir, output_dir, date, section_percent=0.6):
     industry_set = set()
     category_set = set()
     industry_fund_map = dict()
@@ -45,16 +45,23 @@ def main(input_dir, output_dir, section_percent=0.6):
         if not os.path.exists(f):
             continue
         df = pd.read_csv(f)
-        latest_return = df['return'].iloc[-1]
-        if industry_fund_agg_details.get(industry) == None:
-            industry_fund_agg_details[industry] = {}
+        df = df.set_index("净值日期")
+        if date in df.index:
+            daily_return = df.loc[date, 'return']
 
-        industry_fund_agg_details[industry][ticker]= latest_return
+            if industry_fund_agg_details.get(industry) == None:
+                industry_fund_agg_details[industry] = {}
+
+            industry_fund_agg_details[industry][ticker]= daily_return
 
     for k in industry_fund_agg_details.keys():
         returns = industry_fund_agg_details[k]
         avg = sum(returns.values())/len(returns)
         industry_fund_agg[k] = avg
+
+    output_dir = output_dir + '/' + ''.join(date.split('-'))
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
 
     with open(f'{output_dir}/fund_agg_details.json', 'w',  encoding='utf-8') as json_file:
         json.dump(industry_fund_map, json_file, ensure_ascii=False)
@@ -83,11 +90,12 @@ if __name__ == '__main__':
     # Add arguments
     parser.add_argument('--input', type=str, help='The input file path')
     parser.add_argument('--output', type=str, help='The output file path')
-
+    parser.add_argument('--date', type=str, help='start date')
     # Parse the arguments
     args = parser.parse_args()
 
     # Access the arguments
     input = args.input
     output = args.output
-    main(input, output)
+    date = args.date
+    main(input, output, date)
