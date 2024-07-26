@@ -231,7 +231,7 @@ def main(symbol_file_path,symbol,search_file_path):
     Analysis_class.create_interesting_times_tear_sheet(df_target['return'])
     Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
 
-
+    df_target = Analysis_class.return_forecast(df_target, index_comps[comp_1_name],asset_type=asset_type)
 
 
     df_target.to_csv(save_file_path)
