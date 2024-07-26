@@ -142,7 +142,7 @@ python_op_2 = BashOperator(
     task_id='upload_search_folder',
     trigger_rule='all_success',
     # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
-    bash_command='python /home/app/Desktop/Pathfinder-Analysis/airflow_pipeline/s3_operator/.py /home/app/Desktop/output_search'
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/airflow_pipeline/s3_operator/outputSearchUploader.py /home/app/Desktop/output_search'
 )
 
 
