@@ -14,7 +14,7 @@ def merge_return_columns(folder_path, output_folder):
 
         # Check if it is a directory
         if os.path.isdir(sub_folder_path):
-            file_path = os.path.join(sub_folder_path, 'sample_features.csv')
+            file_path = os.path.join(sub_folder_path, 'sample_feature.csv')
 
             # Check if the CSV file exists
             if os.path.exists(file_path):
