@@ -940,8 +940,8 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
             df_temp_1 = returns_2.iloc[i-window:i]
             df_temp_2 = comp.iloc[i-window:i]
 
-            X = df_temp_1['return'][1:].values
-            Y = df_temp_2[1:].values
+            Y = df_temp_1['return'][1:].values
+            X = df_temp_2[1:].values
             alpha, beta = linreg(X,Y)
             returns_2['alpha'][i]=alpha
             returns_2['beta'][i]=beta
@@ -1833,3 +1833,66 @@ def plot_drawdown_underwater(returns):
     #ax.set_title('Underwater plot')
     #ax.set_xlabel('')
     return returns
+    
+def return_forecast(returns,comps,asset_type):
+    
+    if asset_type=="stock_":
+        comps = comps.resample('3M').last().pct_change()
+        comps = comps.tail(40)
+        average_index_high_return = comps.quantile(0.9)
+        average_index_mean_return = comps.mean()
+        average_index_low_return = comps.quantile(0.1)
+
+        returns_alpha = returns['alpha'].resample('3M').mean()
+        returns_beta = returns['beta'].resample('3M').mean()
+
+        returns['max_future_return']=0
+        returns['min_future_return']=0
+        returns['mean_future_return']=0
+
+
+        returns['max_future_return'].iloc[-1] = average_index_high_return * returns_beta.mean()+returns_alpha.mean()
+        returns['min_future_return'].iloc[-1] = average_index_low_return * returns_beta.mean()+returns_alpha.mean()
+        returns['mean_future_return'].iloc[-1] = average_index_mean_return * returns_beta.mean()+returns_alpha.mean()
+        return returns
+
+    if asset_type=="bond_":
+        comps = comps.resample('3M').last().pct_change()
+        comps = comps.tail(40)
+        average_index_high_return = comps.quantile(0.9)
+        average_index_mean_return = comps.mean()
+        average_index_low_return = comps.quantile(0.1)
+
+        returns_alpha = returns['alpha'].resample('3M').mean()
+        returns_beta = returns['beta'].resample('3M').mean()
+
+        returns['max_future_return']=0
+        returns['min_future_return']=0
+        returns['mean_future_return']=0
+
+
+        returns['max_future_return'].iloc[-1] = average_index_high_return * returns_beta.mean()+returns_alpha.mean()
+        returns['min_future_return'].iloc[-1] = average_index_low_return * returns_beta.mean()+returns_alpha.mean()
+        returns['mean_future_return'].iloc[-1] = average_index_mean_return * returns_beta.mean()+returns_alpha.mean()
+        return returns
+
+
+    if asset_type=="overseas_":
+        comps = comps.resample('3M').last().pct_change()
+        comps = comps.tail(40)
+        average_index_high_return = comps.quantile(0.9)
+        average_index_mean_return = comps.mean()
+        average_index_low_return = comps.quantile(0.1)
+
+        returns_alpha = returns['alpha'].resample('3M').mean()
+        returns_beta = returns['beta'].resample('3M').mean()
+
+        returns['max_future_return']=0
+        returns['min_future_return']=0
+        returns['mean_future_return']=0
+
+
+        returns['max_future_return'].iloc[-1] = average_index_high_return * returns_beta.mean()+returns_alpha.mean()
+        returns['min_future_return'].iloc[-1] = average_index_low_return * returns_beta.mean()+returns_alpha.mean()
+        returns['mean_future_return'].iloc[-1] = average_index_mean_return * returns_beta.mean()+returns_alpha.mean()
+        return returns
