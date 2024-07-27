@@ -7,6 +7,7 @@ def merge_return_columns(folder_path, output_folder, section_percent=0.6):
     combined_df = pd.DataFrame(columns=["ticker", "industry"])
 
     # Iterate through each sub-folder
+    rows = []
     for sub_folder in os.listdir(folder_path):
         sub_folder_path = os.path.join(folder_path, sub_folder)
 
@@ -25,9 +26,10 @@ def merge_return_columns(folder_path, output_folder, section_percent=0.6):
                     percentage_str = top[3]
                     percentage_float = float(percentage_str.strip('%')) / 100
                     if percentage_float > section_percent:
-                        row = (symbol, industry )
-                        combined_df = combined_df.append(row, ignore_index=True)
+                        row = {"ticker":symbol,"industry": industry }
+                        rows.append(row)
 
+    combined_df =pd.DataFrame( rows)
     combined_df.to_csv(os.path.join(output_folder, 'all_industry.csv'), index=False)
 
 
