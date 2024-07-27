@@ -13,7 +13,7 @@ def merge_return_columns(folder_path, output_folder, section_percent=0.6):
         # Check if it is a directory
         if os.path.isdir(sub_folder_path):
             # Path to the industry information file (assuming it's named industry_info.csv)
-            industry_info_path = os.path.join(sub_folder_path, 'industry.csv')
+            industry_info_path = os.path.join(sub_folder_path, 'Industry.csv')
             symbol = sub_folder
             # Check if both CSV files exist
             if os.path.exists(industry_info_path):
