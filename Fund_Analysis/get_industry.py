@@ -4,7 +4,7 @@ import csv
 
 def merge_return_columns(folder_path, output_folder, section_percent=0.6):
     # Initialize an empty DataFrame for merging
-    combined_df = pd.DataFrame(columns=["ticker", "industry"])
+    combined_df = pd.DataFrame(columns=["symbol", "industry"])
 
     # Iterate through each sub-folder
     rows = []
