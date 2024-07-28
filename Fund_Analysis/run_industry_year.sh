@@ -15,7 +15,7 @@ output_dir="/home/app/Desktop/industry_out/"$start_year
 current_date="$start_date"
 while [ "$current_date" != "$end_date" ]; do
     echo "Running script for date: $current_date"
-    python industry.py --input=$input_dir --output=$output_dir --date=$current_date
+    python industry.py --input=$input_dir --output=$output_dir --date=$current_date --year=$start_year
     current_date=$(date -I -d "$current_date + 1 day")
 done
 

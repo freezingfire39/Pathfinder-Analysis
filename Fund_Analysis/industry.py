@@ -4,7 +4,7 @@ import csv
 import argparse
 import pandas as pd
 
-def main(input_dir, output_dir, date, section_percent=0.6):
+def main(input_dir, output_dir, date, year, section_percent=0.6):
     industry_set = set()
     category_set = set()
     industry_fund_map = dict()
@@ -41,7 +41,7 @@ def main(input_dir, output_dir, date, section_percent=0.6):
                 i = row[1]
                 industry_set.add(i)
 
-        f = os.path.join(sub, "sample_feature.csv")
+        f = os.path.join(sub, 'split_by_year', f"sample_feature_{year}.csv")
         if not os.path.exists(f):
             continue
         df = pd.read_csv(f)
@@ -91,6 +91,7 @@ if __name__ == '__main__':
     parser.add_argument('--input', type=str, help='The input file path')
     parser.add_argument('--output', type=str, help='The output file path')
     parser.add_argument('--date', type=str, help='start date')
+    parser.add_argument('--year', type=str, help='start year')
     # Parse the arguments
     args = parser.parse_args()
 
@@ -98,4 +99,5 @@ if __name__ == '__main__':
     input = args.input
     output = args.output
     date = args.date
-    main(input, output, date)
+    year = args.year
+    main(input, output, date, year)
