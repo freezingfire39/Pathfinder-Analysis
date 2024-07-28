@@ -30,12 +30,10 @@ class Fund:
         self.industry = pd.read_csv(os.path.join(directory, self.name, 'Industry.csv'))
 
     def _load_returns(self, directory: str):
-        prices = pd.read_csv(os.path.join(directory, self.name, 'Fund_1.csv'))
+        prices = pd.read_csv(os.path.join(directory, self.name, 'sample_feature.csv'))
         prices["date"] = prices["净值日期"]
         prices["date"] = pd.to_datetime(prices["date"])
         prices.set_index("date",inplace=True)
-        prices = prices.loc[prices.iloc[:,3]!='封闭期']
-        prices["return"] = prices.iloc[:, 1].pct_change()
         self.returns = prices["return"].reset_index().set_index('date')
 
     def get_returns(self):
