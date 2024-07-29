@@ -41,7 +41,7 @@ def main(input_dir, output_dir, date, year, section_percent=0.6):
                 i = row[1]
                 industry_set.add(i)
 
-        f = os.path.join(sub, 'split_by_year', f"sample_feature_{year}.csv")
+        f = os.path.join(sub, 'split_by_year', f"sample_features_{year}.csv")
         if not os.path.exists(f):
             continue
         df = pd.read_csv(f)
