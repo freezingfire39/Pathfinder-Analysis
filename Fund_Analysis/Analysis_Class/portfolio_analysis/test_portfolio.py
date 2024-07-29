@@ -29,7 +29,7 @@ print (Ticker)
 import json
 import pandas as pd
 from pandas.io.json import json_normalize
-data = json.load(open('response.json'))
+data = json.load(open(input_file_path+'response.json'))
 df = json_normalize(data['portfolio'], max_level=2)
 return_list = df['returns'].to_list()
 data = json_normalize(return_list)
