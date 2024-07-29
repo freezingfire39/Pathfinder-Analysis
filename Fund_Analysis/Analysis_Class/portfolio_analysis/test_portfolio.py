@@ -20,10 +20,6 @@ Ticker = "Port_1"
 Trading_days = 250
 trading_days=250
 
-print (Ticker)
-
-
-
 import json
 import pandas as pd
 from pandas.io.json import json_normalize
@@ -90,8 +86,6 @@ df1 = df_target[['累计净值', 'comp_1']]
 df_rets_monthly = df1.resample('M').last().pct_change().dropna()
 
 df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path = input_file_path,security_code = Ticker)
-
-print (df_target)
 
 if comp_1_name in industry_comps:
     df_target = Analysis_class.rolling_volatility(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
