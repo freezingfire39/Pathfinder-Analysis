@@ -203,18 +203,18 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
         comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现弱于对标的基准指数"+returns['benchmark_name'][-1]
-        print (comment_csv)
+
         comment_csv.to_csv(input_file_path+'comments.csv')
     elif returns['rolling_SR'].iloc[-1] > (returns['return'].mean()/returns['return'].std())+0.1:
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。")
         comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现强于对标的基准指数"+returns['benchmark_name'][-1]
-        print (comment_csv)
+
         comment_csv.to_csv(input_file_path+'comments.csv')
     else:
         #print ("This fund's has performed inline with its historical average in the last 6 months.")
         comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现持平对标的基准指数"+returns['benchmark_name'][-1]
-        print (comment_csv)
+
 
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
@@ -524,14 +524,14 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
     returns['drawdown_amount'] = returns['drawdown_amount'].astype(int)
-    print (df_drawdowns['Duration'].max())
+
     returns['drawdown_duration'].iloc[-1] = df_drawdowns['Duration'].max()
     returns['drawdown_amount'].iloc[-1] = df_drawdowns['Net drawdown in %'].max()
 
 
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     
-    print (returns.tail(10))
+
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
     if df_drawdowns['Duration'].mean()>df_benchmark['value'].quantile(0.6):
         comment_csv.at[comment_csv.index[-1],'drawdown_duration_comments']  = "本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。"
@@ -964,7 +964,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         #print ("This fund has outperformed the benchmark")
         #print ("本基金对比基准指数有较明显的超额亏损")
     else:
-        print ("This fund has not outperformed the benchmark")
+        #print ("This fund has not outperformed the benchmark")
         comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金回报对比指数基本一致。"
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金回报对比指数基本一致")
@@ -1100,7 +1100,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
 
     # 3) Combine to produce our final dataframe
     df_mkt_capture = pd.concat([up_ratio, down_ratio], axis=1)
-    print (df_mkt_capture)
+
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     df_mkt_capture.columns = ['Upside Capture', 'Downside Capture']
     
@@ -1254,7 +1254,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
     returns['rolling_SR'] = returns['return'].rolling(250).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     comp[security_code] = returns['累计净值']
     corr_df = comp.corr(method='pearson')
-    print (corr_df)
+
     #reset symbol as index (rather than 0-X)
 
     corr_df_2=corr_df.drop([security_code],axis=1)
@@ -1264,7 +1264,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
     seaborn.heatmap(corr_df, annot=True, cmap='RdYlGn')
     plt.figure()
     corr_df = corr_df[security_code].drop(corr_df[security_code].idxmax())
-    print (corr_df)
+
     comp_1_name = corr_df.idxmax()
     comp_2_name = corr_df.idxmin()
 
@@ -1393,7 +1393,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             
             #print ("本基金与科创板有较强的相关性。")
         elif comp_1_name=="510900.SS":
-            print ("This etf correlates with Hang Seng Index")
+            #print ("This etf correlates with Hang Seng Index")
             #print ("本基金与香港恒生指数有较强的相关性。")
             returns.at[returns.index[-1],'benchmark_name'] = '香港恒生指数'
             comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与香港恒生指数有较强的相关性。"
@@ -1425,7 +1425,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             
             
         elif comp_1_name=="512010.SS":
-            print ("This etf correlates with Pharmaceutical Sector")
+            #print ("This etf correlates with Pharmaceutical Sector")
             #print ("本基金与医药板块有较强的相关性。")
             returns.at[returns.index[-1],'benchmark_name_2'] = '医药板块'
             comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与医药板块有较强的相关性。"
@@ -1618,71 +1618,71 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
     if corr_df[comp_2_name] < -0.9:
         ##save comp_2_name
         if comp_1_name=="510050.SS":
-            print ("This etf negatively correlates with A50")
+            #print ("This etf negatively correlates with A50")
             #print ("本基金与中证50（大盘股）有较强的负相关性。")
         elif comp_1_name=="159901.SZ":
-            print ("This etf negatively correlates with Shenzhen 100")
+            #print ("This etf negatively correlates with Shenzhen 100")
             #print ("本基金与深圳100（深A大盘股）有较强的负相关性。")
         elif comp_1_name=="159949.SZ":
-            print ("This etf negatively correlates with Chuangye 50")
+            #print ("This etf negatively correlates with Chuangye 50")
             #print ("本基金与创业板有较强的负相关性。")
         elif comp_1_name=="510500.SS":
-            print ("This etf negatively correlates with Hushen 300")
+            #print ("This etf negatively correlates with Hushen 300")
             #print ("本基金与沪深300有较强的负相关性。")
         elif comp_1_name=="512100.SS":
-            print ("This etf negatively correlates with Zhongzheng 500")
+            #print ("This etf negatively correlates with Zhongzheng 500")
             #print ("本基金与中证500（中盘股）有较强的负相关性。")
         elif comp_1_name=="512100.SS":
-            print ("This etf negatively correlates with Zhongzheng 1000")
+            #print ("This etf negatively correlates with Zhongzheng 1000")
             #print ("本基金与中证1000（小盘股）有较强的负相关性。")
         elif comp_1_name=="512100.SS":
-            print ("This etf negatively correlates with Kechuang 50")
+            #print ("This etf negatively correlates with Kechuang 50")
             #print ("本基金与科创板有较强的负相关性。")
         elif comp_1_name=="510900.SS":
-            print ("This etf negatively correlates with Hang Seng Index")
+            #print ("This etf negatively correlates with Hang Seng Index")
             #print ("本基金与香港恒生指数有较强的负相关性。")
             
         elif comp_1_name=="510230.SS":
-            print ("This etf negatively correlates with Finance Sector")
+            #print ("This etf negatively correlates with Finance Sector")
             #print ("本基金与金融板块有较强的负相关性。")
         elif comp_1_name=="512010.SS":
-            print ("This etf negatively correlates with Pharmaceutical Sector")
+            #print ("This etf negatively correlates with Pharmaceutical Sector")
             #print ("本基金与医药板块有较强的负相关性。")
         elif comp_1_name=="512170.SS":
-            print ("This etf negatively correlates with Healthcare Sector")
+            #print ("This etf negatively correlates with Healthcare Sector")
             #print ("本基金与医疗板块有较强的负相关性。")
         elif comp_1_name=="515170.SS":
-            print ("This etf negatively correlates with Food & Beverage Sector")
+            #print ("This etf negatively correlates with Food & Beverage Sector")
             #print ("本基金与食品饮料板块有较强的负相关性。")
         elif comp_1_name=="516160.SS":
-            print ("This etf negatively correlates with Energy Sector")
+            #print ("This etf negatively correlates with Energy Sector")
             #print ("本基金与能源板块有较强的负相关性。")
         elif comp_1_name=="512480.SS":
-            print ("This etf negatively correlates with Semiconductor")
+            #print ("This etf negatively correlates with Semiconductor")
             #print ("本基金与半导体板块有较强的负相关性。")
         elif comp_1_name=="515230.SS":
-            print ("This etf negatively correlates with Software")
+            #print ("This etf negatively correlates with Software")
             #print ("本基金与软件板块有较强的相关性。")
         elif comp_1_name=="512660.SS":
-            print ("This etf negatively correlates with Military")
+            #print ("This etf negatively correlates with Military")
             #print ("本基金与军工板块有较强的负相关性。")
         elif comp_1_name=="516220.SS":
-            print ("This etf negatively correlates with Chemicals")
+            #print ("This etf negatively correlates with Chemicals")
             #print ("本基金与化工板块有较强的负相关性。")
         elif comp_1_name=="516800.SS":
-            print ("This etf negatively correlates with Manufacturing")
+            #print ("This etf negatively correlates with Manufacturing")
             #print ("本基金与制造业板块有较强的负相关性。")
         elif comp_1_name=="512400.SS":
-            print ("This etf negatively correlates with Metal")
+            #print ("This etf negatively correlates with Metal")
             #print ("本基金与有色金属板块有较强的负相关性。")
         elif comp_1_name=="159825.SZ":
-            print ("This etf negatively correlates with Agriculture")
+            #print ("This etf negatively correlates with Agriculture")
             #print ("本基金与农业板块有较强的负相关性。")
         elif comp_1_name=="516950.SS":
-            print ("This etf negatively correlates with Infrastructure")
+            #print ("This etf negatively correlates with Infrastructure")
             #print ("本基金与基建板块有较强的负相关性。")
         elif comp_1_name=="516070.SS":
-            print ("This etf negatively correlates with Environmental")
+            #print ("This etf negatively correlates with Environmental")
             #print ("本基金与环保板块有较强的负相关性。")
         
     else:
@@ -1690,7 +1690,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
         #print ("本基金投资风格较多元。")
     returns['positive_comp'][-1] = comp_1_name
     returns['negative_comp'][-1] = comp_2_name
-    print (returns['negative_comp'][-1])
+    #print (returns['negative_comp'][-1])
     #print (returns['negative_comp'][-1])
 
     
