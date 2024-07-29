@@ -44,17 +44,7 @@ rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comm
 rolling_sharpe_df.to_csv('comments.csv')
 
 
-
-
-
-
-
-
 df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-
-
-
-
 
 ##calculate net return
 
@@ -62,10 +52,6 @@ index_comps = pd.read_csv(comp_file_path).set_index('Date')
 industry_comps = pd.read_csv(comp_file_path_2).set_index('Date')
 index_comps.index = pd.to_datetime(index_comps.index)
 industry_comps.index = pd.to_datetime(industry_comps.index)
-
-
-
-
 
 
 comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path, rank_file_path,input_file_path=input_file_path)
@@ -113,12 +99,6 @@ else:
     df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 
 df_target = Analysis_class.plot_drawdown_underwater(df_target)
-
-Analysis_class.create_interesting_times_tear_sheet(df_target['return'])
-Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
-
-
-
 
 df_target.to_csv(save_file_path)
 #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
