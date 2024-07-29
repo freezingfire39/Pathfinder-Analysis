@@ -45,7 +45,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
+
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
     df_target['purchase_comments']=0
@@ -76,7 +76,7 @@ def main(symbol_file_path,symbol,search_file_path):
         
     df_test_4 = df_target['赎回状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
+
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
     df_target['redeem_comments']=0
@@ -124,14 +124,14 @@ def main(symbol_file_path,symbol,search_file_path):
 
     ##calculate net return
     df_background = pd.read_csv(background_file_path)
-    print (df_background)
+
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
     df_target['benchmark_name']=0
     df_target['excess_SR']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "货币基金平均收益"
 
     management_fee = float(management_fee)/100
-    print (management_fee)
+
     custody_fee = df_background['托管费率'].iloc[0].split("%")[0]
     custody_fee = float(custody_fee)/100
 
