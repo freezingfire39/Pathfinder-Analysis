@@ -1618,71 +1618,71 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
     if corr_df[comp_2_name] < -0.9:
         ##save comp_2_name
         if comp_1_name=="510050.SS":
-            #print ("This etf negatively correlates with A50")
+            print ("This etf negatively correlates with A50")
             #print ("本基金与中证50（大盘股）有较强的负相关性。")
         elif comp_1_name=="159901.SZ":
-            #print ("This etf negatively correlates with Shenzhen 100")
+            print ("This etf negatively correlates with Shenzhen 100")
             #print ("本基金与深圳100（深A大盘股）有较强的负相关性。")
         elif comp_1_name=="159949.SZ":
-            #print ("This etf negatively correlates with Chuangye 50")
+            print ("This etf negatively correlates with Chuangye 50")
             #print ("本基金与创业板有较强的负相关性。")
         elif comp_1_name=="510500.SS":
-            #print ("This etf negatively correlates with Hushen 300")
+            print ("This etf negatively correlates with Hushen 300")
             #print ("本基金与沪深300有较强的负相关性。")
         elif comp_1_name=="512100.SS":
-            #print ("This etf negatively correlates with Zhongzheng 500")
+            print ("This etf negatively correlates with Zhongzheng 500")
             #print ("本基金与中证500（中盘股）有较强的负相关性。")
         elif comp_1_name=="512100.SS":
-            #print ("This etf negatively correlates with Zhongzheng 1000")
+            print ("This etf negatively correlates with Zhongzheng 1000")
             #print ("本基金与中证1000（小盘股）有较强的负相关性。")
         elif comp_1_name=="512100.SS":
-            #print ("This etf negatively correlates with Kechuang 50")
+            print ("This etf negatively correlates with Kechuang 50")
             #print ("本基金与科创板有较强的负相关性。")
         elif comp_1_name=="510900.SS":
-            #print ("This etf negatively correlates with Hang Seng Index")
+            print ("This etf negatively correlates with Hang Seng Index")
             #print ("本基金与香港恒生指数有较强的负相关性。")
             
         elif comp_1_name=="510230.SS":
-            #print ("This etf negatively correlates with Finance Sector")
+            print ("This etf negatively correlates with Finance Sector")
             #print ("本基金与金融板块有较强的负相关性。")
         elif comp_1_name=="512010.SS":
-            #print ("This etf negatively correlates with Pharmaceutical Sector")
+            print ("This etf negatively correlates with Pharmaceutical Sector")
             #print ("本基金与医药板块有较强的负相关性。")
         elif comp_1_name=="512170.SS":
-            #print ("This etf negatively correlates with Healthcare Sector")
+            print ("This etf negatively correlates with Healthcare Sector")
             #print ("本基金与医疗板块有较强的负相关性。")
         elif comp_1_name=="515170.SS":
-            #print ("This etf negatively correlates with Food & Beverage Sector")
+            print ("This etf negatively correlates with Food & Beverage Sector")
             #print ("本基金与食品饮料板块有较强的负相关性。")
         elif comp_1_name=="516160.SS":
-            #print ("This etf negatively correlates with Energy Sector")
+            print ("This etf negatively correlates with Energy Sector")
             #print ("本基金与能源板块有较强的负相关性。")
         elif comp_1_name=="512480.SS":
-            #print ("This etf negatively correlates with Semiconductor")
+            print ("This etf negatively correlates with Semiconductor")
             #print ("本基金与半导体板块有较强的负相关性。")
         elif comp_1_name=="515230.SS":
-            #print ("This etf negatively correlates with Software")
+            print ("This etf negatively correlates with Software")
             #print ("本基金与软件板块有较强的相关性。")
         elif comp_1_name=="512660.SS":
-            #print ("This etf negatively correlates with Military")
+            print ("This etf negatively correlates with Military")
             #print ("本基金与军工板块有较强的负相关性。")
         elif comp_1_name=="516220.SS":
-            #print ("This etf negatively correlates with Chemicals")
+            print ("This etf negatively correlates with Chemicals")
             #print ("本基金与化工板块有较强的负相关性。")
         elif comp_1_name=="516800.SS":
-            #print ("This etf negatively correlates with Manufacturing")
+            print ("This etf negatively correlates with Manufacturing")
             #print ("本基金与制造业板块有较强的负相关性。")
         elif comp_1_name=="512400.SS":
-            #print ("This etf negatively correlates with Metal")
+            print ("This etf negatively correlates with Metal")
             #print ("本基金与有色金属板块有较强的负相关性。")
         elif comp_1_name=="159825.SZ":
-            #print ("This etf negatively correlates with Agriculture")
+            print ("This etf negatively correlates with Agriculture")
             #print ("本基金与农业板块有较强的负相关性。")
         elif comp_1_name=="516950.SS":
-            #print ("This etf negatively correlates with Infrastructure")
+            print ("This etf negatively correlates with Infrastructure")
             #print ("本基金与基建板块有较强的负相关性。")
         elif comp_1_name=="516070.SS":
-            #print ("This etf negatively correlates with Environmental")
+            print ("This etf negatively correlates with Environmental")
             #print ("本基金与环保板块有较强的负相关性。")
         
     else:
