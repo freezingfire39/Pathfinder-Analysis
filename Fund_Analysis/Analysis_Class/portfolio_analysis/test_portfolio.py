@@ -11,9 +11,7 @@ asset_type='stock_'
 
 
 input_file_path=''  ##ticker_information fund_1
-background_file_path='Background.csv'
-return_rank_file_path=asset_type+'return_rank.csv'
-cagr_rank_file_path=asset_type+'CAGR_rank.csv'  ##return_rank_csv
+ ##return_rank_csv
 rank_file_path=''+asset_type  ##all other filter csv
 comp_file_path='index_comps.csv'
 comp_file_path_2='industry_comps.csv'
