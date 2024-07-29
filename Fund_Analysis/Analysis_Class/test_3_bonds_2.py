@@ -27,7 +27,7 @@ def main(symbol_file_path,symbol,search_file_path):
     Trading_days = 250
     trading_days=250
 
-    print (Ticker)
+
 
 
     df_target = pd.read_csv(input_file_path)
@@ -49,7 +49,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
+
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
     
@@ -82,7 +82,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     df_test_4 = df_target['赎回状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
+
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
     df_target['redeem_comments']=0
@@ -161,12 +161,12 @@ def main(symbol_file_path,symbol,search_file_path):
 
     ##calculate net return
     df_background = pd.read_csv(background_file_path)
-    print (df_background)
+
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
 
 
     management_fee = float(management_fee)/100
-    print (management_fee)
+
     custody_fee = df_background['托管费率'].iloc[0].split("%")[0]
     custody_fee = float(custody_fee)/100
 
@@ -181,7 +181,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
 
     index_comps = yf.download("TLT", start="2000-01-01", end="2024-10-16")
-    print (index_comps)
+
     df_target['comp_1'] =index_comps['Close'].pct_change()
     index_comps = index_comps['Close']
 
@@ -226,14 +226,14 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['comp_1'] = index_comps
     df1 = df_target[['累计净值', 'comp_1']]
-    print (df1)
+
 
     # Resample to month end and calculate the monthly percent change
     df_rets_monthly = df1.resample('M').last().pct_change().dropna()
 
     df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
-    print (df_target)
+
 
 
     df_target = Analysis_class.rolling_volatility(df_target, index_comps,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
