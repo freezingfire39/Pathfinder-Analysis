@@ -11,9 +11,7 @@ asset_type='stock_'
 
 
 input_file_path=''  ##ticker_information fund_1
-background_file_path='Background.csv'
-return_rank_file_path=asset_type+'return_rank.csv'
-cagr_rank_file_path=asset_type+'CAGR_rank.csv'  ##return_rank_csv
+ ##return_rank_csv
 rank_file_path=''+asset_type  ##all other filter csv
 comp_file_path='index_comps.csv'
 comp_file_path_2='industry_comps.csv'
@@ -22,14 +20,10 @@ Ticker = "Port_1"
 Trading_days = 250
 trading_days=250
 
-print (Ticker)
-
-
-
 import json
 import pandas as pd
 from pandas.io.json import json_normalize
-data = json.load(open('response.json'))
+data = json.load(open(input_file_path+'response.json'))
 df = json_normalize(data['portfolio'], max_level=2)
 return_list = df['returns'].to_list()
 data = json_normalize(return_list)
@@ -46,17 +40,7 @@ rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comm
 rolling_sharpe_df.to_csv('comments.csv')
 
 
-
-
-
-
-
-
 df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-
-
-
-
 
 ##calculate net return
 
@@ -64,10 +48,6 @@ index_comps = pd.read_csv(comp_file_path).set_index('Date')
 industry_comps = pd.read_csv(comp_file_path_2).set_index('Date')
 index_comps.index = pd.to_datetime(index_comps.index)
 industry_comps.index = pd.to_datetime(industry_comps.index)
-
-
-
-
 
 
 comp_3_name,comp_4_name, df_target = Analysis_class.corr_analysis(df_target,industry_comps,Ticker,rank_file_path, rank_file_path,input_file_path=input_file_path)
@@ -107,20 +87,12 @@ df_rets_monthly = df1.resample('M').last().pct_change().dropna()
 
 df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path = input_file_path,security_code = Ticker)
 
-print (df_target)
-
 if comp_1_name in industry_comps:
     df_target = Analysis_class.rolling_volatility(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 else:
     df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 
 df_target = Analysis_class.plot_drawdown_underwater(df_target)
-
-Analysis_class.create_interesting_times_tear_sheet(df_target['return'])
-Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
-
-
-
 
 df_target.to_csv(save_file_path)
 #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])

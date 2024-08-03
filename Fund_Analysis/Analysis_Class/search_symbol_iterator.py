@@ -2,7 +2,7 @@ import os,sys
 import numpy as np
 import pandas as pd
 import datetime
-from airflow.exceptions import AirflowException
+# from airflow.exceptions import AirflowException
 from pathlib import Path
 home = str(Path.home())
 import pytz
@@ -59,7 +59,38 @@ def readBackground(symbol_file_path):
         error_log = "Faild to read file path: "+ str(symbol_file_path)
         logger.error(error_log)
         return 0
+def readDays(symbol_file_path):
+    print ("shortfunds check, start reading file path:", symbol_file_path)
+    symbols = symbol_file_path.split("/")
+    try:
 
+        background_csv = pd.read_csv(symbol_file_path + '/Background.csv')
+        # only need to check Fund 1, fund 2 is money order will skip
+        fund1_csv = pd.read_csv(symbol_file_path + '/Fund_1.csv')
+    except:
+        print ("fail to read background.csv or Fund_1.csv file. skip this file")
+        return 0
+    try:
+        type = background_csv['基金类型'].iloc[0]
+        print("type:", type)
+        logger.info("read " + symbol_file_path + ", background type is:" + type)
+        money_order_array = ['货币型-普通货币','货币型-浮动净值']
+        if type in money_order_array:
+            # skip all money order
+            print("skip money order for shortfunds check.")
+            return 0
+        fund1_csv = fund1_csv.sort_values(by='净值日期')
+        fund1_csv['净值日期'] = pd.to_datetime(fund1_csv['净值日期'])
+        first_date = fund1_csv['净值日期'].iloc[0]
+        last_date = fund1_csv['净值日期'].iloc[-1]
+        difference_days = (last_date - first_date).days
+        logger.info("difference in days:", difference_days)
+        if difference_days <= 250:
+            return 1
+    except Exception as e:
+        print()
+        return 0
+    return 0
 def trigger_python_script(script_path, params):
     print ("trigger: " + script_path + " " + params)
     result = subprocess.run(['python', script_path, params], text=True, capture_output=True)
@@ -101,7 +132,9 @@ def trigger_test_3_bonds_2(formatted_number):
 def trigger_test_4_overseas(formatted_number):
     trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_4_overseas.py', formatted_number)
     pass
-
+def trigger_test_shortfunds(formatted_number):
+    trigger_python_script(home + '/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/test_shortfunds.py', formatted_number)
+    pass
 def main(start_symbol, end_symbol, input_file_path, files):
     # iterator from [start_symbol to end_symbol]
     # read Background.csv column 基金类型
@@ -111,6 +144,10 @@ def main(start_symbol, end_symbol, input_file_path, files):
         # print(formatted_number)
         # symbol_file_path = input_file_path + "/" + formatted_number
         symbol_file_path = input_file_path + "/" + file
+        shortType = readDays(symbol_file_path)
+        if shortType == 1:
+            trigger_test_shortfunds(file)
+            continue
         type = readBackground(symbol_file_path)
         print("type number:", type)
         if type == 1:
@@ -145,4 +182,4 @@ if __name__ == '__main__':
         files = get_files_from_folders(input_file_path)
         main(start_symbol, end_symbol, input_file_path, files)
     except Exception as e:
-        raise AirflowException("fail to run at error ", e)
+        raise Exception("fail to run at error ", e)

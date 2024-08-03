@@ -26,7 +26,6 @@ def main(symbol_file_path,symbol,search_file_path):
     Trading_days = 250
     trading_days=250
 
-    print (Ticker)
 
 
     df_target = pd.read_csv(input_file_path)
@@ -47,7 +46,6 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_test_4 = df_target['申购状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
     
@@ -80,7 +78,6 @@ def main(symbol_file_path,symbol,search_file_path):
     
     df_test_4 = df_target['赎回状态'].resample('D')
     df_test_4 = df_test_4.fillna(method='ffill')
-    print (df_test_4)
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
     df_target['redeem_comments']=0
@@ -145,12 +142,10 @@ def main(symbol_file_path,symbol,search_file_path):
 
     ##calculate net return
     df_background = pd.read_csv(background_file_path)
-    print (df_background)
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
 
 
     management_fee = float(management_fee)/100
-    print (management_fee)
     custody_fee = df_background['托管费率'].iloc[0].split("%")[0]
     custody_fee = float(custody_fee)/100
 
@@ -219,7 +214,6 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)
 
-    print (df_target)
 
     if comp_1_name in industry_comps:
         df_target = Analysis_class.rolling_volatility(df_target, industry_comps[comp_1_name],rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker)

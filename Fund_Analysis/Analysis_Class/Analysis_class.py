@@ -203,18 +203,18 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数低于其历史平均水平，意味着策略的近期表现有所下降。")
         comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现弱于对标的基准指数"+returns['benchmark_name'][-1]
-        print (comment_csv)
+
         comment_csv.to_csv(input_file_path+'comments.csv')
     elif returns['rolling_SR'].iloc[-1] > (returns['return'].mean()/returns['return'].std())+0.1:
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。")
         comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现强于对标的基准指数"+returns['benchmark_name'][-1]
-        print (comment_csv)
+
         comment_csv.to_csv(input_file_path+'comments.csv')
     else:
         #print ("This fund's has performed inline with its historical average in the last 6 months.")
         comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现持平对标的基准指数"+returns['benchmark_name'][-1]
-        print (comment_csv)
+
 
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
@@ -524,14 +524,14 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
     returns['drawdown_amount'] = returns['drawdown_amount'].astype(int)
-    print (df_drawdowns['Duration'].max())
+
     returns['drawdown_duration'].iloc[-1] = df_drawdowns['Duration'].max()
     returns['drawdown_amount'].iloc[-1] = df_drawdowns['Net drawdown in %'].max()
 
 
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     
-    print (returns.tail(10))
+
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
     if df_drawdowns['Duration'].mean()>df_benchmark['value'].quantile(0.6):
         comment_csv.at[comment_csv.index[-1],'drawdown_duration_comments']  = "本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。"
@@ -964,7 +964,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         #print ("This fund has outperformed the benchmark")
         #print ("本基金对比基准指数有较明显的超额亏损")
     else:
-        print ("This fund has not outperformed the benchmark")
+        #print ("This fund has not outperformed the benchmark")
         comment_csv.at[comment_csv.index[-1],'alpha_comments']  = "本基金回报对比指数基本一致。"
         comment_csv.to_csv(input_file_path+'comments.csv')
         #print ("本基金回报对比指数基本一致")
@@ -1100,7 +1100,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
 
     # 3) Combine to produce our final dataframe
     df_mkt_capture = pd.concat([up_ratio, down_ratio], axis=1)
-    print (df_mkt_capture)
+
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     df_mkt_capture.columns = ['Upside Capture', 'Downside Capture']
     
@@ -1249,12 +1249,12 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     return returns_daily
 
 
-def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,input_file_path):
+def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,input_file_path,risk_free_rate=0):
     security_code = str(security_code)
-    
+    returns['rolling_SR'] = returns['return'].rolling(250).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
     comp[security_code] = returns['累计净值']
     corr_df = comp.corr(method='pearson')
-    print (corr_df)
+
     #reset symbol as index (rather than 0-X)
 
     corr_df_2=corr_df.drop([security_code],axis=1)
@@ -1264,7 +1264,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
     seaborn.heatmap(corr_df, annot=True, cmap='RdYlGn')
     plt.figure()
     corr_df = corr_df[security_code].drop(corr_df[security_code].idxmax())
-    print (corr_df)
+
     comp_1_name = corr_df.idxmax()
     comp_2_name = corr_df.idxmin()
 
@@ -1299,7 +1299,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'A50.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'A50.csv')
@@ -1314,7 +1314,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Shenzhen100.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Shenzhen100.csv')
@@ -1329,7 +1329,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Chuangye50.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Chuangye50.csv')
@@ -1343,7 +1343,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Hushen300.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Hushen300.csv')
@@ -1358,7 +1358,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Zhongzheng500.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Zhongzheng500.csv')
@@ -1372,7 +1372,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Zhongzheng1000.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Zhongzheng1000.csv')
@@ -1386,14 +1386,14 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Kechuang50.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Kechuang50.csv')
             
             #print ("本基金与科创板有较强的相关性。")
         elif comp_1_name=="510900.SS":
-            print ("This etf correlates with Hang Seng Index")
+            #print ("This etf correlates with Hang Seng Index")
             #print ("本基金与香港恒生指数有较强的相关性。")
             returns.at[returns.index[-1],'benchmark_name'] = '香港恒生指数'
             comment_csv.at[comment_csv.index[-1],'index_comments']  = "本基金与香港恒生指数有较强的相关性。"
@@ -1402,7 +1402,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Hangseng.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Hangseng.csv')
@@ -1418,14 +1418,14 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Finance.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Finance.csv')
             
             
         elif comp_1_name=="512010.SS":
-            print ("This etf correlates with Pharmaceutical Sector")
+            #print ("This etf correlates with Pharmaceutical Sector")
             #print ("本基金与医药板块有较强的相关性。")
             returns.at[returns.index[-1],'benchmark_name_2'] = '医药板块'
             comment_csv.at[comment_csv.index[-1],'industry_comments']  = "本基金与医药板块有较强的相关性。"
@@ -1434,7 +1434,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Pharmaceutical.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Pharmaceutical.csv')
@@ -1448,7 +1448,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Healthcare.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Healthcare.csv')
@@ -1462,7 +1462,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'FoodBeverage.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'FoodBeverage.csv')
@@ -1477,7 +1477,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Energy.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Energy.csv')
@@ -1492,7 +1492,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Semiconductor.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Semiconductor.csv')
@@ -1506,7 +1506,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Software.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Software.csv')
@@ -1521,7 +1521,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Military.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Military.csv')
@@ -1535,7 +1535,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Chemicals.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Chemicals.csv')
@@ -1550,7 +1550,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Manufacturing.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Manufacturing.csv')
@@ -1565,7 +1565,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Metal.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Metal.csv')
@@ -1580,7 +1580,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Agriculture.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Agriculture.csv')
@@ -1595,7 +1595,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Infrastructure.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Infrastructure.csv')
@@ -1609,7 +1609,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             rank_file = pd.read_csv(rank_file_path_2+'Environmental.csv').set_index('Unnamed: 0')
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
-                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name]}
+                new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['return'][-1]}
                 rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 rank_file.to_csv(rank_file_path_2+'Environmental.csv')
@@ -1690,7 +1690,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
         #print ("本基金投资风格较多元。")
     returns['positive_comp'][-1] = comp_1_name
     returns['negative_comp'][-1] = comp_2_name
-    print (returns['negative_comp'][-1])
+    #print (returns['negative_comp'][-1])
     #print (returns['negative_comp'][-1])
 
     
