@@ -2,6 +2,8 @@ import json
 import os
 import csv
 import argparse
+
+import numpy as np
 import pandas as pd
 
 import warnings
@@ -58,7 +60,7 @@ def asset_calc(input_dir, output_dir, year, quarter, section_percent=0.6):
 
         # Filter the data for the specified year
         df_year = df[df['Year'] == int(year)]
-        df_year["asset"] = df_year['期末净资产（亿元）'].astype(float)
+        df_year["asset"] = df_year['期末净资产（亿元）'].replace('---', np.nan).astype(float)
         # Group by quarter and calculate the average of the net assets
         quarterly_avg = df_year.groupby('Quarter')['asset'].mean().reset_index()
         df = quarterly_avg.set_index("Quarter")
