@@ -36,6 +36,8 @@ def main(input_dir, output_dir, date, year, section_percent=0.6):
             industry_set.add(industry)
             if percentage_float > section_percent:
                 industry_fund_map[ticker] = industry
+            else:
+                continue
 
             for row in csvreader:
                 i = row[1]
