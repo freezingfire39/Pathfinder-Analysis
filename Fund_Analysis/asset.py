@@ -73,7 +73,7 @@ def asset_calc(input_dir, output_dir, year, quarter, section_percent=0.6):
         os.makedirs(output_dir)
 
     with open(f'{output_dir}/asset_sum.json', 'w',  encoding='utf-8') as json_file:
-        json.dump(asset_fund_map, json_file, ensure_ascii=False)
+        json.dump(asset_fund_agg, json_file, ensure_ascii=False)
 
 
 if __name__ == '__main__':
