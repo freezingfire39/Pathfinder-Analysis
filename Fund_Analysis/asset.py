@@ -42,6 +42,7 @@ def asset_calc(input_dir, output_dir, year, quarter, section_percent=0.6):
         if not os.path.exists(f):
             continue
         df = pd.read_csv(f)
+        df = df[~df['日期'].str.contains('说明')]
         df['日期'] = pd.to_datetime(df['日期'])
 
         # Extract the year and quarter from the date
