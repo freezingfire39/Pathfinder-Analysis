@@ -46,7 +46,7 @@ def asset_calc(input_dir, output_dir, year, quarter, section_percent=0.6):
         if not os.path.exists(f):
             continue
         df = pd.read_csv(f)
-        keyword_row = df[df.iloc[:, 0] == '说明'].index
+        keyword_row = df[df.iloc[:, 0].str.startswith('说明')].index
         if not keyword_row.empty:
             df = df.iloc[:keyword_row[0]]
 
