@@ -4,6 +4,10 @@ import csv
 import argparse
 import pandas as pd
 
+import warnings
+
+warnings.filterwarnings('ignore')
+
 def asset_calc(input_dir, output_dir, year, quarter, section_percent=0.6):
     quarter = f'{year}Q{quarter}'
     industry_set = set()
@@ -12,7 +16,6 @@ def asset_calc(input_dir, output_dir, year, quarter, section_percent=0.6):
     asset_fund_agg_details = dict()
     asset_fund_agg = dict()
     for subdir in os.listdir(input_dir):
-        print(subdir)
         sub = os.path.join(input_dir, subdir)
         # checking if it is a file
         ticker = subdir
