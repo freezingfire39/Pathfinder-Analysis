@@ -23,4 +23,6 @@ Start/Enable the service(s):
 sudo systemctl enable myapp-py.service
 sudo systemctl start myapp-py.service 
 sudo systemctl restart myapp-py.service
-Check status: sudo systemctl status myapp-py.service
+Check status: 
+sudo systemctl status myapp-py.service
+journalctl -u myapp-py.service -f
