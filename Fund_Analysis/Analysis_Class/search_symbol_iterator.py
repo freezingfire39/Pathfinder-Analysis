@@ -84,7 +84,7 @@ def readDays(symbol_file_path):
         first_date = fund1_csv['净值日期'].iloc[0]
         last_date = fund1_csv['净值日期'].iloc[-1]
         difference_days = (last_date - first_date).days
-        logger.info("difference in days:", difference_days)
+        logger.info(symbol_file_path + ", difference in days:" + str(difference_days))
         if difference_days <= 250:
             return 1
     except Exception as e:

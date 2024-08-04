@@ -100,11 +100,11 @@ def main(symbol_file_path,symbol,search_file_path):
 
         close_days = df_test_1.index[-1]-df_test_2.index[-1]
 
-        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放赎回已经过去了"+close_days+"天。"
+        df_target.at[df_target.index[-1],'purchase_days']  = "本基金距离上次开放赎回已经过去了"+str(close_days)+"天。"
         df_test_2 = df_test_2.to_frame()
         df_test_2['flag']=1
         df_test_5 = df_test_2['flag'].resample('Y').sum()
-        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+int(df_test_5.mean())+"天开放赎回"
+        df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放赎回"
 
     
     df_target = df_target['累计净值'].resample('D').last()
