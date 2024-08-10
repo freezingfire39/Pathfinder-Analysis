@@ -48,13 +48,14 @@ def main(input_dir, output_dir, date, year, section_percent=0.6):
             continue
         df = pd.read_csv(f)
         df = df.set_index("净值日期")
+        df.fillna(0, inplace=True)
         if date in df.index:
             daily_return = df.loc[date, 'return']
+            if daily_return >0:
+                if industry_fund_agg_details.get(industry) == None:
+                    industry_fund_agg_details[industry] = {}
 
-            if industry_fund_agg_details.get(industry) == None:
-                industry_fund_agg_details[industry] = {}
-
-            industry_fund_agg_details[industry][ticker]= daily_return
+                industry_fund_agg_details[industry][ticker]= daily_return
 
     for k in industry_fund_agg_details.keys():
         returns = industry_fund_agg_details[k]
