@@ -55,13 +55,16 @@ def resample_returns(df_returns, frequency='Q'):
 def return_analysis(returns,input_file_path, rank_file_path, asset_type):
 
         
-    df_returns_qtr = resample_returns(returns['return'], 'Q')
-    df_returns_qtr = df_returns_qtr.to_frame()
-    pivot_df = df_returns_qtr.pivot_table(index=df_returns_qtr.index.year, columns=df_returns_qtr.index.quarter,
+    try:
+        df_returns_qtr = resample_returns(returns['return'], 'Q')
+        df_returns_qtr = df_returns_qtr.to_frame()
+        pivot_df = df_returns_qtr.pivot_table(index=df_returns_qtr.index.year, columns=df_returns_qtr.index.quarter,
                                               values=df_returns_qtr.columns[0], aggfunc='sum')
-    pivot_df = pivot_df.reindex(columns=[1, 2, 3, 4])
+        pivot_df = pivot_df.reindex(columns=[1, 2, 3, 4])
     
-    pivot_df.to_csv(input_file_path+"return_heatmap.csv")
+        pivot_df.to_csv(input_file_path+"return_heatmap.csv")
+    except:
+        pass
     ##need to answer three questions 1. is the return high? 2. Where is it coming from? 3. Is it consistent?
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
     df_benchmark_2 = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
