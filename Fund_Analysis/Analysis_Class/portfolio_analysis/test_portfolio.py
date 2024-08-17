@@ -92,7 +92,7 @@ if comp_1_name in industry_comps:
 else:
     df_target = Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 
-df_target = Analysis_class.plot_drawdown_underwater(df_target)
+#df_target = Analysis_class.plot_drawdown_underwater(df_target)
 
 df_target.to_csv(save_file_path)
 #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
