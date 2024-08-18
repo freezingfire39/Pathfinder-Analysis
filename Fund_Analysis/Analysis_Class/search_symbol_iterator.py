@@ -15,8 +15,8 @@ formatter = '[[time]] - [[name]] - [[level_name]] - [[msg]]'
 # add/del channel
 # logger.add_channel(filename='log.txt', level=logging4.WARNING)
 # logger.add_channel(filename=sys.stdout, level=logging4.ERROR, formatter=formatter)
-logger.add_channel(filename=home + '/Desktop/info.log', level=logging4.INFO, formatter=formatter)
-logger.add_channel(filename=home + '/Desktop/error.log', level=logging4.ERROR, formatter=formatter)
+logger.add_channel(filename=home + '/Desktop/log/info.log', level=logging4.INFO, formatter=formatter)
+logger.add_channel(filename=home + '/Desktop/log/error.log', level=logging4.ERROR, formatter=formatter)
 # logger.del_channel(filename='log2.txt')
 def readBackground(symbol_file_path):
     print ("start reading file path:", symbol_file_path)
