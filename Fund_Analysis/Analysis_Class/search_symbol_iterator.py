@@ -140,7 +140,7 @@ def main(start_symbol, end_symbol, input_file_path, files):
     # read Background.csv column 基金类型
     # for i in range(start_symbol, (end_symbol+1)):
     #     formatted_number = f"{i:06}"  # Formats the number as a string with leading zeros up to 6 digits
-    logger.info("range start:" + start_symbol + ", end:" + end_symbol)
+    logger.info("range start:" + str(start_symbol) + ", end:" + str(end_symbol))
     for file in files[int(start_symbol): int(end_symbol)]:
         # print(formatted_number)
         # symbol_file_path = input_file_path + "/" + formatted_number
