@@ -85,8 +85,8 @@ def readDays(symbol_file_path):
         last_date = fund1_csv['净值日期'].iloc[-1]
         difference_days = (last_date - first_date).days
         logger.info(symbol_file_path + ", difference in days:" + str(difference_days))
-        if difference_days <= 250:
-            return 1
+        if difference_days <= 370:
+            return 10
     except Exception as e:
         print()
         return 0
@@ -148,7 +148,7 @@ def main(start_symbol, end_symbol, input_file_path, files):
         logger.info("range start:" + str(start_symbol) + ", end:" + str(end_symbol) + ", counter:" +str(counter))
         symbol_file_path = input_file_path + "/" + file
         shortType = readDays(symbol_file_path)
-        if shortType == 1:
+        if shortType == 10:
             trigger_test_shortfunds(file)
             continue
         type = readBackground(symbol_file_path)
