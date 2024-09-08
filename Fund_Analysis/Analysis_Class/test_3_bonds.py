@@ -179,7 +179,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     index_comps = yf.download("511260.SS", start="2000-01-01", end="2024-10-16")
 
-    df_target['comp_1'] =index_comps['Close'].pct_change()
+    df_target['comp_1'] =index_comps['Close']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
     index_comps = index_comps['Close']
 
@@ -187,7 +187,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     df_target.dropna(inplace=True)
-    df_target['excess_return']=df_target['return']-df_target['comp_1']
+    df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
 
 
 
