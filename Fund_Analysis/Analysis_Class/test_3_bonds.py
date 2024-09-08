@@ -218,7 +218,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
-    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'],rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
+    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
 
@@ -234,7 +234,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'],rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
+    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
