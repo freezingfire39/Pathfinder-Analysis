@@ -158,13 +158,14 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16") ##use 003718
-    df_target['comp_1'] =index_comps['Close'].pct_change()
+    df_target['comp_1'] =index_comps['Close']
+    df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
     index_comps = index_comps['Close']
 
     index_comps.index = pd.to_datetime(index_comps.index)
 
 
-    df_target['excess_return']=df_target['return']-df_target['comp_1']
+    df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
 
 
 
@@ -197,7 +198,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
-    df_target = Analysis_class.alpha_beta_analysis(df_target, index_comps,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
+    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
 
@@ -211,13 +212,12 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    df_target = Analysis_class.rolling_volatility(df_target, index_comps,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
+    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
 
-    Analysis_class.create_interesting_times_tear_sheet(df_target['return'])
-    Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
+    Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
 
     df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
 
