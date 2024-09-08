@@ -1793,7 +1793,6 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
         Rolling volatility.
     """
 
-    comp = comp.pct_change()
 
     returns['vol'] = returns['return'].rolling(rolling_vol_window).std() \
         * np.sqrt(250)
