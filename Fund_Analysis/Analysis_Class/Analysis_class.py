@@ -770,7 +770,55 @@ def print_table(table,
 
     display(HTML(html))
 
+def event_analysis(returns, benchmark_rets=None,
+                                        periods=None, legend_loc='best',
+                                        return_fig=False):
+    """
+    Generate a number of returns plots around interesting points in time,
+    like the flash crash and 9/11.
 
+    Plots: returns around the dotcom bubble burst, Lehmann Brothers' failure,
+    9/11, US downgrade and EU debt crisis, Fukushima meltdown, US housing
+    bubble burst, EZB IR, Great Recession (August 2007, March and September
+    of 2008, Q1 & Q2 2009), flash crash, April and October 2014.
+
+    benchmark_rets must be passed, as it is meaningless to analyze performance
+    during interesting times without some benchmark to refer to.
+
+    Parameters
+    ----------
+    returns : pd.Series
+        Daily returns of the strategy, noncumulative.
+         - See full explanation in create_full_tear_sheet.
+    benchmark_rets : pd.Series
+        Daily noncumulative returns of the benchmark.
+         - This is in the same style as returns.
+    periods: dict or OrderedDict, optional
+        historical event dates that may have had significant
+        impact on markets
+    legend_loc : plt.legend_loc, optional
+         The legend's location.
+    return_fig : boolean, optional
+        If True, returns the figure that was plotted on.
+    """
+
+    rets_interesting = extract_interesting_date_ranges(
+        returns, periods)
+
+    if not rets_interesting:
+        warnings.warn('Passed returns do not overlap with any'
+                      'interesting times.', UserWarning)
+        return
+
+    df_date = pd.DataFrame(rets_interesting).describe().transpose().loc[:, ['mean', 'min', 'max']] * 100
+    print (df_date)
+    df_date.to_csv('date.csv')
+    if benchmark_rets is not None:
+        returns = clip_returns_to_benchmark(returns, benchmark_rets)
+
+        bmark_interesting = extract_interesting_date_ranges(
+            benchmark_rets, periods)
+            
 def standardize_data(x):
     """
     Standardize an array with mean and standard deviation.
@@ -901,9 +949,34 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
     if return_fig:
         return fig
     
-def event_analysis(returns):
-    create_interesting_times_tear_sheet(returns)
-    
+def clip_returns_to_benchmark(rets, benchmark_rets):
+    """
+    Drop entries from rets so that the start and end dates of rets match those
+    of benchmark_rets.
+
+    Parameters
+    ----------
+    rets : pd.Series
+        Daily returns of the strategy, noncumulative.
+         - See pf.tears.create_full_tear_sheet for more details
+
+    benchmark_rets : pd.Series
+        Daily returns of the benchmark, noncumulative.
+
+    Returns
+    -------
+    clipped_rets : pd.Series
+        Daily noncumulative returns with index clipped to match that of
+        benchmark returns.
+    """
+
+    if (rets.index[0] < benchmark_rets.index[0]) \
+            or (rets.index[-1] > benchmark_rets.index[-1]):
+        clipped_rets = rets[benchmark_rets.index]
+    else:
+        clipped_rets = rets
+
+    return clipped_rets
     
 def linreg(x,y):
     x = sm.add_constant(x)
