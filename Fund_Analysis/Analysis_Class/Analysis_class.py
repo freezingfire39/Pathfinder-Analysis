@@ -1003,10 +1003,10 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
 
     df_drop=[]
     for i in comp.index:
-        if i not in returns.index:
+        if i not in returns_2.index:
             df_drop.append(i)
     comp = comp.drop(df_drop, axis=0)
-    comp = comp.pct_change()
+
 
     for i in range(len(returns_2)):
         if i<window:
