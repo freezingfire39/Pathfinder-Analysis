@@ -186,7 +186,7 @@ def main(symbol_file_path,symbol,search_file_path):
     index_comps.index = pd.to_datetime(index_comps.index)
 
 
-
+    df_target.dropna(inplace=True)
     df_target['excess_return']=df_target['return']-df_target['comp_1']
 
 
