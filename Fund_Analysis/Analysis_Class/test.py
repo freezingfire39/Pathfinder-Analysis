@@ -172,6 +172,7 @@ def main(symbol_file_path,symbol,search_file_path):
     comp_1_name,comp_2_name, df_target = Analysis_class.corr_analysis(df_target,index_comps,Ticker,rank_file_path=rank_file_path, rank_file_path_2 = rank_file_path,input_file_path = symbol_file_path)
 
     df_target['comp_1'] = index_comps[comp_1_name]
+    df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
     df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
 
     df_target['rolling_mean'] = df_target['return'].rolling(trading_days).mean()
@@ -222,12 +223,9 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
 
-    Analysis_class.create_interesting_times_tear_sheet(df_target['return'])
-    Analysis_class.create_interesting_times_tear_sheet(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
-
     df_target = Analysis_class.return_forecast(df_target, index_comps[comp_1_name],asset_type=asset_type)
 
-
+    Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 
