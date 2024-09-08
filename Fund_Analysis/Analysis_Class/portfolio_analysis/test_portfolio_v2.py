@@ -93,9 +93,9 @@ df_target = Analysis_class.return_analysis(df_target,input_file_path = input_fil
 df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, security_code = Ticker,input_file_path=input_file_path)
 
 if comp_1_name in industry_comps:
-    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
+    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 else:
-    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
+    df_target = Analysis_class.alpha_beta_analysis(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 
 
 df_target['累计净值'] = (1+df_target['return']).cumprod()
@@ -111,9 +111,9 @@ df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank
 print (df_target)
 
 if comp_1_name in industry_comps:
-    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
+    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 else:
-    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'],rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
+    df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path,input_file_path = input_file_path, security_code = Ticker)
 
 
 
