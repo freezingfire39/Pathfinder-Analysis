@@ -2,4 +2,4 @@
 #*/*/LICENSE.chromedriver
 .idea/
 sample
-.pyc
+*.pyc
