@@ -23,7 +23,6 @@ class PortfolioSerializer(serializers.Serializer):
 class AnalysisSerializer(serializers.Serializer):
     type = serializers.CharField()
     values = TimeSeriesSerializer(many=True)
-    comment = serializers.CharField()
 
 class AnalyzerOutputSerializer(serializers.Serializer):
     portfolio = PortfolioSerializer()

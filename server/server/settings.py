@@ -125,3 +125,5 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 RETURNS_DATA_FILE_PATH = None
+RANK_FILE_PATH = None
+COMMENTS_FILE_PATH = None

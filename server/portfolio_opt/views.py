@@ -18,6 +18,8 @@ class OptimizePortfolioView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.fdir = settings.RETURNS_DATA_FILE_PATH
+        self.rpath = settings.RANK_FILE_PATH
+        self.cpath = settings.COMMENTS_FILE_PATH
         self.fac = OptimizerFactory()
     def post(self, request):
         input_serializer = OptimizationInputSerializer(data=request.data)
@@ -25,7 +27,12 @@ class OptimizePortfolioView(APIView):
             symbols = input_serializer.validated_data['symbols']
             capital = input_serializer.validated_data['amount']
             method = input_serializer.validated_data['method']
-
+            if self.fdir is None:
+                self.fdir = "D:/workspace/aggregation/"
+            if self.rpath is None:
+                self.rpath = "D:/workspace/output_search/"
+            if self.cpath is None:
+                self.cpath = "D:/workspace/comments/"
             p = Portfolio(capital, eft_tags=symbols, fdir=self.fdir)
 
             p.load()
@@ -33,22 +40,23 @@ class OptimizePortfolioView(APIView):
             optimizer = self.fac.create(enums.OptimizerType[method.upper()], portfolio=p)
             optimizer.optimize_portfolio()
             p.calc_historical_returns()
-            analyzer = Analyzer(p)
+            analyzer = Analyzer(p, rank_file_path=self.rpath, comments_output_path=self.cpath)
             history = analyzer.history()
-            rolling_sr=  analyzer.rolling_sharpe()
-            rolling_vol = analyzer.rolling_volatility()
-            max_dd = analyzer.max_drawdown()
+            df_target=  analyzer.analyze()
+            df_target = df_target.drop(columns=['positive_comp', 'negative_comp', 'benchmark_name', 'benchmark_name_2'])
+            df_target.fillna(0, inplace=True)
+            df_target.replace([np.inf, -np.inf], 0, inplace=True)
+            analyses = []
+            for col in df_target.columns:
+                values = [{"date": date.strftime('%Y-%m-%d'), "value": value} for date, value in zip(df_target.index, df_target[col])]
+                analyses.append({"type":col, "values":values})
 
             response_data = {
                 "portfolio": {
                     "component": p.weights,
                     "returns": history
                 },
-                "analysis": [
-                    {"type": "rolling_sharpe","values":rolling_sr[0], "comment": rolling_sr[1]},
-                    {"type": "rolling_vol", "values": rolling_vol[0], "comment": rolling_vol[1]},
-                    {"type": "max_drawdown", "values": max_dd[0], "comment":max_dd[1]},
-                ]
+                "analysis": analyses
             }
             output_serializer = AnalyzerOutputSerializer(response_data)
             return Response(output_serializer.data, status=status.HTTP_200_OK)
