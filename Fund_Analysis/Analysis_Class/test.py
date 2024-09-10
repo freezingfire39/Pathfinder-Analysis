@@ -226,6 +226,10 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.return_forecast(df_target, index_comps[comp_1_name],asset_type=asset_type)
 
     Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
+
+    df_target.drop(['index_peers','industry_peers'],axis=1,inplace=True)
+    df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df_target.fillna(method='ffill',inplace=True)
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 
