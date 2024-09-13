@@ -139,8 +139,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    df_target['cum_return'] = (1+df_target_2['return']).cumprod()-1
-    df_target['cum_net_return'] = (1+df_target_2['net_return']).cumprod()-1
+    df_target['cum_return'] = (1+df_target['return']).cumprod()-1
+    df_target['cum_net_return'] = (1+df_target['net_return']).cumprod()-1
     
     df_target['fund_name']=0
     df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
