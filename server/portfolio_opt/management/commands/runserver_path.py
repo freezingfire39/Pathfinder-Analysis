@@ -15,9 +15,16 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         file_path = options.get('file_path')
+        rank_file_path = options.get('rank_file_path')
+        comment_file_path = options.get('comment_file_path')
         if file_path:
             # Set the file path in Django settings
             settings.RETURNS_DATA_FILE_PATH = file_path
+        if rank_file_path:
+            # Set the file path in Django settings
+            settings.RANK_FILE_PATH = rank_file_path
+        if comment_file_path:
+            settings.COMMENTS_FILE_PATH = comment_file_path
 
         # Call the base command's handle method
         super().handle(*args, **options)
