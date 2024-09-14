@@ -151,6 +151,9 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['net_return']=df_target['return']-(custody_fee+management_fee)/Trading_days
 
+    df_target['cum_return'] = (1+df_target['return']).cumprod()-1
+    df_target['cum_net_return'] = (1+df_target['net_return']).cumprod()-1
+
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
     df_target['fund_name']=0
@@ -221,6 +224,8 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
 
+    df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df_target.fillna(method='ffill',inplace=True)
 
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])

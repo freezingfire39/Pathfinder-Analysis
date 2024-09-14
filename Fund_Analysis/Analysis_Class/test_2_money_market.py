@@ -53,6 +53,9 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target_2['net_return']=df_target_2['return']-(custody_fee+management_fee+sales_fee)/Trading_days
 
+    df_target_2['cum_return'] = (1+df_target_2['return']).cumprod()-1
+    df_target_2['cum_net_return'] = (1+df_target_2['net_return']).cumprod()-1
+
     df_target_2['累计净值'] =(1+df_target_2['return']).cumprod()
 
 

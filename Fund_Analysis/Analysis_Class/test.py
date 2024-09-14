@@ -117,7 +117,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.set_index('净值日期',inplace=True)
     df_target = df_target.fillna(method='ffill')
     df_target['return'] = df_target['累计净值'].pct_change()
-    
+    df_target['cum_return'] = (1+df_target['return']).cumprod()-1
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
 
@@ -150,6 +150,7 @@ def main(symbol_file_path,symbol,search_file_path):
     custody_fee = float(custody_fee)/100
 
     df_target['net_return']=df_target['return']-(custody_fee+management_fee)/Trading_days
+    df_target['cum_net_return'] = (1+df_target['net_return']).cumprod()-1
 
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
@@ -226,6 +227,10 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.return_forecast(df_target, index_comps[comp_1_name],asset_type=asset_type)
 
     Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
+
+    df_target.drop(['index_peers','industry_peers'],axis=1,inplace=True)
+    df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df_target.fillna(method='ffill',inplace=True)
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 
