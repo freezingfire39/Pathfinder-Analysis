@@ -12,7 +12,7 @@ Description=My Python Application
 After=syslog.target
 [Service]
 User=app
-ExecStart=/home/app/manage runserver_path --file_path=/home/app/Desktop/output_china/ --noreload
+ExecStart=/home/app/manage runserver_path --file_path=/home/app/Desktop/output_china/ --rank_file_path=/home/app/Desktop/output_search/ --comment_file_path=/home/app/Desktop/output_china/ --noreload
 Restart=on-failure
 
 [Install]
