@@ -25,7 +25,7 @@ def main(asset_type,path):
     rolling_sharpe_df.to_csv(path+'negative_beta_rank.csv')
     rolling_sharpe_df.to_csv(path+'volatility_rank.csv')
     rolling_sharpe_df.to_csv(path+'excess_sharpe_rank.csv')
-
+    rolling_sharpe_df.to_csv(path+'auto_corr_rank.csv')
 
 
 
