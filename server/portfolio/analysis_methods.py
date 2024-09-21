@@ -178,7 +178,7 @@ class PortfolioAnalysis:
             #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
 
 
-
+        returns['cum_net_return'] = (1+returns['return']).cumprod()-1
         returns['excess_return'].fillna(method='ffill',inplace=True)
         returns['excess_SR'] = returns['excess_return'].rolling(window).apply(lambda x: (x.mean() - risk_free_rate) / x.std(), raw = True)
 

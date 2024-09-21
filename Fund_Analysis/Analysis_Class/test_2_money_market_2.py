@@ -147,7 +147,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
+    if df_target['annual_return'][-1] > 0.01:
 
         new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': "不适用", 'return': df_target['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row

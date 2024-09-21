@@ -43,7 +43,7 @@ class OptimizePortfolioView(APIView):
             analyzer = Analyzer(p, rank_file_path=self.rpath, comments_output_path=self.cpath)
             history = analyzer.history()
             df_target=  analyzer.analyze()
-            df_target = df_target.drop(columns=['positive_comp', 'negative_comp', 'benchmark_name', 'benchmark_name_2'])
+            df_target = df_target.drop(columns=['positive_comp', 'negative_comp', 'benchmark_name', 'benchmark_name_2','累计净值'])
             df_target.fillna(0, inplace=True)
             df_target.replace([np.inf, -np.inf], 0, inplace=True)
             analyses = []

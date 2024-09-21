@@ -109,10 +109,16 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type):
 
     df_return = returns['累计净值'].resample('3M').last()
     df_return_2 = df_return.rolling(5).apply(lambda x: x.autocorr(), raw=False)
+    rank_file = pd.read_csv(rank_file_path+'auto_corr_rank.csv').set_index('Unnamed: 0')
+       
 
     if df_return_2.mean()>0.5:
         comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较稳定")
         comment_csv.to_csv(input_file_path+'comments.csv')
+        new_row = {'ticker': security_code, 'value': df_return_2.mean(), 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+        rank_file.to_csv(rank_file_path+'auto_corr_rank.csv')
 
     else:
         comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较不稳定")
