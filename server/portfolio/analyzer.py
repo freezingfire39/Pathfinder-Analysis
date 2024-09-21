@@ -15,8 +15,8 @@ class Analyzer:
         self.comments_output_path = comments_output_path
         self.trading_days = 250
     def history(self):
-        returns = self.portfolio.returns["return"]
-        returns.index = returns.index.date
+        returns = self.portfolio.returns["return"].copy()
+        returns.index = returns.index.strftime('%Y-%m-%d')
         return self._to_json(returns)
 
     # def rolling_sharpe(self, risk_free_rate=0.0, window=120): # transaction fee -> net return
