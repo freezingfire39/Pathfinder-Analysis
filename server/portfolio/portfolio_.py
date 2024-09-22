@@ -15,10 +15,10 @@ class Fund:
         self.industry = None
 
     def load(self, directory: str):
-        self._load_background(directory)
+        # self._load_background(directory)
         # self._load_holdings(directory)
         self._load_returns(directory)
-        self._load_industry(directory)
+        # self._load_industry(directory)
 
     def _load_background(self, directory: str):
         self.background = pd.read_csv(os.path.join(directory, self.name, 'Background.csv'))
