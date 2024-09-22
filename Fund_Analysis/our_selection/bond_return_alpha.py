@@ -1,6 +1,7 @@
 import pandas as pd
 
-input_path = '/Users/yiluntong/Downloads/'
+input_path = '/home/app/Desktop/output_search/'
+output_path = '/home/app/Desktop/output_search/'
 stock_list=[]
 rank_csv_1 = pd.read_csv(input_path+'bond_alpha_rank.csv').set_index('Unnamed: 0')
 rank_csv_2 = pd.read_csv(input_path+'bond_return_rank.csv').set_index('Unnamed: 0')
@@ -13,5 +14,5 @@ for i in range(len(rank_csv_2)):
         df = df.append(rank_csv_2.iloc[i], ignore_index=True)
 
 print (df)
-df.to_csv("bond_return_alpha.csv", sep=',',index=False)
+df.to_csv(output_path+"bond_return_alpha.csv", sep=',',index=False)
 
