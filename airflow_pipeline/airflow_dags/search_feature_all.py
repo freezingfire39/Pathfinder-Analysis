@@ -896,6 +896,79 @@ python_op_4 = BashOperator(
     dag=dag,
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/Analysis_Class/sort_search_file.py '
 )
+python_op_501 = BashOperator(
+    task_id='bond_return_alpha',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/bond_return_alpha.py '
+)
+python_op_502 = BashOperator(
+    task_id='bond_return_downside_capture',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/bond_return_downside_capture.py '
+)
+python_op_503 = BashOperator(
+    task_id='bond_return_duration',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/bond_return_duration.py '
+)
+python_op_504 = BashOperator(
+    task_id='bond_return_sharpe',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/bond_return_sharpe.py '
+)
+python_op_505 = BashOperator(
+    task_id='overseas_return_alpha',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/overseas_return_alpha.py '
+)
+python_op_506 = BashOperator(
+    task_id='overseas_return_drawdown_amount',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/overseas_return_drawdown_amount.py '
+)
+python_op_507 = BashOperator(
+    task_id='overseas_return_low_beta',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/overseas_return_low_beta.py '
+)
+python_op_508 = BashOperator(
+    task_id='overseas_return_sharpe',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/overseas_return_sharpe.py '
+)
+python_op_509 = BashOperator(
+    task_id='stock_return_amount',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/stock_return_amount.py '
+)
+python_op_510 = BashOperator(
+    task_id='stock_return_duration',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/stock_return_duration.py '
+)
+python_op_511 = BashOperator(
+    task_id='stock_return_low_beta',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/stock_return_low_beta.py '
+)
+python_op_512 = BashOperator(
+    task_id='stock_return_upside_capture',
+    trigger_rule='all_success',
+    dag=dag,
+    bash_command='python /home/app/Desktop/Pathfinder-Analysis/Fund_Analysis/our_selection/stock_return_upside_capture.py '
+)
+
 
 python_op_0 >> python_op_201 >> python_op_202 >> python_op_203 >> python_op_204 >> python_op_205 >> python_op_206 \
 >> python_op_207 >> python_op_208 >> python_op_209 >> python_op_210 >> python_op_211 >> python_op_212 >> python_op_213 \
@@ -913,7 +986,18 @@ python_op_0 >> python_op_201 >> python_op_202 >> python_op_203 >> python_op_204 
 >> python_op_291 >> python_op_292 >> python_op_293 >> python_op_294 >> python_op_295 >> python_op_296 >> python_op_297 \
 >> python_op_298 >> python_op_299 >> python_op_300 >> python_op_301 >> python_op_302 >> python_op_303 >> python_op_304 \
 >> python_op_305 >> python_op_306 >> python_op_307 >> python_op_308 \
->> python_op_4 >> python_op_1
+>> python_op_4
 
-
+python_op_501.set_upstream(python_op_4)
+python_op_502.set_upstream(python_op_4)
+python_op_503.set_upstream(python_op_4)
+python_op_504.set_upstream(python_op_4)
+python_op_505.set_upstream(python_op_4)
+python_op_506.set_upstream(python_op_4)
+python_op_507.set_upstream(python_op_4)
+python_op_508.set_upstream(python_op_4)
+python_op_509.set_upstream(python_op_4)
+python_op_510.set_upstream(python_op_4)
+python_op_511.set_upstream(python_op_4)
+python_op_512.set_upstream(python_op_4)
 
