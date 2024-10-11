@@ -13,5 +13,5 @@ for i in range(len(rank_csv_2)):
     if ticker in rank_csv_1['ticker'].values:
         df = df.append(rank_csv_2.iloc[i], ignore_index=True)
 
-df.to_csv(output_path"bond_return_sharpe.csv", sep=',',index=False)
+df.to_csv(output_path+"bond_return_sharpe.csv", sep=',',index=False)
 
