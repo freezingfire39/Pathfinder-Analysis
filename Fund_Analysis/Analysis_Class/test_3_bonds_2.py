@@ -47,7 +47,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['benchmark_name']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
     
-    df_test_4 = df_target['申购状态'].resample('D')
+    df_test_4 = df_target['申购状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
 
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
