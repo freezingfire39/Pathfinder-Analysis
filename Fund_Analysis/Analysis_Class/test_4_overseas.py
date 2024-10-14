@@ -43,22 +43,6 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    
-
-    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
-
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
-
-
-    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
 
     rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_comments','return_corr_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
     rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
@@ -140,6 +124,25 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = df_target.fillna(method='ffill')
     df_target['return'] = df_target['累计净值'].pct_change()
     df_target['cum_return'] = (1+df_target['return']).cumprod()-1
+
+
+    
+    
+
+    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
+    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > 0.05:
+
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(return_rank_file_path)
+
+
+    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
 
     df_target['benchmark_name']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "标普500"
