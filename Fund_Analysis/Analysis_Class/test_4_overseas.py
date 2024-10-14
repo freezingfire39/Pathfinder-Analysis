@@ -42,17 +42,6 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['return'] = df_target['累计净值'].pct_change()
 
 
-    df_target = df_target['累计净值'].resample('D').last()
-    df_target = df_target.to_frame()
-    df_target.reset_index(inplace=True)
-    from pandas.tseries.offsets import BDay
-    isBusinessDay = BDay().onOffset
-    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
-    df_target = df_target[match_series]
-    df_target.set_index('净值日期',inplace=True)
-    df_target = df_target.fillna(method='ffill')
-    df_target['return'] = df_target['累计净值'].pct_change()
-    df_target['cum_return'] = (1+df_target['return']).cumprod()-1
 
     
 
@@ -140,7 +129,17 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-
+    df_target = df_target['累计净值'].resample('D').last()
+    df_target = df_target.to_frame()
+    df_target.reset_index(inplace=True)
+    from pandas.tseries.offsets import BDay
+    isBusinessDay = BDay().onOffset
+    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
+    df_target = df_target[match_series]
+    df_target.set_index('净值日期',inplace=True)
+    df_target = df_target.fillna(method='ffill')
+    df_target['return'] = df_target['累计净值'].pct_change()
+    df_target['cum_return'] = (1+df_target['return']).cumprod()-1
 
     df_target['benchmark_name']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "标普500"
