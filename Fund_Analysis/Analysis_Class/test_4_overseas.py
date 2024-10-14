@@ -171,7 +171,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
 
 
-
+    df_target = df_target.groupby(df_target.index).last()
 
 
 
