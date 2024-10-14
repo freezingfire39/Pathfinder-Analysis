@@ -44,7 +44,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
     
-    df_test_4 = df_target['申购状态'].resample('D')
+    df_test_4 = df_target['申购状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
 
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
