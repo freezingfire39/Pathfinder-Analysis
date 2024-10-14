@@ -53,7 +53,7 @@ def resample_returns(df_returns, frequency='Q'):
         raise ValueError("Invalid frequency. Choose 'A' for annual or 'Q' for quarterly.")
 
 
-def return_analysis(returns,input_file_path, rank_file_path, asset_type):
+def return_analysis(returns,input_file_path, rank_file_path, asset_type,security_code):
 
         
     try:
