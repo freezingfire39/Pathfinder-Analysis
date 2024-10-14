@@ -80,7 +80,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
 
     
-    df_test_4 = df_target['赎回状态'].resample('D')
+    df_test_4 = df_target['赎回状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
 
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
