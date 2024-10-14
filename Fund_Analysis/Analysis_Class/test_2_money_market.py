@@ -144,7 +144,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
     
 
-
+    df_target_2['rolling_SR']=0
 
     df_target_2['benchmark_name']=0
     df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
