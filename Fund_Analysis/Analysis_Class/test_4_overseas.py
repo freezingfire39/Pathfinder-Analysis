@@ -172,7 +172,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-
+    df_target.dropna(inplace=True)
 
 
 
