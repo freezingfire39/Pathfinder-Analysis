@@ -72,6 +72,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
 
     returns['return_percentile'] = 0
+    returns['return_percentile'] = returns['return_percentile'].astype('float64')
     returns['return_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['return'][-1], kind='rank')
     
     if returns['return'][-1]>df_benchmark['value'].quantile(0.6):
