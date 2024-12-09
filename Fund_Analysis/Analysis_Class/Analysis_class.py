@@ -74,6 +74,10 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
     returns['return_percentile'] = 0
     returns['return_percentile'] = returns['return_percentile'].astype('float64')
     returns['return_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['return'][-1], kind='rank')
+
+    returns['excess_sharpe_percentile'] = 0
+    returns['excess_sharpe_percentile'] = returns['excess_sharpe_percentile'].astype('float64')
+    returns['excess_sharpe_percentile'][-1] = stats.percentileofscore(df_benchmark_2['value'], returns['excess_SR'][-1], kind='rank')
     
     if returns['return'][-1]>df_benchmark['value'].quantile(0.6):
         if returns['excess_SR'][-1]>df_benchmark_2['value'].quantile(0.6):
@@ -235,6 +239,12 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         #print ("本基金最近一年的夏普指数与其历史平均水平基本一致，意味着策略的近期表现没有很大的变化。")
 
     df_benchmark = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
+
+    returns['sharpe_percentile'] = 0
+    returns['sharpe_percentile'] = returns['sharpe_percentile'].astype('float64')
+    returns['sharpe_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['rolling_SR'][-1], kind='rank')
+
+    
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     if returns['rolling_SR'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'sr_benchmark_comments']  = ("本基金过去一年的夏普指数超越了市场90%的基金")
@@ -548,6 +558,13 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     
 
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
+
+
+    returns['drawdownduration_percentile'] = 0
+    returns['drawdownduration_percentile'] = returns['drawdownduration_percentile'].astype('float64')
+    returns['drawdownduration_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['drawdown_duration'].iloc[-1], kind='rank')
+
+    
     if df_drawdowns['Duration'].mean()>df_benchmark['value'].quantile(0.6):
         comment_csv.at[comment_csv.index[-1],'drawdown_duration_comments']  = "本基金的回撤时间大于类似产品的平均，意味着在亏损的时候会需要更多的时间回到原点。"
         comment_csv.to_csv(input_file_path+'comments.csv')
@@ -634,6 +651,12 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         
         
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
+
+    returns['drawdownamount_percentile'] = 0
+    returns['drawdownamount_percentile'] = returns['drawdownduration_percentile'].astype('float64')
+    returns['drawdownamount_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['drawdown_amount'].iloc[-1], kind='rank')
+
+    
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     if returns['drawdown_amount'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'drawdown_amount_benchmark_comments']  = ("本基金历史最大回撤金额小于市场90%的基金")
@@ -1040,6 +1063,10 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
 
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     df_benchmark = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
+
+    returns['alpha_percentile'] = 0
+    returns['alpha_percentile'] = returns['alpha_percentile'].astype('float64')
+    returns['alpha_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['alpha'].iloc[-1], kind='rank')
     
     if returns['alpha'][-1]>df_benchmark['value'].quantile(0.6):
         #print ("This fund has outperformed the benchmark")
@@ -1084,6 +1111,12 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         
     rank_file = pd.read_csv(rank_file_path+'positive_beta_rank.csv').set_index('Unnamed: 0')
     df_benchmark = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
+
+    returns['beta_percentile'] = 0
+    returns['beta_percentile'] = returns['beta_percentile'].astype('float64')
+    returns['beta_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['beta'].iloc[-1], kind='rank')
+
+                    
     if returns['beta'][-1] > df_benchmark['value'].quantile(0.95):
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
@@ -1194,6 +1227,17 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     
     df_benchmark = pd.read_csv(rank_file_path+'upside_capture_benchmark.csv').set_index('Unnamed: 0')
     df_benchmark_2 = pd.read_csv(rank_file_path+'downside_capture_benchmark.csv').set_index('Unnamed: 0')
+
+
+    returns['upside_percentile'] = 0
+    returns['upside_percentile'] = returns['upside_percentile'].astype('float64')
+    returns['upside_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Upside Capture'][0], kind='rank')
+
+    returns['downside_percentile'] = 0
+    returns['downside_percentile'] = returns['downside_percentile'].astype('float64')
+    returns['downside_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Downside Capture'][0], kind='rank')
+
+    
     
     if df_mkt_capture['Upside Capture'][0]>df_benchmark['value'].quantile(0.6) and df_mkt_capture['Downside Capture'][0]>df_benchmark_2['value'].quantile(0.6):
         if df_mkt_capture['Upside Capture'][0]-df_mkt_capture['Downside Capture'][0]>0:
@@ -1864,6 +1908,12 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
     
     
     df_benchmark = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
+
+
+    returns['vol_percentile'] = 0
+    returns['vol_percentile'] = returns['vol_percentile'].astype('float64')
+    returns['vol_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['vol'][-1], kind='rank')
+    
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     if returns['vol'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'volatility_benchmark_comments']  = ("本基金过去一年的波动率超越了市场90%的基金")
