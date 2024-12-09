@@ -70,6 +70,10 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
     df_benchmark_2 = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
+
+    returns['return_percentile'] = 0
+    returns['return_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['return'][-1], kind='rank')
+    
     if returns['return'][-1]>df_benchmark['value'].quantile(0.6):
         if returns['excess_SR'][-1]>df_benchmark_2['value'].quantile(0.6):
             comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报并且最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
@@ -128,16 +132,16 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
 
     df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
-    if returns['return'][-1]>=df_benchmark['value'].quantile(0.9):
+    if returns['annual_return'][-1]>=df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'return_benchmark_comments']  = ("本基金过去一年的回报超越了市场90%的基金")
         comment_csv.to_csv(input_file_path+'comments.csv')
-    elif returns['return'][-1]>=df_benchmark['value'].quantile(0.75) and returns['return'][-1]<df_benchmark['value'].quantile(0.9):
+    elif returns['annual_return'][-1]>=df_benchmark['value'].quantile(0.75) and returns['return'][-1]<df_benchmark['value'].quantile(0.9):
         comment_csv.at[comment_csv.index[-1],'return_benchmark_comments']  = ("本基金过去一年的回报位于市场前25%和前10%之间")
         comment_csv.to_csv(input_file_path+'comments.csv')
-    elif returns['return'][-1]>=df_benchmark['value'].quantile(0.5) and returns['return'][-1]<df_benchmark['value'].quantile(0.75):
+    elif returns['annual_return'][-1]>=df_benchmark['value'].quantile(0.5) and returns['return'][-1]<df_benchmark['value'].quantile(0.75):
         comment_csv.at[comment_csv.index[-1],'return_benchmark_comments']  = ("本基金过去一年的回报位于市场前50%和前25%之间")
         comment_csv.to_csv(input_file_path+'comments.csv')
-    elif returns['return'][-1]>=df_benchmark['value'].quantile(0.25) and returns['return'][-1]<df_benchmark['value'].quantile(0.5):
+    elif returns['annual_return'][-1]>=df_benchmark['value'].quantile(0.25) and returns['return'][-1]<df_benchmark['value'].quantile(0.5):
         comment_csv.at[comment_csv.index[-1],'return_benchmark_comments']  = ("本基金过去一年的回报位于市场后25%和后50%之间")
         comment_csv.to_csv(input_file_path+'comments.csv')
     else:
