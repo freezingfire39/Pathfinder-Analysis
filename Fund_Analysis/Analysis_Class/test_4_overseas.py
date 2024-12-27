@@ -41,26 +41,14 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.index = pd.to_datetime(df_target.index)
     df_target['return'] = df_target['累计净值'].pct_change()
 
-    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
-
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
 
 
-    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
-    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
 
     rolling_sharpe_df = pd.DataFrame(index=df_target.index,columns=['rolling_SR_comments','excess_return_comments', 'alpha_comments','beta_comments','upside_capture_comments','downside_capture_comments','index_comments','sector_comments','volatility_comments','drawdown_amount_comments', 'drawdown_duration_comments','return_comments','return_corr_comments','return_benchmark_comments', 'alpha_benchmark_comments','beta_benchmark_comments','upside_benchmark_comments','downside_benchmark_comments','excess_sharpe_benchmark_comments','sr_benchmark_comments','drawdown_duration_benchmark_comments','drawdown_amount_benchmark_comments','volatility_benchmark_comments'])
     rolling_sharpe_df.to_csv(symbol_file_path+'comments.csv')
 
     
-    df_test_4 = df_target['申购状态'].resample('D')
+    df_test_4 = df_target['申购状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
@@ -92,7 +80,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_target.at[df_target.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
 
     
-    df_test_4 = df_target['赎回状态'].resample('D')
+    df_test_4 = df_target['赎回状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放赎回")]
@@ -125,7 +113,36 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
+    df_target = df_target['累计净值'].resample('D').last()
+    df_target = df_target.to_frame()
+    df_target.reset_index(inplace=True)
+    from pandas.tseries.offsets import BDay
+    isBusinessDay = BDay().onOffset
+    match_series = pd.to_datetime(df_target['净值日期']).map(isBusinessDay)
+    df_target = df_target[match_series]
+    df_target.set_index('净值日期',inplace=True)
+    df_target = df_target.fillna(method='ffill')
+    df_target['return'] = df_target['累计净值'].pct_change()
+    df_target['cum_return'] = (1+df_target['return']).cumprod()-1
 
+
+    
+    
+
+    df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
+    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > 0.05:
+
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(return_rank_file_path)
+
+
+    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+    new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
 
     df_target['benchmark_name']=0
     df_target.at[df_target.index[-1],'benchmark_name']  = "标普500"
@@ -171,7 +188,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target['excess_return']=df_target['return']-df_target['comp_1'].pct_change()
 
 
-
+    df_target = df_target.groupby(df_target.index).last()
 
 
 
@@ -196,8 +213,9 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     
-    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type)
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type,security_code = Ticker)
 
+    
     df_target = Analysis_class.max_drawdown_analysis(df_target,rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
@@ -219,13 +237,14 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
+    df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
+    df_target.fillna(method='ffill',inplace=True)
+
 
     Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
 
     df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
 
-    df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
-    df_target.fillna(method='ffill',inplace=True)
 
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])

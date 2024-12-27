@@ -64,7 +64,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rolling_sharpe_df.to_csv('comments.csv')
 
     
-    df_test_4 = df_target_2['申购状态'].resample('D')
+    df_test_4 = df_target_2['申购状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
 
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
@@ -97,7 +97,7 @@ def main(symbol_file_path,symbol,search_file_path):
         df_target_2.at[df_target_2.index[-1],'purchase_days_2']  = "本基金每年约有"+str(df_test_5.mean())+"天开放认购"
 
     df_target_2['excess_SR']=0
-    df_test_4 = df_target_2['赎回状态'].resample('D')
+    df_test_4 = df_target_2['赎回状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
 
     df_test_1 = df_test_4[df_test_4.str.contains("暂停赎回")]
@@ -144,7 +144,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
     
 
-
+    df_target_2['rolling_SR']=0
 
     df_target_2['benchmark_name']=0
     df_target_2.at[df_target_2.index[-1],'benchmark_name']  = "货币基金平均收益"
@@ -165,7 +165,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.to_csv(cagr_rank_file_path)
 
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
-    df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
+    df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type,security_code = Ticker)
     df_target_2.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
 
