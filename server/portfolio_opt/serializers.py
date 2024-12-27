@@ -24,6 +24,11 @@ class AnalysisSerializer(serializers.Serializer):
     type = serializers.CharField()
     values = TimeSeriesSerializer(many=True)
 
+class ScoreSerializer(serializers.Serializer):
+    type = serializers.CharField()
+    value = serializers.FloatField()
+
 class AnalyzerOutputSerializer(serializers.Serializer):
     portfolio = PortfolioSerializer()
     analysis = AnalysisSerializer(many=True)
+    score = ScoreSerializer(many=True)

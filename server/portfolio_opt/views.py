@@ -1,9 +1,12 @@
 import os
 
+import pandas as pd
 from django.http import JsonResponse
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from scipy.stats import percentileofscore
+
 from portfolio.factory import OptimizerFactory
 from portfolio.portfolio_ import Portfolio
 from portfolio.utils import enums
@@ -21,6 +24,14 @@ class OptimizePortfolioView(APIView):
         self.rpath = settings.RANK_FILE_PATH
         self.cpath = settings.COMMENTS_FILE_PATH
         self.fac = OptimizerFactory()
+
+    def score(self, df, col, file):
+        p_value = df[col].iloc[-1]
+        fpath = os.path.join(self.rpath, file)
+        df = pd.read_csv(fpath)
+        score = percentileofscore(df["value"].dropna().to_list(), p_value)
+        return score
+
     def post(self, request):
         input_serializer = OptimizationInputSerializer(data=request.data)
         if input_serializer.is_valid():
@@ -47,18 +58,34 @@ class OptimizePortfolioView(APIView):
             df_target.fillna(0, inplace=True)
             df_target.replace([np.inf, -np.inf], 0, inplace=True)
             analyses = []
+            scores = []
+            score_pairs = {
+                "vol": "stock_volatility_benchmark.csv",
+                "drawdown_amount": "stock_drawdown_amount_benchmark.csv",
+                "beta": "stock_positive_beta_benchmark.csv",
+                "alpha": "stock_alpha_benchmark.csv",
+                "rolling_SR": "stock_rolling_sharpe_benchmark.csv",
+                "annual_return": "stock_return_benchmark.csv",
+            }
             for col in df_target.columns:
                 values = [{"date": date.strftime('%Y-%m-%d'), "value": value} for date, value in zip(df_target.index, df_target[col])]
                 analyses.append({"type":col, "values":values})
+
+            for name, file in score_pairs.items():
+                score = self.score(df_target, name, file)
+                scores.append({"type":name, "value": score})
 
             response_data = {
                 "portfolio": {
                     "component": p.weights,
                     "returns": history
                 },
-                "analysis": analyses
+                "analysis": analyses,
+                "score": scores,
             }
             output_serializer = AnalyzerOutputSerializer(response_data)
             return Response(output_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(input_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
