@@ -168,8 +168,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type,security_code = Ticker)
 
 
-    df_target_2.fillna(0,inplace=True)
-    df_target_2 = df_target_2[df_target_2['vol'] != 0]
+
 
     
     df_target_2.to_csv(save_file_path)
