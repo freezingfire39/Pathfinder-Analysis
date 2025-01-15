@@ -18,8 +18,10 @@ for f in files[:3:]:
         if data['基金管理人'].iloc[0] in df['manager']:
             pass
         else:
-            df.at[df.index[-1],'manager']  = data['基金管理人'].iloc[0]
+            df.loc[count]  = [data['基金管理人'].iloc[0], '']
+    count = count+1
 
 
 df.to_csv('manager.csv')
-    
+
+print (df)
