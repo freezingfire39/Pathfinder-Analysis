@@ -12,7 +12,7 @@ df = pd.DataFrame(columns=['manager', 'manager_link'])
 
 
 #print(fnames)
-for f in files[:3:]:
+for f in files[:10:]:
     with open(f) as csv_file:
         data = pd.read_csv(csv_file)
         if data['基金管理人'].iloc[0] in df['manager']:
