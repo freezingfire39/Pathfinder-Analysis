@@ -185,7 +185,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         
     rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_rank.csv').set_index('Unnamed: 0')
     df_benchmark = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
-    if returns['rolling_SR'][-1] > df_benchmark['value'].quantile(0.95):
+    if returns['rolling_SR'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
@@ -598,7 +598,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         #print ("本基金的回撤时间与类似产品的平均基本一致。")
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
     rank_file = pd.read_csv(rank_file_path+'drawdown_duration_rank.csv').set_index('Unnamed: 0')
-    if returns['drawdown_duration'].iloc[-1] < df_benchmark['value'].quantile(0.05):
+    if returns['drawdown_duration'].iloc[-1] < df_benchmark['value'].quantile(0.1):
 
         new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
@@ -1102,7 +1102,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         #print ("本基金对比基准指数的波动率基本一致)
     df_benchmark = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
     rank_file = pd.read_csv(rank_file_path+'alpha_rank.csv').set_index('Unnamed: 0')
-    if returns['alpha'][-1] > df_benchmark['value'].quantile(0.95):
+    if returns['alpha'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
@@ -1117,7 +1117,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     returns['beta_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], returns['beta'].iloc[-1], kind='rank')
 
                     
-    if returns['beta'][-1] > df_benchmark['value'].quantile(0.95):
+    if returns['beta'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
@@ -1125,7 +1125,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
         
     rank_file = pd.read_csv(rank_file_path+'negative_beta_rank.csv').set_index('Unnamed: 0')
-    if returns['beta'][-1] < df_benchmark['value'].quantile(0.05):
+    if returns['beta'][-1] < df_benchmark['value'].quantile(0.1):
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
@@ -1892,7 +1892,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
     
     rank_file = pd.read_csv(rank_file_path+'volatility_rank.csv').set_index('Unnamed: 0')
     df_benchmark = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
-    if returns['vol'][-1] < df_benchmark['value'].quantile(0.05):
+    if returns['vol'][-1] < df_benchmark['value'].quantile(0.1):
 
         new_row = {'ticker': security_code, 'value': returns['vol'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
