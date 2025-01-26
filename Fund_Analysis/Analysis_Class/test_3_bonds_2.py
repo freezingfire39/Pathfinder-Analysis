@@ -186,7 +186,7 @@ def main(symbol_file_path,symbol,search_file_path):
     import tushare as ts
     pro = ts.pro_api('84be1015becc0b9dbbab507552c328cbf447bc02cbd29cfa09029bc6')
 
-    df_trade = pro.fund_nav(ts_code='511090.SH', start_date='20180101', end_date='20251229')
+    df_trade = pro.fund_nav(ts_code='511260.SH', start_date='20180101', end_date='20251229')
     df_trade = df_trade.iloc[::-1]
     df_trade.set_index('nav_date',inplace=True)
     df_trade.index = pd.to_datetime(df_trade.index)
