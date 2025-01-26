@@ -132,13 +132,7 @@ def main(symbol_file_path,symbol,search_file_path):
             df_target['return'][i]=0
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > df_benchmark['value'].quantile(0.1):
 
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
 
 
     rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
@@ -179,7 +173,13 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
 
 
+    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
+    df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > df_benchmark['value'].quantile(0.1):
 
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
+        rank_file.loc[len(rank_file)] = new_row
+        rank_file.to_csv(return_rank_file_path)
 
     index_comps = yf.download("511260.SS", start="2000-01-01", end="2024-10-16")
 
