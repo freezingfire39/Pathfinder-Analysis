@@ -250,6 +250,16 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
 
 
+    df_target.fillna(0,inplace=True)
+    
+    df_target = df_target[df_target['rolling_SR'] != 0]
+    df_target = df_target[df_target['alpha'] != 0]
+    df_target = df_target[df_target['beta'] != 0]
+    df_target = df_target[df_target['vol'] != 0]
+    df_target = df_target[df_target['Upside_Capture'] != 0]
+    df_target = df_target[df_target['Downside_Capture'] != 0]
+
+
     df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
     df_target.fillna(method='ffill',inplace=True)
     df_target.to_csv(save_file_path)

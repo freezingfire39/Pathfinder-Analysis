@@ -228,6 +228,18 @@ def main(symbol_file_path,symbol,search_file_path):
 
     Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
 
+
+    df_target.fillna(0,inplace=True)
+    
+    df_target = df_target[df_target['rolling_SR'] != 0]
+    df_target = df_target[df_target['alpha'] != 0]
+    df_target = df_target[df_target['beta'] != 0]
+    df_target = df_target[df_target['vol'] != 0]
+    df_target = df_target[df_target['Upside_Capture'] != 0]
+    df_target = df_target[df_target['Downside_Capture'] != 0]
+
+
+
     df_target.drop(['index_peers','industry_peers'],axis=1,inplace=True)
     df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
     df_target.fillna(method='ffill',inplace=True)
