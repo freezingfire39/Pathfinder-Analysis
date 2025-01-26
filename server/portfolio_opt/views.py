@@ -24,12 +24,27 @@ class OptimizePortfolioView(APIView):
         self.rpath = settings.RANK_FILE_PATH
         self.cpath = settings.COMMENTS_FILE_PATH
         self.fac = OptimizerFactory()
+        self.score_pair = {
+            "vol": self._reverse_score,
+            "drawdown_amount": self._reverse_score,
+            "beta": self._reverse_score,
+            "alpha": self._score,
+            "rolling_SR": self._score,
+            "annual_return": self._score,
+        }
 
-    def score(self, df, col, file):
+    def _score(self, df, col, file):
         p_value = df[col].iloc[-1]
         fpath = os.path.join(self.rpath, file)
         df = pd.read_csv(fpath)
         score = percentileofscore(df["value"].dropna().to_list(), p_value)
+        return score
+
+    def _reverse_score(self, df, col, file):
+        p_value = df[col].iloc[-1]
+        fpath = os.path.join(self.rpath, file)
+        df = pd.read_csv(fpath)
+        score = 100 - percentileofscore(df["value"].dropna().to_list(), p_value)
         return score
 
     def post(self, request):
@@ -72,7 +87,7 @@ class OptimizePortfolioView(APIView):
                 analyses.append({"type":col, "values":values})
 
             for name, file in score_pairs.items():
-                score = self.score(df_target, name, file)
+                score = self.score_pair[name](df_target, name, file)
                 scores.append({"type":name, "value": score})
 
             response_data = {
@@ -87,5 +102,54 @@ class OptimizePortfolioView(APIView):
             return Response(output_serializer.data, status=status.HTTP_200_OK)
         else:
             return Response(input_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FundRankView(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fdir = settings.RETURNS_DATA_FILE_PATH
+        self.rpath = settings.RANK_FILE_PATH
+        self.cpath = settings.COMMENTS_FILE_PATH
+        self.pairs = {
+            "vol": "stock_volatility_benchmark.csv",
+            "drawdown_amount": "stock_drawdown_amount_benchmark.csv",
+            "beta": "stock_positive_beta_benchmark.csv",
+            "alpha": "stock_alpha_benchmark.csv",
+            "rolling_SR": "stock_rolling_sharpe_benchmark.csv",
+            "annual_return": "stock_return_benchmark.csv",
+        }
+        self.order_func = {
+            "vol": self._ascend,
+            "drawdown_amount": self._ascend,
+            "beta": self._ascend,
+            "alpha": self._descend,
+            "rolling_SR": self._descend,
+            "annual_return": self._descend,
+        }
+
+    def _ascend(self, df):
+        df = df.nsmallest(10, 'value')
+        return df['ticker']
+
+    def _descend(self, df):
+        df = df.nlargest(10, 'value')
+        return df['ticker']
+
+    def get(self, request):
+        metric = request.query_params.get('metric')
+
+        file = self.pairs[metric]
+        if self.fdir is None:
+            self.fdir = "D:/workspace/aggregation/"
+        if self.rpath is None:
+            self.rpath = "D:/workspace/output_search/"
+        if self.cpath is None:
+            self.cpath = "D:/workspace/comments/"
+        fpath = os.path.join(self.rpath, file)
+        tickers = list(self.order_func[metric](pd.read_csv(fpath)))
+
+        return Response(tickers)
+
+
 
 
