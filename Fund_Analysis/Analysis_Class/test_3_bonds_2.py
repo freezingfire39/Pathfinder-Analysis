@@ -181,11 +181,17 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
     df_target['benchmark_name']=0
-    df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
+    df_target.at[df_target.index[-1],'benchmark_name']  = "上证30年期国债"
 
-    index_comps = yf.download("TLT", start="2000-01-01", end="2024-10-16")
+    import tushare as ts
+    pro = ts.pro_api('84be1015becc0b9dbbab507552c328cbf447bc02cbd29cfa09029bc6')
 
-    df_target['comp_1'] =index_comps['Close']
+    df_trade = pro.fund_nav(ts_code='511090.SH', start_date='20180101', end_date='20251229')
+    df_trade = df_trade.iloc[::-1]
+    df_trade.set_index('nav_date',inplace=True)
+    df_trade.index = pd.to_datetime(df_trade.index)
+
+    df_target['comp_1'] = df_trade['accum_nav']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
     index_comps = index_comps['Close']
 
