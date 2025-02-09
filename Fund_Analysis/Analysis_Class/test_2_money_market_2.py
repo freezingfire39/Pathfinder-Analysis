@@ -15,7 +15,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     input_file_path=symbol_file_path+'Fund_1.csv'
     background_file_path=symbol_file_path+'Background.csv'
-    rank_file_path=asset_type+''
+    rank_file_path=search_file_path+asset_type+''
     return_rank_file_path=search_file_path+asset_type+'return_rank.csv'
     cagr_rank_file_path=search_file_path+asset_type+'CAGR_rank.csv'  ##return_rank_csv
     Trading_days = 250
