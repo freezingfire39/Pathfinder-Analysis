@@ -223,7 +223,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df1 = df_target[['累计净值', 'comp_1']]
 
     # Resample to month end and calculate the monthly percent change
-    df_rets_monthly = df1.resample('M').last().pct_change().dropna()
+    df_rets_monthly = df1.resample('M').last().pct_change()
 
     print (df_target)
     
