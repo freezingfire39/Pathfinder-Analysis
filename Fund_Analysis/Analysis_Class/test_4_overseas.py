@@ -175,7 +175,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     
 
-    index_comps = yf.download("^GSPC", start="2000-01-01", end="2025-10-16") ##use 003718
+    index_comps = yf.download("SPY", start="2000-01-01", end="2025-10-16") ##use 003718
 
 
     
