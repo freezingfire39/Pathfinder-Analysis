@@ -8,8 +8,6 @@ df_3 = pro.fund_portfolio(ts_code='006937.OF')
 
 df_3 = df_3.sort_values(by=['amount'])
 
-
-
 df = df_3.tail(20)
 
 
@@ -28,63 +26,52 @@ df['last_quarter_profit'] = df['last_quarter_profit'].astype('float64')
 df['this_quarter_profit'] = 0
 df['this_quarter_profit'] = df['this_quarter_profit'].astype('float64')
 
-df['total_revenue'] = 0
-df['total_revenue'] = df['total_revenue'].astype('float64')
-
-df['total_profit'] = 0
-df['total_profit'] = df['total_profit'].astype('float64')
 
 
-df_2 = pro.margin_detail(ts_code=df['symbol'].iloc[0], start_date='20240115', end_date='20241215')
+
+df_2 = pro.cyq_perf(ts_code=df['symbol'].iloc[0], start_date='20180801', end_date='20241208') ##end date today's date, start_date 5 month minus
 df_2.set_index('trade_date',inplace=True)
 df_2.index = pd.to_datetime(df_2.index)
 
 
-df_4 = pro.moneyflow_mkt_dc(start_date='20240101', end_date='20241230')
-df_4.set_index('trade_date',inplace=True)
-df_4.index = pd.to_datetime(df_4.index)
-
-
-print (df_4)
+print (df_2)
 
 for symbol in df['symbol']:
 
     if symbol == df['symbol'].iloc[0]:
         pass
     
+    df_temp = pro.moneyflow_ths(ts_code=symbol, start_date='20241101', end_date='20241201') ##end date today's date, start date one month minus
 
 
-    df_temp = pro.margin_detail(ts_code=symbol, start_date='20240115', end_date='20241215')
+    df['last_month_flow'] += df_temp['net_amount'].sum()
+
+    df_temp = pro.cyq_perf(ts_code=symbol, start_date='20180801', end_date='20241208') ##end date today's date, start_date 5 month minus
     df_temp.set_index('trade_date',inplace=True)
     df_temp.index = pd.to_datetime(df_temp.index)
 
-    
 
-    df_2['rzye']+=df_temp['rzye']
+
+
+
+    df_2['weight_avg']+=df_temp['weight_avg']
+
 
 
 df_trade = pro.fund_nav(ts_code='006937.OF', start_date='20180101', end_date='20241229')
 print (df_trade)
 df_trade = df_trade.iloc[::-1]
-df_trade.set_index('nav_date',inplace=True)
+df_trade.set_index('ann_date',inplace=True)
 df_trade.index = pd.to_datetime(df_trade.index)
+
 df_trade['return'] = df_trade['accum_nav'].pct_change()
 print (df_trade)
 
-
-
 df_2.dropna(inplace=True)
-df.dropna(inplace=True)
 
 df_drop=[]
 for i in df_trade.index:
     if i not in df_2.index:
-        df_drop.append(i)
-df_trade = df_trade.drop(df_drop, axis=0)
-
-df_drop=[]
-for i in df_trade.index:
-    if i not in df_4.index:
         df_drop.append(i)
 df_trade = df_trade.drop(df_drop, axis=0)
 
@@ -94,14 +81,10 @@ for i in df_2.index:
         df_drop.append(i)
 df_2 = df_2.drop(df_drop, axis=0)
 
-df_drop=[]
-for i in df_4.index:
-    if i not in df_trade.index:
-        df_drop.append(i)
-df_4 = df_4.drop(df_drop, axis=0)
 
 
-df_trade['gap'] = df_2['rzye'].pct_change()
+
+df_trade['gap'] = df_2['winner_rate']
 
 
 df_trade['zscore_3'] =(df_trade['gap'] - df_trade['gap'].rolling(10).mean())/df_trade['gap'].rolling(10).std(ddof=0)
@@ -116,18 +99,14 @@ for i in range(len(df_trade)):
         continue
 
 
-    if df_trade['zscore_3'][i-1]<=-0.1 and df_trade['zscore_3'][i-1]>=-0.5:
+    if df_trade['zscore_3'][i-1]<=-0. and df_trade['zscore_3'][i-1]>=-3.:
         df_trade['trade'][i:i+1]=-1
 
-    elif df_trade['zscore_3'][i-1]>=0.1 and df_trade['zscore_3'][i-1]<=0.5:
+    elif df_trade['zscore_3'][i-1]>=0. and df_trade['zscore_3'][i-1]<=3.:
         df_trade['trade'][i:i+1]=1
 
 
-    if df_trade['zscore_3'][i-1]>=0.5:
-        df_trade['trade'][i:i+1]=-1
 
-    elif df_trade['zscore_3'][i-1]<=-0.5:
-        df_trade['trade'][i:i+1]=1
 
 df_trade['full_return'] = df_trade['trade']*df_trade['return']
 import pyfolio_master as pf

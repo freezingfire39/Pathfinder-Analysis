@@ -132,12 +132,7 @@ def main(symbol_file_path,symbol,search_file_path):
             df_target['return'][i]=0
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
 
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
 
 
     rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
@@ -202,11 +197,11 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path=symbol_file_path, security_code = Ticker, asset_type = asset_type)
 
-
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
+    df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > df_benchmark['value'].quantile(0.8):
 
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
         

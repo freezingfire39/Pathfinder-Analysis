@@ -133,12 +133,6 @@ def main(symbol_file_path,symbol,search_file_path):
             df_target['return'][i]=0
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
-    rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
-
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
 
 
 
@@ -181,11 +175,17 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
 
     df_target['benchmark_name']=0
-    df_target.at[df_target.index[-1],'benchmark_name']  = "上证10年期国债"
+    df_target.at[df_target.index[-1],'benchmark_name']  = "上证30年期国债"
 
-    index_comps = yf.download("TLT", start="2000-01-01", end="2024-10-16")
+    import tushare as ts
+    pro = ts.pro_api('84be1015becc0b9dbbab507552c328cbf447bc02cbd29cfa09029bc6')
 
-    df_target['comp_1'] =index_comps['Close']
+    df_trade = pro.fund_nav(ts_code='511260.SH', start_date='20180101', end_date='20251229')
+    df_trade = df_trade.iloc[::-1]
+    df_trade.set_index('nav_date',inplace=True)
+    df_trade.index = pd.to_datetime(df_trade.index)
+
+    df_target['comp_1'] = df_trade['accum_nav']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
     index_comps = index_comps['Close']
 
@@ -207,9 +207,10 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target['annual_return'][-1] > 0.05:
+    df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
+    if df_target['annual_return'][-1] > df_benchmark['value'].quantile(0.8):
 
-        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
+        new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
         

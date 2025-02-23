@@ -45,7 +45,7 @@ df_4.set_index('trade_date',inplace=True)
 df_4.index = pd.to_datetime(df_4.index)
 
 
-print (df_4)
+print (df_2)
 
 for symbol in df['symbol']:
 
@@ -101,7 +101,7 @@ for i in df_4.index:
 df_4 = df_4.drop(df_drop, axis=0)
 
 
-df_trade['gap'] = df_2['rqye'].pct_change()
+df_trade['gap'] = df_2['rzrqye'].pct_change()
 
 
 df_trade['zscore_3'] =(df_trade['gap'] - df_trade['gap'].rolling(10).mean())/df_trade['gap'].rolling(10).std(ddof=0)
@@ -119,10 +119,10 @@ for i in range(len(df_trade)):
 
 
 
-    if df_trade['zscore_3'][i-1]>=0.4:
+    if df_trade['zscore_3'][i-1]>=0.:
         df_trade['trade'][i:i+1]=-1
 
-    elif df_trade['zscore_3'][i-1]<=-0.4:
+    elif df_trade['zscore_3'][i-1]<=-0.:
         df_trade['trade'][i:i+1]=1
 
 df_trade['full_return'] = df_trade['trade']*df_trade['return']

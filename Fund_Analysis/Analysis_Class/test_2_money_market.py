@@ -14,7 +14,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     input_file_path=symbol_file_path+'Fund_2.csv'
     background_file_path=symbol_file_path+'Background.csv'
-    rank_file_path=asset_type+''
+    rank_file_path=search_file_path+asset_type+''
     return_rank_file_path=search_file_path+asset_type+'return_rank.csv'
     cagr_rank_file_path=search_file_path+asset_type+'CAGR_rank.csv'  ##return_rank_csv
     Trading_days = 250
@@ -153,9 +153,10 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     rank_file = pd.read_csv(return_rank_file_path).set_index('Unnamed: 0')
-    if df_target_2['annual_return'][-1] > 0.01:
+    df_benchmark = pd.read_csv(rank_file_path+'return_benchmark.csv').set_index('Unnamed: 0')
+    if df_target_2['annual_return'][-1] > df_benchmark['value'].quantile(0.8):
 
-        new_row = {'ticker': Ticker, 'value': df_target_2['annual_return'][-1],'name': df_target_2['fund_name'][-1], 'sharpe_ratio': "不适用", 'return': df_target_2['return'][-1]}
+        new_row = {'ticker': Ticker, 'value': df_target_2['annual_return'][-1], 'name': df_target_2['fund_name'][-1], 'sharpe_ratio': df_target_2['rolling_SR'][-1], 'return': df_target_2['return'][-1]}
         rank_file.loc[len(rank_file)] = new_row
         rank_file.to_csv(return_rank_file_path)
         
