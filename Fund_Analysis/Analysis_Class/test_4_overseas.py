@@ -233,7 +233,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
-    print (df_target)
+
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
     df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
     df_target.fillna(method='ffill',inplace=True)
@@ -244,6 +244,8 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
 
     df_target.fillna(0,inplace=True)
+
+    print (df_target)
     
     df_target = df_target[df_target['rolling_SR'] != 0]
     df_target = df_target[df_target['alpha'] != 0]
