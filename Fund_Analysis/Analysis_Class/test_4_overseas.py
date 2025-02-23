@@ -225,12 +225,12 @@ def main(symbol_file_path,symbol,search_file_path):
     # Resample to month end and calculate the monthly percent change
     df_rets_monthly = df1.resample('M').last().pct_change()
 
-    print (df_target)
+
     
     df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
-
+    print (df_target)
     df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
@@ -249,8 +249,8 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = df_target[df_target['alpha'] != 0]
     df_target = df_target[df_target['beta'] != 0]
     df_target = df_target[df_target['vol'] != 0]
-    #df_target = df_target[df_target['Upside_Capture'] != 0]
-    #df_target = df_target[df_target['Downside_Capture'] != 0]
+    df_target = df_target[df_target['Upside_Capture'] != 0]
+    df_target = df_target[df_target['Downside_Capture'] != 0]
     
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
