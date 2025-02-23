@@ -1229,13 +1229,13 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     df_benchmark_2 = pd.read_csv(rank_file_path+'downside_capture_benchmark.csv').set_index('Unnamed: 0')
 
 
-    returns['upside_percentile'] = 0
-    returns['upside_percentile'] = returns['upside_percentile'].astype('float64')
-    returns['upside_percentile'].iloc[-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Upside Capture'][0], kind='rank')
+    returns_daily['upside_percentile'] = 0
+    returns_daily['upside_percentile'] = returns_daily['upside_percentile'].astype('float64')
+    returns_daily['upside_percentile'].iloc[-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Upside Capture'][0], kind='rank')
 
-    returns['downside_percentile'] = 0
-    returns['downside_percentile'] = returns['downside_percentile'].astype('float64')
-    returns['downside_percentile'].iloc[-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Downside Capture'][0], kind='rank')
+    returns_daily['downside_percentile'] = 0
+    returns_daily['downside_percentile'] = returns_daily['downside_percentile'].astype('float64')
+    returns_daily['downside_percentile'].iloc[-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Downside Capture'][0], kind='rank')
 
     
     
