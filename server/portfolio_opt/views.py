@@ -10,7 +10,8 @@ from scipy.stats import percentileofscore
 from portfolio.factory import OptimizerFactory
 from portfolio.portfolio_ import Portfolio
 from portfolio.utils import enums
-from .serializers import OptimizationInputSerializer, OptimizedPortfolioSerializer, AnalyzerOutputSerializer
+from .serializers import OptimizationInputSerializer, OptimizedPortfolioSerializer, AnalyzerOutputSerializer, \
+    CustomInputSerializer
 import numpy as np
 from scipy.optimize import minimize
 from django.conf import settings
@@ -32,6 +33,7 @@ class OptimizePortfolioView(APIView):
             "rolling_SR": self._score,
             "annual_return": self._score,
         }
+        self.input_serializer_method = OptimizationInputSerializer
 
     def _score(self, df, col, file):
         p_value = df[col].iloc[-1]
@@ -47,25 +49,29 @@ class OptimizePortfolioView(APIView):
         score = 100 - percentileofscore(df["value"].dropna().to_list(), p_value)
         return score
 
+    def generate_porfolio(self, input_serializer):
+        symbols = input_serializer.validated_data['symbols']
+        capital = input_serializer.validated_data['amount']
+        method = input_serializer.validated_data['method']
+        if self.fdir is None:
+            self.fdir = "D:/workspace/aggregation/"
+        if self.rpath is None:
+            self.rpath = "D:/workspace/output_search/"
+        if self.cpath is None:
+            self.cpath = "D:/workspace/comments/"
+        p = Portfolio(capital, eft_tags=symbols, fdir=self.fdir)
+
+        p.load()
+
+        optimizer = self.fac.create(enums.OptimizerType[method.upper()], portfolio=p)
+        optimizer.optimize_portfolio()
+        p.calc_historical_returns()
+        return p
     def post(self, request):
-        input_serializer = OptimizationInputSerializer(data=request.data)
+        input_serializer = self.input_serializer_method(data=request.data)
         if input_serializer.is_valid():
-            symbols = input_serializer.validated_data['symbols']
-            capital = input_serializer.validated_data['amount']
-            method = input_serializer.validated_data['method']
-            if self.fdir is None:
-                self.fdir = "D:/workspace/aggregation/"
-            if self.rpath is None:
-                self.rpath = "D:/workspace/output_search/"
-            if self.cpath is None:
-                self.cpath = "D:/workspace/comments/"
-            p = Portfolio(capital, eft_tags=symbols, fdir=self.fdir)
 
-            p.load()
-
-            optimizer = self.fac.create(enums.OptimizerType[method.upper()], portfolio=p)
-            optimizer.optimize_portfolio()
-            p.calc_historical_returns()
+            p = self.generate_porfolio(input_serializer)
             analyzer = Analyzer(p, rank_file_path=self.rpath, comments_output_path=self.cpath)
             history = analyzer.history()
             df_target=  analyzer.analyze()
@@ -149,6 +155,42 @@ class FundRankView(APIView):
         tickers = list(self.order_func[metric](pd.read_csv(fpath)))
 
         return Response(tickers)
+
+
+class CustomPortfolioView(OptimizePortfolioView):
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fdir = settings.RETURNS_DATA_FILE_PATH
+        self.rpath = settings.RANK_FILE_PATH
+        self.cpath = settings.COMMENTS_FILE_PATH
+        self.fac = OptimizerFactory()
+        self.score_pair = {
+            "vol": self._reverse_score,
+            "drawdown_amount": self._reverse_score,
+            "beta": self._reverse_score,
+            "alpha": self._score,
+            "rolling_SR": self._score,
+            "annual_return": self._score,
+        }
+        self.input_serializer_method = CustomInputSerializer
+    def generate_porfolio(self, input_serializer):
+        capital = input_serializer.validated_data['amount']
+        weights = input_serializer.validated_data['weights']
+        if self.fdir is None:
+            self.fdir = "D:/workspace/aggregation/"
+        if self.rpath is None:
+            self.rpath = "D:/workspace/output_search/"
+        if self.cpath is None:
+            self.cpath = "D:/workspace/comments/"
+
+        symbols = [ w["symbol"] for w in weights ]
+        p = Portfolio(capital, eft_tags=symbols, fdir=self.fdir)
+        p.load()
+        p.weights = [ {"fund": weight["symbol"], "weight":weight["weight"], "amount":weight["weight"]*capital} for weight in weights]
+        p.calc_historical_returns()
+        return p
+
 
 
 
