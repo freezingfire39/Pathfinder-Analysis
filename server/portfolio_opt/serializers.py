@@ -7,6 +7,13 @@ class OptimizationInputSerializer(serializers.Serializer):
                                               ('min_volatility', 'Minimal Volatility'),
                                               ('max_sharpe_ratio', 'Max Sharpe Ratio')])
 
+class CustomWeightSerializer(serializers.Serializer):
+    symbol = serializers.CharField()
+    weight = serializers.FloatField()
+class CustomInputSerializer(serializers.Serializer):
+    amount = serializers.FloatField()
+    weights = CustomWeightSerializer(many=True)
+
 class OptimizedPortfolioSerializer(serializers.Serializer):
     fund = serializers.CharField()
     weight = serializers.FloatField()
