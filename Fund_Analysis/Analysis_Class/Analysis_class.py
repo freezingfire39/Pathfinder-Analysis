@@ -1231,11 +1231,11 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
 
     returns['upside_percentile'] = 0
     returns['upside_percentile'] = returns['upside_percentile'].astype('float64')
-    returns['upside_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Upside Capture'][0], kind='rank')
+    returns['upside_percentile'].iloc[-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Upside Capture'][0], kind='rank')
 
     returns['downside_percentile'] = 0
     returns['downside_percentile'] = returns['downside_percentile'].astype('float64')
-    returns['downside_percentile'][-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Downside Capture'][0], kind='rank')
+    returns['downside_percentile'].iloc[-1] = stats.percentileofscore(df_benchmark['value'], df_mkt_capture['Downside Capture'][0], kind='rank')
 
     
     
