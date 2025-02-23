@@ -178,16 +178,6 @@ def main(symbol_file_path,symbol,search_file_path):
     index_comps = yf.download("^GSPC", start="2000-01-01", end="2025-10-16") ##use 003718
 
 
-    df_drop=[]
-    for i in df_target.index:
-        if i not in index_comps.index:
-            df_drop.append(i)
-    df_target = df_target.drop(df_drop, axis=0)
-    df_drop=[]
-    for i in index_comps.index:
-        if i not in df_target.index:
-            df_drop.append(i)
-    index_comps = index_comps.drop(df_drop, axis=0)
     
     df_target['comp_1'] =index_comps['Close']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
