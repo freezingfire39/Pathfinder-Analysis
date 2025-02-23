@@ -230,10 +230,10 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
-    print (df_target)
+
     df_target = Analysis_class.rolling_volatility(df_target, df_target['comp_1'].pct_change(),rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
-
+    print (df_target)
     df_target = Analysis_class.plot_drawdown_underwater(df_target)
     df_target.replace([np.inf, -np.inf], np.nan, inplace=True)
     df_target.fillna(method='ffill',inplace=True)
