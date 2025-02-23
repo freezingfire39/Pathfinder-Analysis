@@ -225,6 +225,8 @@ def main(symbol_file_path,symbol,search_file_path):
     # Resample to month end and calculate the monthly percent change
     df_rets_monthly = df1.resample('M').last().pct_change().dropna()
 
+    print (df_target)
+    
     df_target = Analysis_class.market_capture_ratio(df_rets_monthly, df_target, rank_file_path = rank_file_path, input_file_path=symbol_file_path,security_code = Ticker)
 
 
