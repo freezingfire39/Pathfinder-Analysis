@@ -2,7 +2,7 @@ from airflow import DAG
 from airflow.decorators import task
 
 DATA_DATE = '{{ data_interval_end }}'
-DJANGO_URL = ''
+DJANGO_URL = 'localhost:8000'
 BODY = {"weights":[{"symbol":"000552", "weight": 0.35},
                         {"symbol":"000415", "weight":0.35},
                         {"symbol":"001309", "weight":0.15},
