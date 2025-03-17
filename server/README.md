@@ -4,6 +4,7 @@ pip install pyinstaller
 pyinstaller --onefile manage.py
 
 find the execute file at dist/manage
+move manage to /home/app
 ## how to deploy at server
 sudo vi /etc/systemd/system/myapp-py.service
 -------
