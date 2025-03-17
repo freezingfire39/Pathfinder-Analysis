@@ -25,9 +25,9 @@ def pull_result(**kwargs):
     import os
     import datetime
     date = datetime.datetime.now().strftime("%Y-%m-%d")
-    url = kwargs['url']
-    body = kwargs['body']
-    output = kwargs['output']
+    url = kwargs["templates_dict"]['url']
+    body = kwargs["templates_dict"]['body']
+    output = kwargs["templates_dict"]['output']
     full_url = url + "/api/v1/py/custom/portfolio/"
     response = requests.post(full_url, json=body)
     response.raise_for_status()
