@@ -38,7 +38,6 @@ def pull_result(**kwargs):
 
 with DAG(
     dag_id='default_portoflio',
-    schedule="0 10 * * 1-5" ,
     start_date=datetime(2020, 1, 1, tzinfo=local_tz),
     catchup=False,
     default_args=default_args,
