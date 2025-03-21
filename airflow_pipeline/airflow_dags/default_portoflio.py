@@ -3,7 +3,7 @@ import pendulum
 from airflow import DAG
 from airflow.decorators import task
 
-DJANGO_URL = '127.0.0.1:8000'
+DJANGO_URL = 'http://127.0.0.1:8000'
 BODY = {"weights":[{"symbol":"000552", "weight": 0.35},
                         {"symbol":"000415", "weight":0.35},
                         {"symbol":"001309", "weight":0.15},
