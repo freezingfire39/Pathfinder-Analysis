@@ -1,10 +1,15 @@
 #deployment process:
 pip install pyinstaller
 
+ssh app@13.250.6.53
+cd /home/app/Desktop/Pathfinder-Analysis/server
+rm -r dist
 pyinstaller --onefile manage.py
-
-find the execute file at dist/manage
-move manage to /home/app
+use local terminal to cp the data into server node:
+ scp app@13.250.6.53:/home/app/Desktop/Pathfinder-Analysis/server/dist/manage . 
+ scp manage app@api.fundureka.com:/home/app
+now go to the server node to do the following step:
+ssh app@api.fundureka.com
 ## how to deploy at server
 sudo vi /etc/systemd/system/myapp-py.service
 -------
@@ -19,6 +24,13 @@ Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 -------
+restart the server:
+sudo systemctl stop myapp-py.service 
+### if it has warming for deamon-reload run this command: 
+sudo systemctl daemon-reload 
+sudo systemctl start myapp-py.service 
+
+------- command for testing.
 Reload systemd: sudo systemctl daemon-reload
 Start/Enable the service(s): 
 sudo systemctl enable myapp-py.service
