@@ -32,7 +32,7 @@ def pull_result(**kwargs):
     response = requests.post(full_url, json=body)
     response.raise_for_status()
     result = response.json()
-    filename = os.path.join(output, "default_portoflio.json")
+    filename = os.path.join(output, "default_portfolio.json")
     with open(filename, "w") as file:
         json.dump(result, file, indent=4)
 
