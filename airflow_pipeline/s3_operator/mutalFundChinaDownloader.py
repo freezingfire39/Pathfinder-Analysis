@@ -48,7 +48,7 @@ if __name__ == "__main__":
     try:
         # main()
         # downloadFilePath = sys.argv[1]
-        downloadFilePath = 'output_china'
+        downloadFilePath = directory_path + 'output_china'
         main(downloadFilePath)
     except Exception as e:
         raise Exception("fail to run at error ", e)
