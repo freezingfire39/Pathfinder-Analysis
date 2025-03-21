@@ -1,3 +1,4 @@
+import json
 import os
 
 import pandas as pd
@@ -191,6 +192,18 @@ class CustomPortfolioView(OptimizePortfolioView):
         p.calc_historical_returns()
         return p
 
+
+class DefaultPortfolioView(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.fdir = "/home/app/Desktop/default_portfolio/default_portfolio.json"
+
+    def get(self, request):
+        with open(self.fdir, 'r') as file:
+            response_data = json.load(file)
+
+        output_serializer = AnalyzerOutputSerializer(response_data)
+        return Response(output_serializer.data, status=status.HTTP_200_OK)
 
 
 

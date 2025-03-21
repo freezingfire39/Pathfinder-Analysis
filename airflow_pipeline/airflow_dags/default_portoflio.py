@@ -3,7 +3,7 @@ import pendulum
 from airflow import DAG
 from airflow.decorators import task
 
-DJANGO_URL = '127.0.0.1:8000'
+DJANGO_URL = 'http://127.0.0.1:8000'
 BODY = {"weights":[{"symbol":"000552", "weight": 0.35},
                         {"symbol":"000415", "weight":0.35},
                         {"symbol":"001309", "weight":0.15},
@@ -32,13 +32,12 @@ def pull_result(**kwargs):
     response = requests.post(full_url, json=body)
     response.raise_for_status()
     result = response.json()
-    filename = os.path.join(output, f"{date}.json")
+    filename = os.path.join(output, "default_portfolio.json")
     with open(filename, "w") as file:
         json.dump(result, file, indent=4)
 
 with DAG(
     dag_id='default_portoflio',
-    schedule="0 10 * * 1-5" ,
     start_date=datetime(2020, 1, 1, tzinfo=local_tz),
     catchup=False,
     default_args=default_args,
