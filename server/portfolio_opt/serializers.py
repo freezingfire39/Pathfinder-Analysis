@@ -39,3 +39,6 @@ class AnalyzerOutputSerializer(serializers.Serializer):
     portfolio = PortfolioSerializer()
     analysis = AnalysisSerializer(many=True)
     score = ScoreSerializer(many=True)
+
+class TimingAnalyzerOutputSerializer(serializers.Serializer):
+    analysis = AnalysisSerializer(many=True)

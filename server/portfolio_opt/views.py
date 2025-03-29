@@ -12,7 +12,7 @@ from portfolio.factory import OptimizerFactory
 from portfolio.portfolio_ import Portfolio
 from portfolio.utils import enums
 from .serializers import OptimizationInputSerializer, OptimizedPortfolioSerializer, AnalyzerOutputSerializer, \
-    CustomInputSerializer
+    CustomInputSerializer, TimingAnalyzerOutputSerializer
 import numpy as np
 from scipy.optimize import minimize
 from django.conf import settings
@@ -204,6 +204,46 @@ class DefaultPortfolioView(APIView):
 
         output_serializer = AnalyzerOutputSerializer(response_data)
         return Response(output_serializer.data, status=status.HTTP_200_OK)
+
+
+class TimingPortfolioView(APIView):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.ret_file = "D:/workspace/timing/timing.csv"
+        self.rpath = settings.RANK_FILE_PATH
+        self.cpath = settings.COMMENTS_FILE_PATH
+        if self.rpath is None:
+            self.rpath = "D:/workspace/output_search/"
+        if self.cpath is None:
+            self.cpath = "D:/workspace/comments/"
+    def get(self, request):
+        df = pd.read_csv(self.ret_file)
+        df.rename(columns={'trade_date':'date', 'full_return':"return"}, inplace=True)
+        df['date']=pd.to_datetime(df['date'])
+        df.set_index('date', inplace=True)
+        analyzer = Analyzer(None, rank_file_path=self.rpath, comments_output_path=self.cpath)
+        df_target = analyzer.analyze_target(df)
+        df_target = df_target.drop(
+            columns=['positive_comp', 'negative_comp', 'benchmark_name', 'benchmark_name_2', '累计净值'])
+        df_target.fillna(0, inplace=True)
+        df_target.replace([np.inf, -np.inf], 0, inplace=True)
+        analyses = []
+        for col in df_target.columns:
+            values = [{"date": date.strftime('%Y-%m-%d'), "value": value} for date, value in
+                      zip(df_target.index, df_target[col])]
+            analyses.append({"type": col, "values": values})
+
+        response_data = {
+            "analysis": analyses,
+        }
+        output_serializer = TimingAnalyzerOutputSerializer(response_data)
+        return Response(output_serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+
+
 
 
 

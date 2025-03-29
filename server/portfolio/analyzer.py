@@ -10,7 +10,6 @@ class Analyzer:
 
     def __init__(self, portfolio, rank_file_path, comments_output_path):
         self.portfolio = portfolio
-        self.returns = self.portfolio.returns
         self.rank_file_path = rank_file_path
         self.comments_output_path = comments_output_path
         self.trading_days = 250
@@ -58,7 +57,7 @@ class Analyzer:
     #
     #     return drawdown_json, ""
 
-    def analyze(self):
+    def analyze_target(self, df_target):
         comp_file_path = 'index_comps.csv'
         comp_file_path_2 = 'industry_comps.csv'
         comp_file_path = os.path.join(self.rank_file_path, comp_file_path)
@@ -70,7 +69,6 @@ class Analyzer:
         self.rank_file_path = self.rank_file_path + "stock_"
         pa = PortfolioAnalysis(self.rank_file_path, self.comments_output_path)
         ticker = "Sample"
-        df_target = self.portfolio.returns
         trading_days = 250
         rolling_sharpe_df = pd.DataFrame(index=df_target.index,
                                          columns=['rolling_SR_comments', 'excess_return_comments', 'alpha_comments',
@@ -142,8 +140,10 @@ class Analyzer:
                                                           input_file_path=self.comments_output_path, security_code=ticker)
         return df_target
 
-
-
+    def analayze(self):
+        df_target = self.portfolio.returns
+        df_target = self.analyze_target(df_target)
+        return df_target
 
     def _to_json(self, series, col="return"):
         df = series.to_frame()
