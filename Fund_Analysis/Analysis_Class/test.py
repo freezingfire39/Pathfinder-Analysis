@@ -232,12 +232,12 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target.fillna(0,inplace=True)
     
-    df_target = df_target[df_target['rolling_SR'] != 0]
-    df_target = df_target[df_target['alpha'] != 0]
-    df_target = df_target[df_target['beta'] != 0]
-    df_target = df_target[df_target['vol'] != 0]
-    df_target = df_target[df_target['Upside_Capture'] != 0]
-    df_target = df_target[df_target['Downside_Capture'] != 0]
+    #df_target = df_target[df_target['rolling_SR'] != 0]
+    #df_target = df_target[df_target['alpha'] != 0]
+    #df_target = df_target[df_target['beta'] != 0]
+    #df_target = df_target[df_target['vol'] != 0]
+    #df_target = df_target[df_target['Upside_Capture'] != 0]
+    #df_target = df_target[df_target['Downside_Capture'] != 0]
 
 
 
