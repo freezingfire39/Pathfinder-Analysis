@@ -21,7 +21,7 @@ symbols_list = ['510050.SS', '159901.SZ', '159949.SZ', '510300.SS', '510500.SS',
 #array to store prices
 symbols=[]
 for ticker in symbols_list:
-    r = yf.download(ticker, start=start, end="2024-05-05")
+    r = yf.download(ticker, start=start, end="2025-05-05")
     # add a symbol column
     r['Symbol'] = ticker
     symbols.append(r)
@@ -43,7 +43,7 @@ symbols=[]
 #array to store prices
 symbols=[]
 for ticker in symbols_list:
-    r = yf.download(ticker, start=start, end="2024-05-05")
+    r = yf.download(ticker, start=start, end="2025-05-05")
     # add a symbol column
     r['Symbol'] = ticker
     symbols.append(r)
