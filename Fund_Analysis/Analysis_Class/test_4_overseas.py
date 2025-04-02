@@ -253,12 +253,12 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     
-    df_target = df_target[df_target['rolling_SR'] != 0]
-    df_target = df_target[df_target['alpha'] != 0]
-    df_target = df_target[df_target['beta'] != 0]
-    df_target = df_target[df_target['vol'] != 0]
-    df_target = df_target[df_target['Upside_Capture'] != 0]
-    df_target = df_target[df_target['Downside_Capture'] != 0]
+    #df_target = df_target[df_target['rolling_SR'] != 0]
+    #df_target = df_target[df_target['alpha'] != 0]
+    #df_target = df_target[df_target['beta'] != 0]
+    #df_target = df_target[df_target['vol'] != 0]
+    #df_target = df_target[df_target['Upside_Capture'] != 0]
+    #df_target = df_target[df_target['Downside_Capture'] != 0]
     
     df_target.to_csv(save_file_path)
     #Analysis_class.rolling_volatility(df_target, index_comps[comp_1_name])
