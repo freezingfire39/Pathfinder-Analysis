@@ -209,7 +209,7 @@ class DefaultPortfolioView(APIView):
 class TimingPortfolioView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.ret_file = "D:/workspace/timing/timing.csv"
+        self.ret_file = "/home/app/Desktop/timing/timing.csv"
         self.rpath = settings.RANK_FILE_PATH
         self.cpath = settings.COMMENTS_FILE_PATH
         if self.rpath is None:
