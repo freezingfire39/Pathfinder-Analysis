@@ -17,7 +17,8 @@ import numpy as np
 from scipy.optimize import minimize
 from django.conf import settings
 from portfolio.analyzer import Analyzer
-
+from pathlib import Path
+home = str(Path.home())
 
 class OptimizePortfolioView(APIView):
     def __init__(self, **kwargs):
@@ -209,7 +210,7 @@ class DefaultPortfolioView(APIView):
 class TimingPortfolioView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.ret_file = "/home/app/Desktop/timing/timing.csv"
+        self.ret_file = home + "/Desktop/timing/timing.csv"
         self.rpath = settings.RANK_FILE_PATH
         self.cpath = settings.COMMENTS_FILE_PATH
         if self.rpath is None:
