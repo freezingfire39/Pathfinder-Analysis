@@ -140,7 +140,7 @@ class Analyzer:
                                                           input_file_path=self.comments_output_path, security_code=ticker)
         return df_target
 
-    def analayze(self):
+    def analyze(self):
         df_target = self.portfolio.returns
         df_target = self.analyze_target(df_target)
         return df_target
