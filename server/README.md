@@ -5,6 +5,7 @@ ssh app@13.250.6.53
 cd /home/app/Desktop/Pathfinder-Analysis/server
 rm -r dist
 pyinstaller --onefile manage.py
+cp /home/app/Desktop/Pathfinder-Analysis/server/dist/manage /home/app
 use local terminal to cp the data into server node:
  scp app@13.250.6.53:/home/app/Desktop/Pathfinder-Analysis/server/dist/manage . 
  scp app@13.250.6.53:/home/app/Desktop/timing/timing.csv .
