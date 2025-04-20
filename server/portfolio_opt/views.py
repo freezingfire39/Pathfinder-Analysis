@@ -211,11 +211,12 @@ class TimingPortfolioView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.ret_file = home + "/Desktop/default_portfolio/timing.csv"
+        # self.ret_file = "D:/workspace/timing/timing.csv"
 
     def get(self, request):
         df = pd.read_csv(self.ret_file)
-
-        return Response(df.to_json(orient="records"), status=status.HTTP_200_OK)
+        json_return = df.to_json(orient="records")
+        return Response(json.loads(json_return), status=status.HTTP_200_OK)
 
 
 
