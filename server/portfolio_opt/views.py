@@ -210,35 +210,12 @@ class DefaultPortfolioView(APIView):
 class TimingPortfolioView(APIView):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.ret_file = home + "/Desktop/timing/timing.csv"
-        self.rpath = settings.RANK_FILE_PATH
-        self.cpath = settings.COMMENTS_FILE_PATH
-        if self.rpath is None:
-            self.rpath = "D:/workspace/output_search/"
-        if self.cpath is None:
-            self.cpath = "D:/workspace/comments/"
+        self.ret_file = home + "/Desktop/default_portfolio/timing.csv"
+
     def get(self, request):
         df = pd.read_csv(self.ret_file)
-        df.rename(columns={'trade_date':'date', 'full_return':"return"}, inplace=True)
-        df['date']=pd.to_datetime(df['date'])
-        df.set_index('date', inplace=True)
-        analyzer = Analyzer(None, rank_file_path=self.rpath, comments_output_path=self.cpath)
-        df_target = analyzer.analyze_target(df)
-        df_target = df_target.drop(
-            columns=['positive_comp', 'negative_comp', 'benchmark_name', 'benchmark_name_2', '累计净值'])
-        df_target.fillna(0, inplace=True)
-        df_target.replace([np.inf, -np.inf], 0, inplace=True)
-        analyses = []
-        for col in df_target.columns:
-            values = [{"date": date.strftime('%Y-%m-%d'), "value": value} for date, value in
-                      zip(df_target.index, df_target[col])]
-            analyses.append({"type": col, "values": values})
 
-        response_data = {
-            "analysis": analyses,
-        }
-        output_serializer = TimingAnalyzerOutputSerializer(response_data)
-        return Response(output_serializer.data, status=status.HTTP_200_OK)
+        return Response(df.to_json(orient="records"), status=status.HTTP_200_OK)
 
 
 
