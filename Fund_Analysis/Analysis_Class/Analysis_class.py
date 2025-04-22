@@ -515,11 +515,11 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_cum = ep.cum_returns(returns['return'], 1.0)
     drawdown_periods = get_top_drawdowns(returns, top=top)
     df_drawdowns = pd.DataFrame(index=list(range(top)),
-                                columns=['Net drawdown in %',
-                                         'Peak date',
-                                         'Valley date',
-                                         'Recovery date',
-                                         'Duration'])
+                                columns=['总回撤百分比',
+                                         '回撤最高点',
+                                         '回撤最低点',
+                                         '恢复日期',
+                                         '回撤持续天数'])
 
     for i, (peak, valley, recovery) in enumerate(drawdown_periods):
         if pd.isnull(recovery):
