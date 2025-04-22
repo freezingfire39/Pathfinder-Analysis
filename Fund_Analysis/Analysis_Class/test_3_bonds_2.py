@@ -185,19 +185,9 @@ def main(symbol_file_path,symbol,search_file_path):
     df_trade.set_index('nav_date',inplace=True)
     df_trade.index = pd.to_datetime(df_trade.index)
 
-    df_drop=[]
-    for i in df_target.index:
-        if i not in df_trade.index:
-            df_drop.append(i)
-    df_target = df_target.drop(df_drop, axis=0)
+    df_target = df_target[~df_target.index.duplicated(keep='first')]
 
-    df_drop=[]
-    for i in df_trade.index:
-        if i not in df_target.index:
-            df_drop.append(i)
-    df_trade = df_trade.drop(df_drop, axis=0)
-
-    
+    df_trade = df_trade[~df_trade.index.duplicated(keep='first')]    
 
     df_target['comp_1'] = df_trade['accum_nav']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
