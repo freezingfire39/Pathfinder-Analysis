@@ -168,7 +168,11 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target['fee_gap'] = df_target['net_return']-df_target['return']
     df_target_2 = Analysis_class.return_analysis(df_target_2,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type,security_code = Ticker)
 
-
+    #df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['vol'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    df_target_2=df_target_2.rename(columns={"return": "费前回报", "net_return": "费后回报"})
 
 
     
