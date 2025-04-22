@@ -239,10 +239,10 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target = df_target[df_target['Upside_Capture'] != 0]
     #df_target = df_target[df_target['Downside_Capture'] != 0]
     df_target['comp_1']=df_target['comp_1'].pct_change()
-    df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
-    df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
-    df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
-    df_target['vol'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['vol'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
 
 
     df_target.drop(['index_peers','industry_peers'],axis=1,inplace=True)
