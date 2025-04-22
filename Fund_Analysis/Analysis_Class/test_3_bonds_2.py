@@ -231,7 +231,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    df_target['comp_1'] = index_comps
+
     df1 = df_target[['累计净值', 'comp_1']]
 
 
