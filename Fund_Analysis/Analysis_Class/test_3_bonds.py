@@ -242,6 +242,15 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
 
+    df_target['comp_1']=df_target['comp_1'].pct_change()
+    #df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['vol'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    df_target=df_target.rename(columns={"return": "费前回报", "net_return": "费后回报", "comp_1": "对应指数回报", "excess_return": "超指数回报",
+                                       "alpha": "超额回报", "beta": "杠杆", "rolling_SR": "夏普比率", "excess_SR": "超额夏普",
+                                       "Upside_Capture": "牛市表现", "Downside_Capture": "熊市表现", "vol": "波动率", "excess_vol": "超指数波动"})
+
     df_target.fillna(0,inplace=True)
     
     #df_target = df_target[df_target['rolling_SR'] != 0]
