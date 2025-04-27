@@ -14,7 +14,7 @@ def get_all_files(input_file_path):
     for filename in os.listdir(input_file_path):
         if 'index_comps' in filename or 'industry_comps' in filename:
             continue
-        if filename.endswith('.csv') and 'benchmark' not in filename:
+        if filename.endswith('.csv'):
             csv_files.append(filename)
     return csv_files
 def main(input_file_path):
