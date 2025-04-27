@@ -23,6 +23,7 @@ def main(input_file_path):
         filepath = os.path.join(input_file_path, filename)
         print("reading file:",filepath)
         df = pd.read_csv(filepath)
+        df = df[~df.ticker.duplicated(keep='first')]
         if 'drawdown_duration' in filename or 'drawdown_amount' in filename or 'volatility' in filename:
             # sorting ascending
             sorted_df = df.sort_values(by='value', ascending=True)
