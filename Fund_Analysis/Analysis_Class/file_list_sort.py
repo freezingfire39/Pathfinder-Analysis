@@ -36,6 +36,26 @@ for root, dirs, files in os.walk(root_folder):
         missing_list.append(dirs[-6:])
 
 
-print (others_list)
-print (missing_list)
+with open("stock_list.json", 'w') as f:
+    # indent=2 is not needed but makes the file human-readable 
+    # if the data is nested
+    json.dump(stock_list, f, indent=2) 
+
+with open("bond_list.json", 'w') as f:
+    # indent=2 is not needed but makes the file human-readable 
+    # if the data is nested
+    json.dump(bond_list, f, indent=2) 
+
+
+with open("overseas_list.json", 'w') as f:
+    # indent=2 is not needed but makes the file human-readable 
+    # if the data is nested
+    json.dump(overseas_list, f, indent=2) 
+
+with open("money_market_list.json", 'w') as f:
+    # indent=2 is not needed but makes the file human-readable 
+    # if the data is nested
+    json.dump(money_market_list, f, indent=2) 
+
+
 
