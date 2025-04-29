@@ -37,5 +37,5 @@ for root, dirs, files in os.walk(root_folder):
 
 
 
-print (stock_list)
+print (missing_list)
 
