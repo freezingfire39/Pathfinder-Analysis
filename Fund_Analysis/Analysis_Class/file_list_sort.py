@@ -35,7 +35,10 @@ for root, dirs, files in os.walk(root_folder):
     else:
         missing_list.append(dirs)
 
-
-
-print (missing_list)
+print (len(stock_list))
+print (len(bond_list))
+print (len(overseas_list))
+print (len(money_market_list))
+print (len(others_list))
+print (len(missing_list))
 
