@@ -33,12 +33,9 @@ for root, dirs, files in os.walk(root_folder):
             others_list.append(ticker)
 
     else:
-        missing_list.append(dirs)
+        missing_list.append(dirs[-6:])
 
-print (len(stock_list))
-print (len(bond_list))
-print (len(overseas_list))
-print (len(money_market_list))
-print (len(others_list))
-print (len(missing_list))
+
+print (others_list)
+print (missing_list)
 
