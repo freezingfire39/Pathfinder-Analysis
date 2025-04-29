@@ -39,6 +39,6 @@ for root, dirs, files in os.walk(root_folder):
 print (stock_list)
 print (bond_list)
 print (money_market_list)
-print (overseas_market_list)
+print (overseas_list)
 print (others_list)
 print (missing_list)
