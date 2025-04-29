@@ -2,7 +2,7 @@ import os
 import pandas as pd
 
 stock_list=[]
-
+bond_list=[]
 money_market_list=[]
 overseas_list=[]
 others_list=[]
