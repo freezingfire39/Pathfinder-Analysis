@@ -14,6 +14,9 @@ root_folder = '/home/app/Desktop/output_china'
 for root, dirs, files in os.walk(root_folder):
     if target_filename in files:
         file_path = os.path.join(root, target_filename)
+        print (root)
+        print (dirs)
+        print (files)
         df = pd.read_csv(file_path)
         strategy = df['基金类型'].iloc[0]
         ticker = df['基金代码'].iloc[0]
