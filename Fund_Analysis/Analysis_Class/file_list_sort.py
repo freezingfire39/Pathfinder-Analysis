@@ -10,7 +10,7 @@ missing_list=[]
 
 target_filename = 'Background.csv'
 
-root_folder = '/app/Desktop/output_china'
+root_folder = '/home/app/Desktop/output_china'
 for root, dirs, files in os.walk(root_folder):
     if target_filename in files:
         file_path = os.path.join(root, target_filename)
