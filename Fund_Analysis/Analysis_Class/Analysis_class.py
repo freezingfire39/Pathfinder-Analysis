@@ -1006,13 +1006,14 @@ PERIODS['New Normal'] = (pd.Timestamp('20130101'),
 ##China Stock Crash
 PERIODS['New Normal'] = (pd.Timestamp('20070201'),
                          pd.Timestamp('20071101'))
-PERIODS['2015 Crash'] = (pd.Timestamp('20150601'),
+PERIODS['2015股灾] = (pd.Timestamp('20150601'),
                          pd.Timestamp('20160201'))
-PERIODS['2023 Crash'] = (pd.Timestamp('20231201'),
+PERIODS['新冠初期'] = (pd.Timestamp('20191201'),
+                         pd.Timestamp('20200601'))
+PERIODS['2023股灾'] = (pd.Timestamp('20231201'),
                          pd.Timestamp('20240222'))
                          
-PERIODS['Covid'] = (pd.Timestamp('20191201'),
-                         pd.Timestamp('20200601'))
+
 
 def print_table(table,
                 name=None,
