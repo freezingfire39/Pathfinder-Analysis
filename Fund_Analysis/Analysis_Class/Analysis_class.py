@@ -818,7 +818,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         
         success = Analysis_class.write_to_file_with_lock(
-        rank_file_path+'drawdown_duration_rank.csv'',
+        rank_file_path+'drawdown_duration_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
         retry_delay=0.5 # Customize delay between retries
@@ -841,7 +841,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
         success = Analysis_class.write_to_file_with_lock(
-        rank_file_path+'drawdown_amount_rank.csv'',
+        rank_file_path+'drawdown_amount_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
         retry_delay=0.5 # Customize delay between retries
@@ -1367,7 +1367,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
 
         new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         success = Analysis_class.write_to_file_with_lock(
-        rank_file_path+'alpha_rank.csv'',
+        rank_file_path+'alpha_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
         retry_delay=0.5 # Customize delay between retries
@@ -1398,7 +1398,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         #rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
            # new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         success = Analysis_class.write_to_file_with_lock(
-        rank_file_path+'positive_beta_rank.csv'',
+        rank_file_path+'positive_beta_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
         retry_delay=0.5 # Customize delay between retries
@@ -1415,7 +1415,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         #new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         success = Analysis_class.write_to_file_with_lock(
-        rank_file_path+'negative_beta_rank.csv'',
+        rank_file_path+'negative_beta_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
         retry_delay=0.5 # Customize delay between retries
@@ -1436,7 +1436,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     #rank_file.to_csv(rank_file_path+'positive_beta_benchmark.csv')
         #new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
     success = Analysis_class.write_to_file_with_lock_2(
-    rank_file_path+'positive_beta_benchmark.csv'',
+    rank_file_path+'positive_beta_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
     retry_delay=0.5 # Customize delay between retries
@@ -1454,7 +1454,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'alpha_benchmark.csv')
     success = Analysis_class.write_to_file_with_lock_2(
-    rank_file_path+'alpha_benchmark.csv'',
+    rank_file_path+'alpha_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
     retry_delay=0.5 # Customize delay between retries
