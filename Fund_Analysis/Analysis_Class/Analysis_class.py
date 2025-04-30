@@ -16,6 +16,90 @@ from matplotlib.ticker import FuncFormatter
 import utils
 import statsmodels.api as sm
 from statsmodels import regression
+import os
+import sys
+import time
+import fcntl # Unix/Linux
+import csv
+# import msvcrt # Windows alternative
+
+def write_to_file_with_lock(file_path, data_dict, max_retries=3, retry_delay=1):
+    """
+    Write content to a file with exclusive lock during the operation, with retry on failure.
+
+    Args:
+    file_path (str): Path to the file
+    content (str): Content to write to the file
+    max_retries (int): Maximum number of retry attempts (default: 3)
+    retry_delay (float): Delay between retries in seconds (default: 1)
+    """
+    attempt = 0
+    last_error = None
+
+    while attempt < max_retries:
+        attempt += 1
+        try:
+# Open the file in read-write mode, create if it doesn't exist
+            with open(file_path, 'a+') as file: # Using 'a+' mode to append
+                print(f"Attempt {attempt}: Locking file: {file_path}")
+
+                try:
+# Lock the file (exclusive lock)
+# Unix/Linux:
+                    fcntl.flock(file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+# Windows alternative:
+# msvcrt.locking(file.fileno(), msvcrt.LK_NBLCK, len(content))
+
+                    print("File locked. Writing content...")
+
+# Move to the start of the file if you want to overwrite
+
+
+                    fieldnames = ['Unnamed: 0','ticker', 'value', 'name', 'sharpe_ratio','return']
+                    writer = csv.DictWriter(file,fieldnames=fieldnames)
+
+# Write the content
+                    writer.writerow(data_dict)
+
+# Ensure content is written to disk
+                    file.flush()
+                    os.fsync(file.fileno())
+
+                    print("Content written successfully.")
+                    return True # Success
+
+                except (IOError, BlockingIOError) as e:
+# Lock acquisition failed (non-blocking mode)
+                    last_error = e
+                    if attempt < max_retries:
+                        print(f"File is locked by another process. Retrying in {retry_delay} seconds...")
+                        time.sleep(retry_delay)
+                        continue
+                    else:
+                        raise IOError(f"Failed to acquire lock after {max_retries} attempts") from e
+
+                finally:
+# Unlock the file if we got the lock
+                    if 'file' in locals() and file:
+                        print("Unlocking file...")
+# Unix/Linux:
+                        fcntl.flock(file, fcntl.LOCK_UN)
+# Windows alternative:
+# msvcrt.locking(file.fileno(), msvcrt.LK_UNLCK, len(content))
+
+        except IOError as e:
+            last_error = e
+            if attempt < max_retries:
+                print(f"Attempt {attempt} failed. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"Error after {max_retries} attempts: {e}", file=sys.stderr)
+                return False
+
+        print(f"Max retries ({max_retries}) exceeded. Last error: {last_error}", file=sys.stderr)
+        return False
+
+
 
 def resample_returns(df_returns, frequency='Q'):
     """
