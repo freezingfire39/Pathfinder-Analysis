@@ -286,7 +286,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
         comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较稳定")
         comment_csv.to_csv(input_file_path+'comments.csv')
         new_row = {'ticker': security_code, 'value': df_return_2.mean(), 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'auto_corr_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -357,7 +357,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
 
         new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         #rank_file.loc[len(rank_file)] = new_row
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'rolling_sharpe_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -377,7 +377,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'rolling_sharpe_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'rolling_sharpe_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -396,7 +396,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     rank_file = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1]}
 
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'excess_sharpe_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -420,7 +420,7 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
         #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'excess_sharpe_rank.csv')
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'excess_sharpe_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -817,7 +817,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
 
         new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'drawdown_duration_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -840,7 +840,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'drawdown_amount_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -857,7 +857,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'drawdown_amount_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'drawdown_amount_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -874,7 +874,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'drawdown_duration_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'drawdown_duration_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -1366,7 +1366,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     if returns['alpha'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'alpha_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -1397,7 +1397,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
            # new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'positive_beta_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -1414,7 +1414,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
         #new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'negative_beta_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -1435,7 +1435,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'positive_beta_benchmark.csv')
         #new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'positive_beta_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -1453,7 +1453,7 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'alpha_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'alpha_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -1636,7 +1636,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
         #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'upside_capture_rank.csv')
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'upside_capture_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -1656,7 +1656,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
         #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'downside_capture_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -1673,7 +1673,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'upside_capture_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'upside_capture_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -1691,7 +1691,7 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'downside_capture_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'downside_capture_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -1801,7 +1801,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'A50.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'A50.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1823,7 +1823,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Shenzhen100.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Shenzhen100.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1844,7 +1844,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Chuangye50.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Chuangye50.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1864,7 +1864,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Hushen300.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Hushen300.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1885,7 +1885,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Zhongzheng500.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Zhongzheng500.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1905,7 +1905,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Zhongzheng1000.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Zhongzheng1000.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1925,7 +1925,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Kechuang50.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Kechuang50.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1947,7 +1947,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Hangseng.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Hangseng.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1969,7 +1969,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Finance.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Finance.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -1991,7 +1991,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Pharmaceutical.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Pharmaceutical.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2011,7 +2011,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Healthcare.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Healthcare.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2031,7 +2031,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'FoodBeverage.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'FoodBeverage.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2052,7 +2052,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Energy.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Energy.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2073,7 +2073,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Semiconductor.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Semiconductor.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2093,7 +2093,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Software.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Software.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2114,7 +2114,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Military.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Military.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2134,7 +2134,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Chemicals.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Chemicals.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2155,7 +2155,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Manufacturing.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Manufacturing.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2176,7 +2176,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Metal.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Metal.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2197,7 +2197,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Agriculture.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Agriculture.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2218,7 +2218,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Infrastructure.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Infrastructure.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2238,7 +2238,7 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
                 #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
                 #rank_file.to_csv(rank_file_path_2+'Environmental.csv')
-                success = Analysis_class.write_to_file_with_lock(
+                success = write_to_file_with_lock(
                 rank_file_path_2+'Environmental.csv',
                 new_row,
                 max_retries=5, # Customize retry attempts
@@ -2397,7 +2397,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
         #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
         #rank_file.to_csv(rank_file_path+'volatility_rank.csv')
-        success = Analysis_class.write_to_file_with_lock(
+        success = write_to_file_with_lock(
         rank_file_path+'volatility_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -2409,7 +2409,7 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
     #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'volatility_benchmark.csv')
-    success = Analysis_class.write_to_file_with_lock_2(
+    success = write_to_file_with_lock_2(
     rank_file_path+'volatility_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
