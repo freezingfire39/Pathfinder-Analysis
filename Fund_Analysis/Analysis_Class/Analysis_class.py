@@ -995,7 +995,7 @@ PERIODS = OrderedDict()
 #                                         pd.Timestamp('20070801'))
 
 PERIODS['08年股灾'] = (pd.Timestamp('20070801'),
-#                        pd.Timestamp('20090401'))
+                        pd.Timestamp('20090401'))
 
 #PERIODS['Recovery'] = (pd.Timestamp('20090401'),
  #                      pd.Timestamp('20130101'))
