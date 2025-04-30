@@ -286,7 +286,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
         comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较稳定")
         comment_csv.to_csv(input_file_path+'comments.csv')
         new_row = {'ticker': security_code, 'value': df_return_2.mean(), 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-         success = Analysis_class.write_to_file_with_lock(
+        success = Analysis_class.write_to_file_with_lock(
         rank_file_path+'auto_corr_rank.csv',
         new_row,
         max_retries=5, # Customize retry attempts
@@ -1205,7 +1205,7 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
 
     print_table(pd.DataFrame(rets_interesting)
                       .describe().transpose()
-                      .loc[:, ['mean', 'min', 'max']] * 100,
+                      .loc[:, ['平均回报', '最低回报', '最高回报']] * 100,
                       name='Stress Events',
                       float_format='{0:.2f}%'.format)
 
