@@ -1198,6 +1198,8 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
     rets_interesting = extract_interesting_date_ranges(
         returns, periods)
 
+    print (rets_interesting)
+
     if not rets_interesting:
         warnings.warn('Passed returns do not overlap with any'
                       'interesting times.', UserWarning)
