@@ -1101,12 +1101,14 @@ def event_analysis(returns, benchmark_rets=None,
     rets_interesting = extract_interesting_date_ranges(
         returns, periods)
 
+    print (rets_interesting)
+
     if not rets_interesting:
         warnings.warn('Passed returns do not overlap with any'
                       'interesting times.', UserWarning)
         return
 
-    df_date = pd.DataFrame(rets_interesting).describe().transpose().loc[:, ['平均回报', '最低回报', '最高回报']] * 100
+    df_date = pd.DataFrame(rets_interesting).describe().transpose().loc[:, ['mean', 'min', 'max']] * 100
     print (df_date)
     df_date.to_csv('date.csv')
     if benchmark_rets is not None:
