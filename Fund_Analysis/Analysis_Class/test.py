@@ -127,13 +127,25 @@ def main(symbol_file_path,symbol,search_file_path):
 
     df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
 
-
-
-    rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+
+    success = write_to_file_with_lock(
+    search_file_path+asset_type+'return_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)
+
+    #rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
+
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+    #rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
 
     
 
