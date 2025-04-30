@@ -858,7 +858,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'drawdown_amount_benchmark.csv')
     success = Analysis_class.write_to_file_with_lock_2(
-    rank_file_path+'drawdown_amount_benchmark.csv'',
+    rank_file_path+'drawdown_amount_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
     retry_delay=0.5 # Customize delay between retries
@@ -875,7 +875,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
     #rank_file.to_csv(rank_file_path+'drawdown_duration_benchmark.csv')
     success = Analysis_class.write_to_file_with_lock_2(
-    rank_file_path+'drawdown_duration_benchmark.csv'',
+    rank_file_path+'drawdown_duration_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
     retry_delay=0.5 # Customize delay between retries
