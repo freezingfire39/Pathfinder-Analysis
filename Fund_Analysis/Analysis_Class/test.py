@@ -129,7 +129,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
     new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
 
-    success = write_to_file_with_lock(
+    success = Analysis_class.write_to_file_with_lock_2(
     search_file_path+asset_type+'return_benchmark.csv',
     new_row,
     max_retries=5, # Customize retry attempts
@@ -198,11 +198,32 @@ def main(symbol_file_path,symbol,search_file_path):
     if df_target['annual_return'][-1] > df_benchmark['value'].quantile(0.8):
 
         new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
-        
+        success = Analysis_class.write_to_file_with_lock(
+        return_rank_file_path,
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)
     rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
     new_row = {'ticker': Ticker, 'value': df_target['CAGR'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
+
+    success = Analysis_class.write_to_file_with_lock(
+    cagr_rank_file_path,
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)
+    
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
 
