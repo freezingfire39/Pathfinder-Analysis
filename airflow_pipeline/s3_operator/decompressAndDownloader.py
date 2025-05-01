@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 
 home = str(Path.home())
-bucket_name = 'mutal-fund-china-01'  # Same bucket as before
+bucket_name = 'migration-bucket-21'  # Same bucket as before
 
 
 def download_from_s3(bucket_name, s3_key, local_path):
