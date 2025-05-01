@@ -760,10 +760,7 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_drawdowns['Recovery date'] = pd.to_datetime(
         df_drawdowns['Recovery date'])
     
-    df_drawdowns=df_drawdowns.rename(columns={"Net drawdown in %": "总回撤百分比", "Peak date": "回撤高点日期", "Valley date": "回撤低点日期", "Recovery date": "恢复日期",
-                                       "Duration": "回撤持续时间" })
-    
-    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
+
     returns['drawdown_duration'] = 0
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
@@ -939,7 +936,10 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         comment_csv.to_csv(input_file_path+'comments.csv')
     
     
+    df_drawdowns=df_drawdowns.rename(columns={"Net drawdown in %": "总回撤百分比", "Peak date": "回撤高点日期", "Valley date": "回撤低点日期", "Recovery date": "恢复日期",
+                                       "Duration": "回撤持续时间" })
     
+    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
     
         
     return returns
