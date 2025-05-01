@@ -730,11 +730,11 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_cum = ep.cum_returns(returns['return'], 1.0)
     drawdown_periods = get_top_drawdowns(returns, top=top)
     df_drawdowns = pd.DataFrame(index=list(range(top)),
-                                columns=['总回撤百分比',
-                                         '回撤最高点',
-                                         '回撤最低点',
-                                         '恢复日期',
-                                         '回撤持续天数'])
+                                columns=['Net drawdown in %',
+                                         'Peak date',
+                                         'Valley date',
+                                         'Recovery date',
+                                         'Duration'])
 
     for i, (peak, valley, recovery) in enumerate(drawdown_periods):
         if pd.isnull(recovery):
@@ -759,6 +759,10 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_drawdowns['Valley date'] = pd.to_datetime(df_drawdowns['Valley date'])
     df_drawdowns['Recovery date'] = pd.to_datetime(
         df_drawdowns['Recovery date'])
+    
+    df_target=df_target.rename(columns={"Net drawdown in %": "总回撤百分比", "Peak date": "回撤高点日期", "Valley date": "回撤低点日期", "Recovery date": "恢复日期",
+                                       "Duration": "回撤持续时间" })
+    
     df_drawdowns.to_csv(input_file_path+'drawdown.csv')
     returns['drawdown_duration'] = 0
     returns['drawdown_amount'] = 0
