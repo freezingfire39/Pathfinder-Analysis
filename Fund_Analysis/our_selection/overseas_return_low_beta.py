@@ -9,7 +9,7 @@ rank_csv_2 = pd.read_csv(input_path+'overseas_return_rank.csv').set_index('Unnam
 df = pd.DataFrame(columns = rank_csv_2.columns)
 
 for i in range(len(rank_csv_2)):
-    ticker = rank_csv_2['ticker'][i]
+    ticker = rank_csv_2['ticker'].iloc[i]
     if ticker in rank_csv_1['ticker'].values:
         df = df.append(rank_csv_2.iloc[i], ignore_index=True)
 
