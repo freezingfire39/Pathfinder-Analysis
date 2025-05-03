@@ -34,7 +34,7 @@ default_args = {
 }
 
 dag = DAG(
-    's3_uploader_search', default_args=default_args,
+    's3_uploader_all', default_args=default_args,
     user_defined_filters= {'localtz': localize_ny_tz},
     catchup=False,
     schedule_interval=None
