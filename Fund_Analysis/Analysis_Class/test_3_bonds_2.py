@@ -138,20 +138,26 @@ def main(symbol_file_path,symbol,search_file_path):
 
     rank_file = pd.read_csv(search_file_path+asset_type+'return_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+    #rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+    success = Analysis_class.write_to_file_with_lock_2(
+    search_file_path+asset_type+'return_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)
 
 
     df_target['CAGR'] = 0
 
     df_target['CAGR'].iloc[-1] = (df_target['累计净值'].iloc[-1]/df_target['累计净值'].iloc[0])**(1/(len(df_target)/trading_days))
 
-
-    rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
-    new_row = {'ticker': Ticker, 'value': df_target['CAGR'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    rank_file.to_csv(cagr_rank_file_path)
 
     ##calculate net return
     df_background = pd.read_csv(background_file_path)
@@ -180,16 +186,18 @@ def main(symbol_file_path,symbol,search_file_path):
     import tushare as ts
     pro = ts.pro_api('84be1015becc0b9dbbab507552c328cbf447bc02cbd29cfa09029bc6')
 
-    df_trade = pro.fund_nav(ts_code='511260.SH', start_date='20180101', end_date='20251229')
+    df_trade = pro.fund_nav(ts_code='511260.SH', start_date='20100101', end_date='20251229')
     df_trade = df_trade.iloc[::-1]
     df_trade.set_index('nav_date',inplace=True)
     df_trade.index = pd.to_datetime(df_trade.index)
 
+    df_target = df_target[~df_target.index.duplicated(keep='first')]
+
+    df_trade = df_trade[~df_trade.index.duplicated(keep='first')]    
+
     df_target['comp_1'] = df_trade['accum_nav']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
-    index_comps = index_comps['Close']
 
-    index_comps.index = pd.to_datetime(index_comps.index)
 
 
 
@@ -201,7 +209,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     df_target['rolling_mean'] = df_target['return'].rolling(trading_days).mean()
-    df_target['comp_mean'] = index_comps.rolling(trading_days).mean()
+    df_target['comp_mean'] = df_target['comp_1'].rolling(trading_days).mean()
 
     df_target = Analysis_class.rolling_sharpe(df_target,rank_file_path = rank_file_path, input_file_path = symbol_file_path,security_code = Ticker, asset_type = asset_type)
 
@@ -211,13 +219,40 @@ def main(symbol_file_path,symbol,search_file_path):
     if df_target['annual_return'][-1] > df_benchmark['value'].quantile(0.8):
 
         new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1], 'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
-        rank_file.to_csv(return_rank_file_path)
+        #rank_file.loc[len(rank_file)] = new_row
+        #rank_file.to_csv(return_rank_file_path)
+        #new_row = {'ticker': Ticker, 'value': df_target['annual_return'][-1]}
+    #rank_file.loc[len(rank_file)] = new_row
+    #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
+    #rank_file.to_csv(search_file_path+asset_type+'return_benchmark.csv')
+        success = Analysis_class.write_to_file_with_lock(
+        return_rank_file_path,
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)
         
     rank_file = pd.read_csv(cagr_rank_file_path).set_index('Unnamed: 0')
     new_row = {'ticker': Ticker, 'value': df_target['CAGR'][-1],'name': df_target['fund_name'][-1], 'sharpe_ratio': df_target['rolling_SR'][-1], 'return': df_target['return'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
-    rank_file.to_csv(cagr_rank_file_path)
+
+    success = Analysis_class.write_to_file_with_lock(
+    cagr_rank_file_path,
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)
+    #rank_file.loc[len(rank_file)] = new_row
+    #rank_file.to_csv(cagr_rank_file_path)
 
     
     df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = rank_file_path, asset_type=asset_type,security_code = Ticker)
@@ -229,7 +264,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
 
-    df_target['comp_1'] = index_comps
+
     df1 = df_target[['累计净值', 'comp_1']]
 
 
@@ -248,7 +283,16 @@ def main(symbol_file_path,symbol,search_file_path):
 
     Analysis_class.event_analysis(df_target['return'], benchmark_rets=df_target['comp_1'].pct_change())
 
-    df_target = Analysis_class.return_forecast(df_target, index_comps,asset_type=asset_type)
+    df_target = Analysis_class.return_forecast(df_target, df_target['comp_1'],asset_type=asset_type)
+
+    df_target['comp_1']=df_target['comp_1'].pct_change()
+    #df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    #df_target['vol'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
+    df_target=df_target.rename(columns={"return": "费前回报", "net_return": "费后回报", "comp_1": "对应指数回报", "excess_return": "超指数回报",
+                                       "alpha": "超额回报", "beta": "杠杆", "rolling_SR": "夏普比率", "excess_SR": "超额夏普",
+                                       "Upside_Capture": "牛市表现", "Downside_Capture": "熊市表现", "vol": "波动率", "excess_vol": "超指数波动"})
 
 
     df_target.fillna(0,inplace=True)

@@ -16,6 +16,167 @@ from matplotlib.ticker import FuncFormatter
 import utils
 import statsmodels.api as sm
 from statsmodels import regression
+import os
+import sys
+import time
+import fcntl # Unix/Linux
+import csv
+# import msvcrt # Windows alternative
+
+def write_to_file_with_lock(file_path, data_dict, max_retries=3, retry_delay=1):
+    """
+    Write content to a file with exclusive lock during the operation, with retry on failure.
+
+    Args:
+    file_path (str): Path to the file
+    content (str): Content to write to the file
+    max_retries (int): Maximum number of retry attempts (default: 3)
+    retry_delay (float): Delay between retries in seconds (default: 1)
+    """
+    attempt = 0
+    last_error = None
+
+    while attempt < max_retries:
+        attempt += 1
+        try:
+# Open the file in read-write mode, create if it doesn't exist
+            with open(file_path, 'a+') as file: # Using 'a+' mode to append
+                print(f"Attempt {attempt}: Locking file: {file_path}")
+
+                try:
+# Lock the file (exclusive lock)
+# Unix/Linux:
+                    fcntl.flock(file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+# Windows alternative:
+# msvcrt.locking(file.fileno(), msvcrt.LK_NBLCK, len(content))
+
+                    print("File locked. Writing content...")
+
+# Move to the start of the file if you want to overwrite
+
+
+                    fieldnames = ['Unnamed: 0','ticker', 'value', 'name', 'sharpe_ratio','return']
+                    writer = csv.DictWriter(file,fieldnames=fieldnames)
+
+# Write the content
+                    writer.writerow(data_dict)
+
+# Ensure content is written to disk
+                    file.flush()
+                    os.fsync(file.fileno())
+
+                    print("Content written successfully.")
+                    return True # Success
+
+                except (IOError, BlockingIOError) as e:
+# Lock acquisition failed (non-blocking mode)
+                    last_error = e
+                    if attempt < max_retries:
+                        print(f"File is locked by another process. Retrying in {retry_delay} seconds...")
+                        time.sleep(retry_delay)
+                        continue
+                    else:
+                        raise IOError(f"Failed to acquire lock after {max_retries} attempts") from e
+
+                finally:
+# Unlock the file if we got the lock
+                    if 'file' in locals() and file:
+                        print("Unlocking file...")
+# Unix/Linux:
+                        fcntl.flock(file, fcntl.LOCK_UN)
+# Windows alternative:
+# msvcrt.locking(file.fileno(), msvcrt.LK_UNLCK, len(content))
+
+        except IOError as e:
+            last_error = e
+            if attempt < max_retries:
+                print(f"Attempt {attempt} failed. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"Error after {max_retries} attempts: {e}", file=sys.stderr)
+                return False
+
+        print(f"Max retries ({max_retries}) exceeded. Last error: {last_error}", file=sys.stderr)
+        return False
+
+
+
+def write_to_file_with_lock_2(file_path, data_dict, max_retries=3, retry_delay=1):
+    """
+    Write content to a file with exclusive lock during the operation, with retry on failure.
+
+    Args:
+    file_path (str): Path to the file
+    content (str): Content to write to the file
+    max_retries (int): Maximum number of retry attempts (default: 3)
+    retry_delay (float): Delay between retries in seconds (default: 1)
+    """
+    attempt = 0
+    last_error = None
+
+    while attempt < max_retries:
+        attempt += 1
+        try:
+# Open the file in read-write mode, create if it doesn't exist
+            with open(file_path, 'a+') as file: # Using 'a+' mode to append
+                print(f"Attempt {attempt}: Locking file: {file_path}")
+
+                try:
+# Lock the file (exclusive lock)
+# Unix/Linux:
+                    fcntl.flock(file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+# Windows alternative:
+# msvcrt.locking(file.fileno(), msvcrt.LK_NBLCK, len(content))
+
+                    print("File locked. Writing content...")
+
+# Move to the start of the file if you want to overwrite
+
+
+                    fieldnames = ['Unnamed: 0','ticker', 'value']
+                    writer = csv.DictWriter(file,fieldnames=fieldnames)
+
+# Write the content
+                    writer.writerow(data_dict)
+
+# Ensure content is written to disk
+                    file.flush()
+                    os.fsync(file.fileno())
+
+                    print("Content written successfully.")
+                    return True # Success
+
+                except (IOError, BlockingIOError) as e:
+# Lock acquisition failed (non-blocking mode)
+                    last_error = e
+                    if attempt < max_retries:
+                        print(f"File is locked by another process. Retrying in {retry_delay} seconds...")
+                        time.sleep(retry_delay)
+                        continue
+                    else:
+                        raise IOError(f"Failed to acquire lock after {max_retries} attempts") from e
+
+                finally:
+# Unlock the file if we got the lock
+                    if 'file' in locals() and file:
+                        print("Unlocking file...")
+# Unix/Linux:
+                        fcntl.flock(file, fcntl.LOCK_UN)
+# Windows alternative:
+# msvcrt.locking(file.fileno(), msvcrt.LK_UNLCK, len(content))
+
+        except IOError as e:
+            last_error = e
+            if attempt < max_retries:
+                print(f"Attempt {attempt} failed. Retrying in {retry_delay} seconds...")
+                time.sleep(retry_delay)
+            else:
+                print(f"Error after {max_retries} attempts: {e}", file=sys.stderr)
+                return False
+
+        print(f"Max retries ({max_retries}) exceeded. Last error: {last_error}", file=sys.stderr)
+        return False
+
 
 def resample_returns(df_returns, frequency='Q'):
     """
@@ -125,9 +286,16 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
         comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较稳定")
         comment_csv.to_csv(input_file_path+'comments.csv')
         new_row = {'ticker': security_code, 'value': df_return_2.mean(), 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        success = write_to_file_with_lock(
+        rank_file_path+'auto_corr_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )    
+    
+    #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'auto_corr_rank.csv')
+        #rank_file.to_csv(rank_file_path+'auto_corr_rank.csv')
 
     else:
         comment_csv.at[comment_csv.index[-1],'return_corr_comments']  = ("这只基金的历史回报较不稳定")
@@ -188,15 +356,38 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     if returns['rolling_SR'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
+        success = write_to_file_with_lock(
+        rank_file_path+'rolling_sharpe_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)
+    
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
+        #rank_file.to_csv(rank_file_path+'rolling_sharpe_rank.csv')
     
     rank_file = pd.read_csv(rank_file_path+'rolling_sharpe_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['rolling_SR'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'rolling_sharpe_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'rolling_sharpe_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'rolling_sharpe_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)
     
     
     returns['excess_return'].fillna(method='ffill',inplace=True)
@@ -204,18 +395,42 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
 
     rank_file = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+
+    success = write_to_file_with_lock_2(
+    rank_file_path+'excess_sharpe_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)    
+
+#rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'excess_sharpe_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'excess_sharpe_benchmark.csv')
 
     rank_file = pd.read_csv(rank_file_path+'excess_sharpe_rank.csv').set_index('Unnamed: 0')
     df_benchmark = pd.read_csv(rank_file_path+'excess_sharpe_benchmark.csv').set_index('Unnamed: 0')
     if returns['excess_SR'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['excess_SR'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'excess_sharpe_rank.csv')
+        #rank_file.to_csv(rank_file_path+'excess_sharpe_rank.csv')
+        success = write_to_file_with_lock(
+        rank_file_path+'excess_sharpe_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)
         
     comment_csv = pd.read_csv(input_file_path+'comments.csv').set_index('净值日期')
     if returns['excess_SR'].iloc[-1] < (returns['excess_return'].mean()/returns['excess_return'].std())-0.1:
@@ -544,7 +759,8 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     df_drawdowns['Valley date'] = pd.to_datetime(df_drawdowns['Valley date'])
     df_drawdowns['Recovery date'] = pd.to_datetime(
         df_drawdowns['Recovery date'])
-    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
+    
+
     returns['drawdown_duration'] = 0
     returns['drawdown_amount'] = 0
     returns['drawdown_duration'] = returns['drawdown_duration'].astype(int)
@@ -601,30 +817,75 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
     if returns['drawdown_duration'].iloc[-1] < df_benchmark['value'].quantile(0.1):
 
         new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        
+        success = write_to_file_with_lock(
+        rank_file_path+'drawdown_duration_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)    
+    #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
+        #rank_file.to_csv(rank_file_path+'drawdown_duration_rank.csv')
         
     rank_file = pd.read_csv(rank_file_path+'drawdown_amount_rank.csv').set_index('Unnamed: 0')
     df_benchmark = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
     if returns['drawdown_amount'].iloc[-1] < df_benchmark['value'].quantile(0.05):
 
         new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
+        #rank_file.to_csv(rank_file_path+'drawdown_amount_rank.csv')
+        success = write_to_file_with_lock(
+        rank_file_path+'drawdown_amount_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)    
 
     rank_file = pd.read_csv(rank_file_path+'drawdown_amount_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['drawdown_amount'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'drawdown_amount_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'drawdown_amount_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'drawdown_amount_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)    
     
     rank_file = pd.read_csv(rank_file_path+'drawdown_duration_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['drawdown_duration'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'drawdown_duration_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'drawdown_duration_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'drawdown_duration_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)    
     
     
     
@@ -675,7 +936,10 @@ def gen_drawdown_table(returns, rank_file_path,security_code,input_file_path,top
         comment_csv.to_csv(input_file_path+'comments.csv')
     
     
+    df_drawdowns=df_drawdowns.rename(columns={"Net drawdown in %": "总回撤百分比", "Peak date": "回撤高点日期", "Valley date": "回撤低点日期", "Recovery date": "恢复日期",
+                                       "Duration": "回撤持续时间" })
     
+    df_drawdowns.to_csv(input_file_path+'drawdown.csv')
     
         
     return returns
@@ -688,71 +952,72 @@ def max_drawdown_analysis(returns, rank_file_path,security_code,input_file_path)
 
 PERIODS = OrderedDict()
 # Dotcom bubble
-PERIODS['Dotcom'] = (pd.Timestamp('20000310'), pd.Timestamp('20000910'))
+#PERIODS['Dotcom'] = (pd.Timestamp('20000310'), pd.Timestamp('20000910'))
 
 # Lehmann Brothers
-PERIODS['Lehman'] = (pd.Timestamp('20080801'), pd.Timestamp('20081001'))
+#PERIODS['08年股灾'] = (pd.Timestamp('20080801'), pd.Timestamp('20081001'))
 
 # 9/11
-PERIODS['9/11'] = (pd.Timestamp('20010911'), pd.Timestamp('20011011'))
+#PERIODS['9/11'] = (pd.Timestamp('20010911'), pd.Timestamp('20011011'))
 
 # 05/08/11  US down grade and European Debt Crisis 2011
-PERIODS[
-    'US downgrade/European Debt Crisis'] = (pd.Timestamp('20110805'),
-                                            pd.Timestamp('20110905'))
+#PERIODS[
+#    'US downgrade/European Debt Crisis'] = (pd.Timestamp('20110805'),
+#                                            pd.Timestamp('20110905'))
 
 # 16/03/11  Fukushima melt down 2011
-PERIODS['Fukushima'] = (pd.Timestamp('20110316'), pd.Timestamp('20110416'))
+#PERIODS['Fukushima'] = (pd.Timestamp('20110316'), pd.Timestamp('20110416'))
 
 # 01/08/03  US Housing Bubble 2003
-PERIODS['US Housing'] = (
-    pd.Timestamp('20030108'), pd.Timestamp('20030208'))
+#PERIODS['US Housing'] = (
+#    pd.Timestamp('20030108'), pd.Timestamp('20030208'))
 
 # 06/09/12  EZB IR Event 2012
-PERIODS['EZB IR Event'] = (
-    pd.Timestamp('20120910'), pd.Timestamp('20121010'))
+#PERIODS['EZB IR Event'] = (
+#    pd.Timestamp('20120910'), pd.Timestamp('20121010'))
 
 # August 2007, March and September of 2008, Q1 & Q2 2009,
-PERIODS['Aug07'] = (pd.Timestamp('20070801'), pd.Timestamp('20070901'))
-PERIODS['Mar08'] = (pd.Timestamp('20080301'), pd.Timestamp('20080401'))
-PERIODS['Sept08'] = (pd.Timestamp('20080901'), pd.Timestamp('20081001'))
-PERIODS['2009Q1'] = (pd.Timestamp('20090101'), pd.Timestamp('20090301'))
-PERIODS['2009Q2'] = (pd.Timestamp('20090301'), pd.Timestamp('20090601'))
+#PERIODS['Aug07'] = (pd.Timestamp('20070801'), pd.Timestamp('20070901'))
+#PERIODS['Mar08'] = (pd.Timestamp('20080301'), pd.Timestamp('20080401'))
+#PERIODS['Sept08'] = (pd.Timestamp('20080901'), pd.Timestamp('20081001'))
+#PERIODS['2009Q1'] = (pd.Timestamp('20090101'), pd.Timestamp('20090301'))
+#PERIODS['2009Q2'] = (pd.Timestamp('20090301'), pd.Timestamp('20090601'))
 
 # Flash Crash (May 6, 2010 + 1 week post),
-PERIODS['Flash Crash'] = (
-    pd.Timestamp('20100505'), pd.Timestamp('20100510'))
+#PERIODS['Flash Crash'] = (
+#    pd.Timestamp('20100505'), pd.Timestamp('20100510'))
 
 # April and October 2014).
-PERIODS['Apr14'] = (pd.Timestamp('20140401'), pd.Timestamp('20140501'))
-PERIODS['Oct14'] = (pd.Timestamp('20141001'), pd.Timestamp('20141101'))
+#PERIODS['Apr14'] = (pd.Timestamp('20140401'), pd.Timestamp('20140501'))
+#PERIODS['Oct14'] = (pd.Timestamp('20141001'), pd.Timestamp('20141101'))
 
 # Market down-turn in August/Sept 2015
-PERIODS['Fall2015'] = (pd.Timestamp('20150815'), pd.Timestamp('20150930'))
+#PERIODS['Fall2015'] = (pd.Timestamp('20150815'), pd.Timestamp('20150930'))
 
 # Market regimes
-PERIODS['Low Volatility Bull Market'] = (pd.Timestamp('20050101'),
-                                         pd.Timestamp('20070801'))
+#PERIODS['Low Volatility Bull Market'] = (pd.Timestamp('20050101'),
+#                                         pd.Timestamp('20070801'))
 
-PERIODS['GFC Crash'] = (pd.Timestamp('20070801'),
+PERIODS['08年股灾'] = (pd.Timestamp('20070801'),
                         pd.Timestamp('20090401'))
 
-PERIODS['Recovery'] = (pd.Timestamp('20090401'),
-                       pd.Timestamp('20130101'))
+#PERIODS['Recovery'] = (pd.Timestamp('20090401'),
+ #                      pd.Timestamp('20130101'))
 
-PERIODS['New Normal'] = (pd.Timestamp('20130101'),
-                         pd.Timestamp('today'))
+#PERIODS['New Normal'] = (pd.Timestamp('20130101'),
+#                         pd.Timestamp('today'))
                          
 ##China Stock Crash
-PERIODS['New Normal'] = (pd.Timestamp('20070201'),
-                         pd.Timestamp('20071101'))
-PERIODS['2015 Crash'] = (pd.Timestamp('20150601'),
+#PERIODS['New Normal'] = (pd.Timestamp('20070201'),
+#                         pd.Timestamp('20071101'))
+PERIODS['2015股灾'] = (pd.Timestamp('20150601'),
                          pd.Timestamp('20160201'))
-PERIODS['2023 Crash'] = (pd.Timestamp('20231201'),
+PERIODS['新冠初期'] = (pd.Timestamp('20191201'),
+                         pd.Timestamp('20200601'))
+PERIODS['2023股灾'] = (pd.Timestamp('20231201'),
                          pd.Timestamp('20240222'))
                          
-PERIODS['Covid'] = (pd.Timestamp('20191201'),
-                         pd.Timestamp('20200601'))
+
 
 def print_table(table,
                 name=None,
@@ -839,6 +1104,8 @@ def event_analysis(returns, benchmark_rets=None,
 
     rets_interesting = extract_interesting_date_ranges(
         returns, periods)
+
+    print (rets_interesting)
 
     if not rets_interesting:
         warnings.warn('Passed returns do not overlap with any'
@@ -937,6 +1204,8 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
     rets_interesting = extract_interesting_date_ranges(
         returns, periods)
 
+    print (rets_interesting)
+
     if not rets_interesting:
         warnings.warn('Passed returns do not overlap with any'
                       'interesting times.', UserWarning)
@@ -944,7 +1213,7 @@ def create_interesting_times_tear_sheet(returns, benchmark_rets=None,
 
     print_table(pd.DataFrame(rets_interesting)
                       .describe().transpose()
-                      .loc[:, ['mean', 'min', 'max']] * 100,
+                      .loc[:, ['平均回报', '最低回报', '最高回报']] * 100,
                       name='Stress Events',
                       float_format='{0:.2f}%'.format)
 
@@ -1105,9 +1374,21 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     if returns['alpha'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        success = write_to_file_with_lock(
+        rank_file_path+'alpha_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)        
+    
+    #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'alpha_rank.csv')
+        #rank_file.to_csv(rank_file_path+'alpha_rank.csv')
         
     rank_file = pd.read_csv(rank_file_path+'positive_beta_rank.csv').set_index('Unnamed: 0')
     df_benchmark = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
@@ -1120,29 +1401,77 @@ def alpha_beta_analysis(returns, comp, security_code,rank_file_path,input_file_p
     if returns['beta'][-1] > df_benchmark['value'].quantile(0.9):
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
+        #rank_file.to_csv(rank_file_path+'positive_beta_rank.csv')
+           # new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
+        success = write_to_file_with_lock(
+        rank_file_path+'positive_beta_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)        
         
     rank_file = pd.read_csv(rank_file_path+'negative_beta_rank.csv').set_index('Unnamed: 0')
     if returns['beta'][-1] < df_benchmark['value'].quantile(0.1):
 
         new_row = {'ticker': security_code, 'value': returns['beta'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
+        success = write_to_file_with_lock(
+        rank_file_path+'negative_beta_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)                
+#rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'negative_beta_rank.csv')
+        #rank_file.to_csv(rank_file_path+'negative_beta_rank.csv')
 
     rank_file = pd.read_csv(rank_file_path+'positive_beta_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['beta'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'positive_beta_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'positive_beta_benchmark.csv')
+        #new_row = {'ticker': security_code, 'value': returns['alpha'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
+    success = write_to_file_with_lock_2(
+    rank_file_path+'positive_beta_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)        
+
 
     rank_file = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['alpha'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'alpha_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'alpha_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'alpha_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)        
     
     
     df_benchmark = pd.read_csv(rank_file_path+'alpha_benchmark.csv').set_index('Unnamed: 0')
@@ -1312,30 +1641,75 @@ def market_capture_ratio(returns, returns_daily, security_code, rank_file_path,i
     if returns_daily['Upside_Capture'][-1] > df_benchmark['value'].quantile(0.6):
 
         new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1], 'name': returns_daily['fund_name'][-1], 'sharpe_ratio': returns_daily['rolling_SR'][-1], 'return': returns_daily['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'upside_capture_rank.csv')
+        #rank_file.to_csv(rank_file_path+'upside_capture_rank.csv')
+        success = write_to_file_with_lock(
+        rank_file_path+'upside_capture_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)        
     
     
     rank_file = pd.read_csv(rank_file_path+'downside_capture_rank.csv').set_index('Unnamed: 0')
     if returns_daily['Downside_Capture'][-1] < df_benchmark_2['value'].quantile(0.4):
 
         new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1], 'name': returns_daily['fund_name'][-1], 'sharpe_ratio': returns_daily['rolling_SR'][-1], 'return': returns_daily['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
+        #rank_file.to_csv(rank_file_path+'downside_capture_rank.csv')
+        success = write_to_file_with_lock(
+        rank_file_path+'downside_capture_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
+
+        if success:
+            print("File write completed successfully.")
+        else:
+            print("Failed to write to file after multiple attempts.", file=sys.stderr)     
 
     rank_file = pd.read_csv(rank_file_path+'upside_capture_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns_daily['Upside_Capture'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'upside_capture_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'upside_capture_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'upside_capture_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)     
+
 
     rank_file = pd.read_csv(rank_file_path+'downside_capture_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns_daily['Downside_Capture'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'downside_capture_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'downside_capture_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'downside_capture_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
+
+    if success:
+        print("File write completed successfully.")
+    else:
+        print("Failed to write to file after multiple attempts.", file=sys.stderr)    
     
     
     
@@ -1432,9 +1806,16 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'A50.csv')
+                #rank_file.to_csv(rank_file_path_2+'A50.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'A50.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
+ 
                 
         elif comp_1_name=="159901.SZ":
             returns.at[returns.index[-1],'benchmark_name'] = '深圳100（深A大盘股）'
@@ -1447,9 +1828,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Shenzhen100.csv')
+                #rank_file.to_csv(rank_file_path_2+'Shenzhen100.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Shenzhen100.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="159949.SZ":
@@ -1462,9 +1849,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Chuangye50.csv')
+                #rank_file.to_csv(rank_file_path_2+'Chuangye50.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Chuangye50.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
                 
             #print ("本基金与创业板有较强的相关性。")
         elif comp_1_name=="510300.SS":
@@ -1476,9 +1869,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Hushen300.csv')
+                #rank_file.to_csv(rank_file_path_2+'Hushen300.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Hushen300.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             #print ("本基金与沪深300有较强的相关性。")
         elif comp_1_name=="510500.SS":
@@ -1491,9 +1890,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Zhongzheng500.csv')
+                #rank_file.to_csv(rank_file_path_2+'Zhongzheng500.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Zhongzheng500.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             #print ("本基金与中证500（中盘股）有较强的相关性。")
         elif comp_1_name=="512100.SS":
@@ -1505,9 +1910,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Zhongzheng1000.csv')
+                #rank_file.to_csv(rank_file_path_2+'Zhongzheng1000.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Zhongzheng1000.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             #print ("本基金与中证1000（小盘股）有较强的相关性。")
         elif comp_1_name=="588000.SS":
@@ -1519,9 +1930,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Kechuang50.csv')
+                #rank_file.to_csv(rank_file_path_2+'Kechuang50.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Kechuang50.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             #print ("本基金与科创板有较强的相关性。")
         elif comp_1_name=="510900.SS":
@@ -1535,9 +1952,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Hangseng.csv')
+                #rank_file.to_csv(rank_file_path_2+'Hangseng.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Hangseng.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="510230.SS":
@@ -1551,9 +1974,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Finance.csv')
+                #rank_file.to_csv(rank_file_path_2+'Finance.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Finance.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="512010.SS":
@@ -1567,9 +1996,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Pharmaceutical.csv')
+                #rank_file.to_csv(rank_file_path_2+'Pharmaceutical.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Pharmaceutical.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
                 
         elif comp_1_name=="512170.SS":
             #print ("This etf correlates with Healthcare Sector")
@@ -1581,9 +2016,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Healthcare.csv')
+                #rank_file.to_csv(rank_file_path_2+'Healthcare.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Healthcare.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
                 
         elif comp_1_name=="515170.SS":
             #print ("This etf correlates with Food & Beverage Sector")
@@ -1595,9 +2036,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'FoodBeverage.csv')
+                #rank_file.to_csv(rank_file_path_2+'FoodBeverage.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'FoodBeverage.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="516160.SS":
@@ -1610,9 +2057,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Energy.csv')
+                #rank_file.to_csv(rank_file_path_2+'Energy.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Energy.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="512480.SS":
@@ -1625,9 +2078,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Semiconductor.csv')
+                #rank_file.to_csv(rank_file_path_2+'Semiconductor.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Semiconductor.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
         elif comp_1_name=="515230.SS":
             #print ("This etf correlates with Software")
@@ -1639,9 +2098,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Software.csv')
+                #rank_file.to_csv(rank_file_path_2+'Software.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Software.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="512660.SS":
@@ -1654,9 +2119,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Military.csv')
+                #rank_file.to_csv(rank_file_path_2+'Military.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Military.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
         elif comp_1_name=="516220.SS":
             #print ("This etf correlates with Chemicals")
@@ -1668,9 +2139,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Chemicals.csv')
+                #rank_file.to_csv(rank_file_path_2+'Chemicals.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Chemicals.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="516800.SS":
@@ -1683,9 +2160,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Manufacturing.csv')
+                #rank_file.to_csv(rank_file_path_2+'Manufacturing.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Manufacturing.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
                 
             
         elif comp_1_name=="512400.SS":
@@ -1698,9 +2181,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Metal.csv')
+                #rank_file.to_csv(rank_file_path_2+'Metal.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Metal.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
         elif comp_1_name=="159825.SZ":
@@ -1713,9 +2202,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Agriculture.csv')
+                #rank_file.to_csv(rank_file_path_2+'Agriculture.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Agriculture.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
                 
                 
         elif comp_1_name=="516950.SS":
@@ -1728,9 +2223,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Infrastructure.csv')
+                #rank_file.to_csv(rank_file_path_2+'Infrastructure.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Infrastructure.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
         elif comp_1_name=="516070.SS":
             #print ("This etf correlates with Environmental")
@@ -1742,9 +2243,15 @@ def corr_analysis(returns,comp, security_code, rank_file_path, rank_file_path_2,
             if corr_df[comp_1_name] > 0.9 and comp_1_name in comp.columns:
 
                 new_row = {'ticker': security_code, 'value': corr_df[comp_1_name], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-                rank_file.loc[len(rank_file)] = new_row
+                #rank_file.loc[len(rank_file)] = new_row
                 #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-                rank_file.to_csv(rank_file_path_2+'Environmental.csv')
+                #rank_file.to_csv(rank_file_path_2+'Environmental.csv')
+                success = write_to_file_with_lock(
+                rank_file_path_2+'Environmental.csv',
+                new_row,
+                max_retries=5, # Customize retry attempts
+                retry_delay=0.5 # Customize delay between retries
+                )
             
             
     if corr_df[comp_2_name] < -0.9:
@@ -1895,15 +2402,27 @@ def rolling_volatility(returns, comp, rank_file_path,security_code,input_file_pa
     if returns['vol'][-1] < df_benchmark['value'].quantile(0.1):
 
         new_row = {'ticker': security_code, 'value': returns['vol'][-1], 'name': returns['fund_name'][-1], 'sharpe_ratio': returns['rolling_SR'][-1], 'return': returns['annual_return'][-1]}
-        rank_file.loc[len(rank_file)] = new_row
+        #rank_file.loc[len(rank_file)] = new_row
         #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-        rank_file.to_csv(rank_file_path+'volatility_rank.csv')
+        #rank_file.to_csv(rank_file_path+'volatility_rank.csv')
+        success = write_to_file_with_lock(
+        rank_file_path+'volatility_rank.csv',
+        new_row,
+        max_retries=5, # Customize retry attempts
+        retry_delay=0.5 # Customize delay between retries
+        )
         
     rank_file = pd.read_csv(rank_file_path+'volatility_benchmark.csv').set_index('Unnamed: 0')
     new_row = {'ticker': security_code, 'value': returns['vol'][-1]}
-    rank_file.loc[len(rank_file)] = new_row
+    #rank_file.loc[len(rank_file)] = new_row
     #rank_file['ticker'] = rank_file['ticker'].apply('="{}"'.format)
-    rank_file.to_csv(rank_file_path+'volatility_benchmark.csv')
+    #rank_file.to_csv(rank_file_path+'volatility_benchmark.csv')
+    success = write_to_file_with_lock_2(
+    rank_file_path+'volatility_benchmark.csv',
+    new_row,
+    max_retries=5, # Customize retry attempts
+    retry_delay=0.5 # Customize delay between retries
+    )
     
     
     
