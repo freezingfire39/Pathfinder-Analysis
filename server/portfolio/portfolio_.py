@@ -34,7 +34,8 @@ class Fund:
         prices["date"] = prices["净值日期"]
         prices["date"] = pd.to_datetime(prices["date"])
         prices.set_index("date",inplace=True)
-        self.returns = prices["return"].reset_index().set_index('date')
+        #self.returns = prices["return"].reset_index().set_index('date')
+        self.returns = prices["费前回报"].reset_index().set_index('date')
 
     def get_returns(self):
         return self.returns
