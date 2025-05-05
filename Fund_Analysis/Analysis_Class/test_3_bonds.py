@@ -169,8 +169,11 @@ def main(symbol_file_path,symbol,search_file_path):
     management_fee = df_background['管理费率'].iloc[0].split("%")[0]
     df_target['fund_name']=0
     df_target.at[df_target.index[-1],'fund_name']  = str(df_background['基金简称'][0])
+    try:
+        management_fee = float(management_fee)/100
 
-    management_fee = float(management_fee)/100
+    except
+        management_fee = 0.002
 
     custody_fee = df_background['托管费率'].iloc[0].split("%")[0]
     custody_fee = float(custody_fee)/100
