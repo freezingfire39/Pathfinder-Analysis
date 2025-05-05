@@ -442,12 +442,12 @@ def rolling_sharpe(returns, rank_file_path,input_file_path,security_code,asset_t
     elif returns['rolling_SR'].iloc[-1] > (returns['return'].mean()/returns['return'].std())+0.1:
         #print ("This fund's has performed below its historical average in the last 6 months.")
         #print ("本基金最近一年的夏普指数高于其历史平均水平，意味着策略的近期表现有所上升。")
-        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现强于对标的基准指数"+returns['benchmark_name'][-1]
+        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现强于对标的基准指数"+str(returns['benchmark_name'][-1])
 
         comment_csv.to_csv(input_file_path+'comments.csv')
     else:
         #print ("This fund's has performed inline with its historical average in the last 6 months.")
-        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现持平对标的基准指数"+returns['benchmark_name'][-1]
+        comment_csv.at[comment_csv.index[-1],'excess_return_comments']  = "本基金最近一年的基本表现持平对标的基准指数"+str(returns['benchmark_name'][-1])
 
 
         comment_csv.to_csv(input_file_path+'comments.csv')
