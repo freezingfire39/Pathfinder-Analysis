@@ -7,10 +7,8 @@ rm -r dist
 pyinstaller --onefile manage.py
 cp /home/app/Desktop/Pathfinder-Analysis/server/dist/manage /home/app
 use local terminal to cp the data into server node:
- scp app@13.250.6.53:/home/app/Desktop/Pathfinder-Analysis/server/dist/manage . 
- scp app@13.250.6.53:/home/app/Desktop/timing/timing.csv .
+ scp app@13.250.6.53:/home/app/Desktop/Pathfinder-Analysis/server/dist/manage .
  scp manage app@api.fundureka.com:/home/app
- scp timing.csv app@api.fundureka.com:/home/app/Desktop/timing
 now go to the server node to do the following step:
 ssh app@api.fundureka.com
 ## how to deploy at server
