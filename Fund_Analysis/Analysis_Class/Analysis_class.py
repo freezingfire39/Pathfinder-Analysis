@@ -274,7 +274,7 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
             comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动但最近一年的表现显著低于对应的基准指数"+str(returns['benchmark_name'][-1]))
             comment_csv.to_csv(input_file_path+'comments.csv')
         else:
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动，最近一年的表现与对应的基准指数"+str(returns['benchmark_name'][-1]+"基本一致"))
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动，最近一年的表现与对应的基准指数"+str(returns['benchmark_name'][-1])+"基本一致")
             comment_csv.to_csv(input_file_path+'comments.csv')
 
     df_return = returns['累计净值'].resample('3M').last()
