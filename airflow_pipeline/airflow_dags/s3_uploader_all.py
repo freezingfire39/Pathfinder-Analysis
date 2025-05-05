@@ -143,7 +143,7 @@ python_op_2 = BashOperator(
     trigger_rule='all_success',
     # bash_command='cd /home/app/Desktop/Pathfinder-Analysis/EastMoney_Scraper/scripts && python funds.eastmoney.py'
     bash_command='python /home/app/Desktop/Pathfinder-Analysis/airflow_pipeline/s3_operator/compressAndUploader.py '
-                 '/home/app/Desktop/output_china,/home/app/Desktop/output_search,/home/app/Desktop/timing,/home/app/Desktop/default_portfolio'
+                 '/home/app/Desktop/output_china,/home/app/Desktop/output_search,/home/app/Desktop/default_portfolio'
 )
 
 
