@@ -74,7 +74,7 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target_2['purchase_days']=0
     df_target_2['purchase_days_2']=0
     if len(df_test_1)==0:
-        df_target.at[df_target.index[-1],'purchase_comments']  = "本基金一直都是开放认购。"
+        df_target_2.at[df_target_2.index[-1],'purchase_comments']  = "本基金一直都是开放认购。"
     
     
     #print ("This fund is always open for investment")
