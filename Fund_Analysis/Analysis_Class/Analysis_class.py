@@ -242,39 +242,39 @@ def return_analysis(returns,input_file_path, rank_file_path, asset_type,security
     
     if returns['return'][-1]>df_benchmark['value'].quantile(0.6):
         if returns['excess_SR'][-1]>df_benchmark_2['value'].quantile(0.6):
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报并且最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报并且最近一年的表现显著超出对应的基准指数"+str(returns['benchmark_name'][-1]))
             comment_csv.to_csv(input_file_path+'comments.csv')
 
         elif returns['excess_SR'][-1]<df_benchmark_2['value'].quantile(0.4):
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("虽然本基金取得了较强的回报，但是最近一年的表现显著低于对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("虽然本基金取得了较强的回报，但是最近一年的表现显著低于对应的基准指数"+str(returns['benchmark_name'][-1]))
             comment_csv.to_csv(input_file_path+'comments.csv')
         else:
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较强的回报，最近一年的表现与对应的基准指数"+str(returns['benchmark_name'][-1])+"基本一致")
             comment_csv.to_csv(input_file_path+'comments.csv')
 
     elif returns['return'][-1]<df_benchmark['value'].quantile(0.4):
         if returns['excess_SR'][-1]>df_benchmark_2['value'].quantile(0.6):
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报但最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报但最近一年的表现显著超出对应的基准指数"+str(returns['benchmark_name'][-1]))
             comment_csv.to_csv(input_file_path+'comments.csv')
 
         elif returns['excess_SR'][-1]<df_benchmark['value'].quantile(0.4):
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报并且最近一年的表现显著低于对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报并且最近一年的表现显著低于对应的基准指数"+str(returns['benchmark_name'][-1]))
             
             comment_csv.to_csv(input_file_path+'comments.csv')
         else:
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金取得了较低的回报，最近一年的表现与对应的基准指数"+str(returns['benchmark_name'][-1])+"基本一致")
             comment_csv.to_csv(input_file_path+'comments.csv')
 
     else:
         if returns['excess_SR'][-1]>df_benchmark_2['value'].quantile(0.6):
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金的净值没有太大的变动但最近一年的表现显著超出对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金的净值没有太大的变动但最近一年的表现显著超出对应的基准指数"+str(returns['benchmark_name'][-1]))
             comment_csv.to_csv(input_file_path+'comments.csv')
             
         elif returns['excess_SR'][-1]<df_benchmark_2['value'].quantile(0.4):
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动但最近一年的表现显著低于对应的基准指数"+returns['benchmark_name'][-1])
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动但最近一年的表现显著低于对应的基准指数"+str(returns['benchmark_name'][-1]))
             comment_csv.to_csv(input_file_path+'comments.csv')
         else:
-            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动，最近一年的表现与对应的基准指数"+returns['benchmark_name'][-1]+"基本一致")
+            comment_csv.at[comment_csv.index[-1],'return_comments']  = ("本基金没有太大的变动，最近一年的表现与对应的基准指数"+str(returns['benchmark_name'][-1]+"基本一致"))
             comment_csv.to_csv(input_file_path+'comments.csv')
 
     df_return = returns['累计净值'].resample('3M').last()
