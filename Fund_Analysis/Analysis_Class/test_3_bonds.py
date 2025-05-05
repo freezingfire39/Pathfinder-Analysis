@@ -172,7 +172,7 @@ def main(symbol_file_path,symbol,search_file_path):
     try:
         management_fee = float(management_fee)/100
 
-    except
+    except:
         management_fee = 0.002
 
     custody_fee = df_background['托管费率'].iloc[0].split("%")[0]
