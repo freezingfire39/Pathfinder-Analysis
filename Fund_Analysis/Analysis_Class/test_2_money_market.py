@@ -79,7 +79,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     #print ("This fund is always open for investment")
     elif len(df_test_2)==0:
-        df_target_2.at[df_target.index[-1],'purchase_comments']  = "本基金尚未开放认购。"
+        df_target_2.at[df_target_2.index[-1],'purchase_comments']  = "本基金尚未开放认购。"
     else:
         if df_target_2['申购状态'][-1]=="开放申购":
             df_target_2.at[df_target_2.index[-1],'purchase_comments']  = "本基金目前开放认购。"
