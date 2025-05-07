@@ -46,6 +46,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     df_test_4 = df_target['申购状态'].resample('D').last()
     df_test_4 = df_test_4.fillna(method='ffill')
+    df_test_4.dropna(inplace=True)
 
     df_test_1 = df_test_4[df_test_4.str.contains("暂停申购")]
     df_test_2 = df_test_4[df_test_4.str.contains("开放申购")]
