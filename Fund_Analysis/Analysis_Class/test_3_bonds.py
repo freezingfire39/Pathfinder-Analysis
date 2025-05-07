@@ -207,7 +207,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     index_comps = df_trade['accum_nav']
-    index_comps['comp_1'] = index_comps['comp_1'].fillna(method='ffill')
+    index_comps = index_comps.fillna(method='ffill')
 
     index_comps.index = pd.to_datetime(index_comps.index)
 
