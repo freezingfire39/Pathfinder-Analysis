@@ -155,7 +155,7 @@ def main(symbol_file_path,symbol,search_file_path):
     rank_file.loc[len(rank_file)] = new_row
     rank_file.to_csv(cagr_rank_file_path)
 
-    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type)
+    df_target = Analysis_class.return_analysis(df_target,input_file_path = symbol_file_path,rank_file_path = search_file_path+asset_type, asset_type=asset_type, security_code = Ticker)
     
     
     
