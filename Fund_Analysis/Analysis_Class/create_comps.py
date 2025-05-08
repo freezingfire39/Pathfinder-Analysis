@@ -14,6 +14,8 @@ import yfinance as yf
 from datetime import datetime
 from pathlib import Path
 home = str(Path.home())
+from curl_cffi import requests
+session = requests.Session(impersonate="chrome")
 
 start = datetime(2010, 1, 1)
 symbols_list = ['510050.SS', '159901.SZ', '159949.SZ', '510300.SS', '510500.SS', '512100.SS', '588000.SS', '510900.SS']
@@ -31,7 +33,7 @@ symbols_list = ['510050.SS', '159901.SZ', '159949.SZ', '510300.SS', '510500.SS',
 #df = df.reset_index()
 #df = df[['Date', 'Close', 'Symbol']]
 #df.head()
-df_pivot=yf.download(symbols_list, start=start, end="2025-05-05")
+df_pivot=yf.download(symbols_list, start=start, end="2025-05-05", session=session)
 df_pivot = df_pivot['Close']
 #df_pivot.set_index('Date',inplace=True)
 #df_pivot.index = pd.to_datetime(df_pivot.index)
@@ -57,7 +59,7 @@ symbols_list = ['510230.SS', '512010.SS', '512170.SS', '515170.SS', '512480.SS',
 #df_pivot=df.pivot('Date','Symbol','Close').reset_index()
 
 
-df_pivot=yf.download(symbols_list, start=start, end="2025-05-05")
+df_pivot=yf.download(symbols_list, start=start, end="2025-05-05", session=session)
 df_pivot = df_pivot['Close']
 #df_pivot.set_index('Date',inplace=True)
 #df_pivot.index = pd.to_datetime(df_pivot.index)
