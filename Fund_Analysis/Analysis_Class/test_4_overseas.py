@@ -183,13 +183,26 @@ def main(symbol_file_path,symbol,search_file_path):
 
     
 
-    index_comps = yf.download("SPY", start="2000-01-01", end="2025-10-16") ##use 003718
+    import tushare as ts
+    pro = ts.pro_api('84be1015becc0b9dbbab507552c328cbf447bc02cbd29cfa09029bc6')
+
+    df_trade = pro.us_daily(ts_code='AAPL', start_date='20100101', end_date='20251204')
+    df_trade = df_trade.iloc[::-1]
+    df_trade.set_index('trade_date',inplace=True)
+    df_trade.index = pd.to_datetime(df_trade.index)
+
+    df_target = df_target[~df_target.index.duplicated(keep='first')]
+
+    df_trade = df_trade[~df_trade.index.duplicated(keep='first')]    
+
+    df_target['comp_1'] = df_trade['close']
+    df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
 
 
     
-    df_target['comp_1'] =index_comps['Close']
-    df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
-    index_comps = index_comps['Close']
+    #df_target['comp_1'] =index_comps['Close']
+    #df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
+    index_comps = df_trade['close']
 
     index_comps.index = pd.to_datetime(index_comps.index)
 
