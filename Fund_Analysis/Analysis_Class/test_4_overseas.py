@@ -5,6 +5,8 @@ import numpy as np
 import sys
 from pathlib import Path
 home = str(Path.home())
+from curl_cffi import requests
+session = requests.Session(impersonate="chrome")
 
 def main(symbol_file_path,symbol,search_file_path):
     #asset_type='stock_'
@@ -198,7 +200,7 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target['comp_1'] = df_trade['close']
     #df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
 
-    index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16") ##use 003718
+    index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16",sessions=sessions) ##use 003718
     print (index_comps)
 
     df_target['comp_1'] =index_comps['Close'].pct_change()
