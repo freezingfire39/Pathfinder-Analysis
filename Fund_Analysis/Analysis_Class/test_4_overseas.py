@@ -207,7 +207,7 @@ def main(symbol_file_path,symbol,search_file_path):
     
     df_target['comp_1'] =index_comps['Close']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
-    index_comps = df_trade['close']
+
 
     index_comps.index = pd.to_datetime(index_comps.index)
 
