@@ -6,7 +6,7 @@ from pathlib import Path
 import tempfile
 
 home = str(Path.home())
-bucket_name = 'migration-bucket-21'  # Same bucket as before
+bucket_name = 'migration-bucket-21'
 
 
 def download_from_s3(bucket_name, s3_key, local_path):
@@ -23,8 +23,8 @@ def download_from_s3(bucket_name, s3_key, local_path):
         s3.download_file(bucket_name, s3_key, local_path)
         print(f"Downloaded {s3_key} to {local_path}")
         return True
-    except NoCredentialsError:
-        print("Credentials not available")
+    except NoCredentialsError as e:
+        print(f"Credentials not available: {str(e)}")
         return False
     except Exception as e:
         print(f"Error downloading from S3: {str(e)}")
@@ -77,11 +77,12 @@ def download_and_extract(bucket_name, s3_keys, download_dir=None, keep_zips=Fals
         # Download the zip file
         zip_filename = os.path.basename(s3_key)
         local_zip_path = os.path.join(download_dir, zip_filename)
-
+        # local_zip_path = (download_dir)
         if download_from_s3(bucket_name, s3_key, local_zip_path):
             # Extract the zip file
-            extract_path = os.path.join(download_dir, os.path.splitext(zip_filename)[0])
-            os.makedirs(extract_path, exist_ok=True)
+            # extract_path = os.path.join(download_dir, os.path.splitext(zip_filename)[0])
+            extract_path = download_dir
+            # os.makedirs(extract_path, exist_ok=True)
 
             if unzip_file(local_zip_path, extract_path):
                 print(f"Successfully extracted {s3_key} to {extract_path}")
