@@ -7,4 +7,5 @@ rm -r ~/Desktop/default_portfolio
 rm -r ~/Desktop/output_search
 ./decompressAndDownloader --keys output_search.zip --dir /home/app/Desktop
 rm -r ~/Desktop/output_china
-3. ./decompressAndDownloader --keys output_china.zip --dir /home/app/Desktop
+./decompressAndDownloader --keys output_china.zip --dir /home/app/Desktop
+3. 
