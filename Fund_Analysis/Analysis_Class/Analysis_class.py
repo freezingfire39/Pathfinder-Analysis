@@ -21,6 +21,7 @@ import sys
 import time
 import fcntl # Unix/Linux
 import csv
+import warnings
 # import msvcrt # Windows alternative
 
 def write_to_file_with_lock(file_path, data_dict, max_retries=3, retry_delay=1):
