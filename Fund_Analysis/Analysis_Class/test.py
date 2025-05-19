@@ -117,6 +117,15 @@ def main(symbol_file_path,symbol,search_file_path):
     df_target.set_index('净值日期',inplace=True)
     df_target = df_target.fillna(method='ffill')
     df_target['return'] = df_target['累计净值'].pct_change()
+
+    for i in range(len(df_target)):
+        if df_target['return'][i]>1:
+            df_target['return'][i]=0
+
+
+
+
+    
     df_target['cum_return'] = (1+df_target['return']).cumprod()-1
 
     df_target['annual_return'] = (1+df_target['return']).rolling(window=trading_days).apply(np.prod, raw=True)-1
@@ -272,6 +281,7 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target = df_target[df_target['Upside_Capture'] != 0]
     #df_target = df_target[df_target['Downside_Capture'] != 0]
     df_target['comp_1']=df_target['comp_1'].pct_change()
+    df_target['comp_1'] = df_target['comp_1'].cumsum()
     #df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
     #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
     #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
