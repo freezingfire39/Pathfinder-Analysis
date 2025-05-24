@@ -200,15 +200,31 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target['comp_1'] = df_trade['close']
     #df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
 
-    index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16",session=session) ##use 003718
-    print (index_comps)
+    #index_comps = yf.download("^GSPC", start="2000-01-01", end="2024-10-16",session=session) ##use 003718
+    #print (index_comps)
 
-    df_target['comp_1'] =index_comps['Close'].pct_change()
-    
-    df_target['comp_1'] =index_comps['Close']
+    #df_target['comp_1'] =index_comps['Close'].pct_change()
+
+    df_trade = pro.fund_nav(ts_code='003718.SH', start_date='20100101', end_date='20251229')
+    df_trade = df_trade.iloc[::-1]
+    df_trade.set_index('nav_date',inplace=True)
+    df_trade.index = pd.to_datetime(df_trade.index)
+
+    df_target = df_target[~df_target.index.duplicated(keep='first')]
+
+    df_trade = df_trade[~df_trade.index.duplicated(keep='first')]    
+
+    df_target['comp_1'] = df_trade['accum_nav']
     df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
 
-    index_comps = index_comps['Close']
+
+
+    index_comps = df_trade['accum_nav']
+    
+    #df_target['comp_1'] =index_comps['Close']
+    #df_target['comp_1'] = df_target['comp_1'].fillna(method='ffill')
+
+    #index_comps = index_comps['Close']
     index_comps.index = pd.to_datetime(index_comps.index)
 
 
@@ -303,9 +319,9 @@ def main(symbol_file_path,symbol,search_file_path):
     #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
     #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
     #df_target['vol'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
-    df_target=df_target.rename(columns={"return": "费前回报", "net_return": "费后回报", "comp_1": "对应指数回报", "excess_return": "超指数回报",
-                                       "alpha": "超额回报", "beta": "杠杆", "rolling_SR": "夏普比率", "excess_SR": "超额夏普",
-                                       "Upside_Capture": "牛市表现", "Downside_Capture": "熊市表现", "vol": "波动率", "excess_vol": "超指数波动"})
+    #df_target=df_target.rename(columns={"return": "费前回报", "net_return": "费后回报", "comp_1": "对应指数回报", "excess_return": "超指数回报",
+    #                                   "alpha": "超额回报", "beta": "杠杆", "rolling_SR": "夏普比率", "excess_SR": "超额夏普",
+    #                                   "Upside_Capture": "牛市表现", "Downside_Capture": "熊市表现", "vol": "波动率", "excess_vol": "超指数波动"})
 
     df_target.fillna(0,inplace=True)
 
