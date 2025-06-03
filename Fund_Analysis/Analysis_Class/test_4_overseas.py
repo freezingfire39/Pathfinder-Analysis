@@ -315,6 +315,7 @@ def main(symbol_file_path,symbol,search_file_path):
 
 
     df_target['comp_1']=df_target['comp_1'].pct_change()
+    df_target['comp_1'] = df_target['comp_1'].cumsum()
     #df_target['return'] = df_target['return'].apply(lambda x: "{:.2%}".format(x))
     #df_target['net_return'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
     #df_target['comp_1'] = df_target['net_return'].apply(lambda x: "{:.2%}".format(x))
